@@ -1,9 +1,10 @@
 <?php
 
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\ProfileController;
 use App\Http\Middleware\AdminAcess;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\DashboardController;
 use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 
 Route::get('/', function () {
@@ -18,9 +19,13 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     //Esta rota foi criada para permitir o middleware AdminAcess
-    Route::middleware([AdminAcess::class])->group(function () {
-        Route::get('/dashboard', [DashboardController::class, 'dashboardView'])->name('dashboard');
-    });
+        Route::middleware([AdminAcess::class])->group(function () {
+            Route::get('/dashboard', [DashboardController::class, 'dashboardView'])->name('dashboard');
+            Route::get('/adminpanel/manage_users', [UserController::class, 'index'])->name('adminpanel.manage.users');
+            Route::resource('users',UserController::class);
+            
+
+        });
     
     
 });

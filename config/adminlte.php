@@ -86,7 +86,7 @@ return [
     'auth_logo' => [
         'enabled' => false,
         'img' => [
-            'path' => 'asset(vendor/adminlte/dist/img/acsj_logo)',
+            'path' => 'vendor/adminlte/dist/img/acsj_logo.png',
             'alt' => 'Auth Logo',
             'class' => '',
             'width' => 50,
@@ -257,7 +257,7 @@ return [
     */
 
     'use_route_url' => false,
-    'dashboard_url' => 'home',
+    'dashboard_url' => '/',
     'logout_url' => 'logout',
     'login_url' => 'login',
     'register_url' => 'register',
@@ -321,7 +321,7 @@ return [
             'can' => 'manage-blog',
         ],
         [
-            'text' => 'pages',
+            'text' => 'Páginas',
             'url' => 'admin/pages',
             'icon' => 'far fa-fw fa-file',
             'label' => 4,
@@ -329,12 +329,12 @@ return [
         ],
         ['header' => 'account_settings'],
         [
-            'text' => 'profile',
+            'text' => 'Perfil',
             'url' => 'admin/settings',
             'icon' => 'fas fa-fw fa-user',
         ],
         [
-            'text' => 'change_password',
+            'text' => 'Alterar senha',
             'url' => 'admin/settings',
             'icon' => 'fas fa-fw fa-lock',
         ],
@@ -376,20 +376,20 @@ return [
                 ],
             ],
         ],
-        ['header' => 'labels'],
+        ['header' => 'Ações'],
         [
-            'text' => 'important',
-            'icon_color' => 'red',
+            'text' => 'Gerenciar usuário ',
+            
+            'url' => 'adminpanel/manage_users',
+        ],
+        [
+            'text' => 'Adcionar refeições',
+               
             'url' => '#',
         ],
         [
-            'text' => 'warning',
-            'icon_color' => 'yellow',
-            'url' => '#',
-        ],
-        [
-            'text' => 'information',
-            'icon_color' => 'cyan',
+            'text' => 'Consultar pedidos',
+            // 'icon_color' => 'cyan',
             'url' => '#',
         ],
     ],
