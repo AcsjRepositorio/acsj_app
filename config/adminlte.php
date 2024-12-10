@@ -377,16 +377,20 @@ return [
             ],
         ],
         ['header' => 'Ações'],
+
+        [
+            'text' => 'Adcionar refeições',
+               
+            'url' => 'adminpanel/manage_meals',
+        ],
+
+
         [
             'text' => 'Gerenciar usuário ',
             
             'url' => 'adminpanel/manage_users',
         ],
-        [
-            'text' => 'Adcionar refeições',
-               
-            'url' => '#',
-        ],
+       
         [
             'text' => 'Consultar pedidos',
             // 'icon_color' => 'cyan',
