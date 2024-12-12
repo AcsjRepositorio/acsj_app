@@ -99,6 +99,7 @@ No painel abaixo, você pode editar as informações do usuário cadastradas no 
 
 
 
+          
                 <div class="text-center">
                     <button type="button" class="btn btn-success" id="nextBtn">Próximo</button>
                 </div>

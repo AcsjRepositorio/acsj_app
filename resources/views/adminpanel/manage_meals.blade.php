@@ -20,6 +20,7 @@
     <table class="table table-bordered table-hover">
         <thead class="table-light text-center">
             <tr>
+                <th scope="col"></th>
                 <th style="width: 10%;">Foto</th>
                 <th style="width: 20%;">Nome</th>
                 <th style="width: 35%;">Descrição</th>
@@ -30,7 +31,19 @@
         </thead>
         <tbody>
             @foreach($meals as $meal)
+
                 <tr>
+
+                    <td class=" bg-black text-white justify-content-center  p-1" style="height: 50px; margin-right: 5px;">
+                    <p class=" text-center  m-0" style="writing-mode: vertical-rl ; font-size: 12px;">
+                            {{$meal->day_of_week}}
+                        </p>
+                    
+                    </td>
+    
+
+                     
+
                     <!-- Foto -->
                     <td class="text-center align-middle">
                         @if($meal->photo)
@@ -54,7 +67,7 @@
 
                     <!-- Ações -->
                     <td class="text-center align-middle">
-                        <a href="" class="btn btn-primary btn-sm me-2">
+                        <a href="{{route('meals.edit', $meal->id)}}" class="btn btn-primary btn-sm me-2">
                             <i class="fas fa-pencil-alt"></i>
                         </a>
                         <form action="{{route('meals.destroy',$meal->id)}}" method="POST" class="d-inline" onsubmit="return confirm('Tem certeza que deseja excluir esta refeição?')">

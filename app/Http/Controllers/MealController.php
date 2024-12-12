@@ -1,11 +1,13 @@
 <?php
 
 namespace App\Http\Controllers;
-use Illuminate\Support\Facades\Storage;
-
-
 use App\Models\Meal;
+
+
+
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class MealController extends Controller
 {
@@ -59,7 +61,29 @@ class MealController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $meal=Meal::findOrfail($id);
+
+        $categories=[
+        'Pequeno almoço' => 1,
+        'Almoço' => 2,
+        'Jantar' => 3,
+        'Lanche' => 4,
+        ];
+
+
+        $daysOfWeek = [
+            1 => 'Segunda-feira',
+            2 => 'Terça-feira',
+            3 => 'Quarta-feira',
+            4 => 'Quinta-feira',
+            5 => 'Sexta-feira',
+            6 => 'Sábado',
+            7 => 'Domingo',
+        ];
+
+
+
+        return view('adminpanel.edit_meals',compact('meal','categories','daysOfWeek'));
     }
 
     /**
@@ -72,6 +96,8 @@ class MealController extends Controller
         'description' => 'required|string',
         'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         'price' => 'required|numeric',
+        'category_id' => 'required|integer|in:1,2,3,4', // IDs das categorias
+        'day_of_week'=>'required|integer|in:1,2,3,4,5,6,7',//Ids dos dias 
     ]);
 
    
@@ -81,18 +107,21 @@ class MealController extends Controller
     $meal->name = $request->name;
     $meal->description = $request->description;
     $meal->price = $request->price;
+    $meal->category_id=$request->category_id;
+    $meal->day_of_week=$request->day_of_week;
 
     
     if ($request->hasFile('photo')) {
-        
-        if ($meal->photo && Storage::exists($meal->photo)) {
-            \Storage::delete($meal->photo);
+        // Excluir a foto antiga, se existir
+        if ($meal->photo) {
+            Storage::disk('public')->delete($meal->photo);
         }
 
-        
-        $path = $request->file('photo')->store('meals', 'public');
-        $meal->photo = $path;
+        // Fazer o upload da nova foto
+        $photoPath = $request->file('photo')->store('photos', 'public');
+        $meal->photo = $photoPath;
     }
+
 
     
     $meal->save();

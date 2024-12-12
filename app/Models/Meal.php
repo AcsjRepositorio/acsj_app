@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Meal extends Model
 {
+
+    public $timestamps = false; // Desativa timestamps automáticos
+
     use HasFactory;
     protected $table='meals';
 
@@ -18,6 +21,7 @@ class Meal extends Model
         'price',
         'menu_id',        
         'category_id',
+        'day_of_week'
     ];
 
 
@@ -32,7 +36,7 @@ class Meal extends Model
 
     public function orders()
     {
-        return $this->belongsToMany(Order::class, 'orders_meals')->withPivot('quantity', 'day_of_week');
+        return $this->belongsToMany(Order::class, 'orders_meals')->withPivot('quantity');
     }
 
 }
