@@ -1,11 +1,11 @@
 @extends('adminlte::page')
 
-@section('title', 'Dashboard - Editar refeição')
+@section('title', 'Dashboard - Inserir usuário')
 
 @section('content')
 
 <div class="container mb-5" style="width: 70%; max-width: 800px;">
-    <h1 class="mb-3">Editar pratos do Cardápio</h1>
+    <h1 class="mb-3">Inserir novo usuário</h1>
     <h5>No painel abaixo, você pode editar as informações dos pratos disponíveis no menu da semana</h5>
     <ul>
         <li>Atualize apenas os campos necessários, revisando os dados antes de confirmar.</li>
@@ -16,9 +16,8 @@
 
 <div class="container p-4 bg-light rounded shadow-sm" style="max-width: 700px;">
     <!-- Multi-Step Form -->
-    <form action="{{ route('meals.update', $meal->id) }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('users.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
-        @method('PUT')
 
         <!-- Step Indicators -->
         <div class="d-flex justify-content-center align-items-center mb-4">
@@ -40,25 +39,20 @@
         <!-- Step 1 -->
         <div id="step-1" class="form-step">
             <!-- Avatar -->
-
-
             <div class="mb-4 text-center">
-                <div class="bg-secondary rounded" style="width: 120px; height: 120px; margin: 0 auto;">
+                <div class="bg-secondary rounded-circle" style="width: 120px; height: 120px; margin: 0 auto;">
                     <img id="photoPreview"
-                        src="{{ $meal->photo ? asset('storage/' . $meal->photo) : asset('images/default-meal.jpg') }}"
+                        src="{{ asset('images/default_user_photo.png') }}"
                         alt="Foto do Prato"
                         class="img-fit rounded-circle border"
                         style="width: 100%; height: 100%; object-fit: cover;">
                 </div>
                 <input type="file" name="photo" class="form-control mt-3" accept="image/*" onchange="previewPhoto(event)">
-
             </div>
 
-            <div class="mb-4">
-                <label for="name" class="form-label">Nome do prato</label>
-                <input type="text" name="name" id="name"
-                    value="{{ old('name', $meal->name) }}"
-                    class="form-control" required>
+            <div class="form-group">
+                <label for="name">Nome</label>
+                <input type="text" class="form-control" id="name" name="name" placeholder="Insira o nome do usuário" required>
             </div>
 
             <div class="text-center">
@@ -68,48 +62,12 @@
 
         <!-- Step 2 -->
         <div id="step-2" class="form-step d-none">
-            <div class="mb-4">
-                <label for="price" class="form-label">Preço</label>
-                <input type="number" name="price" id="price" value="{{ old('price', $meal->price) }}"
-                    class="form-control" step="0.01" required>
-
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" class="form-control" id="email" name="email" placeholder="Insira o email" required>
             </div>
 
-            <div class="mb-4">
-                <label for="category_id" class="form-label">Tipo de Refeição</label>
-                <select name="category_id" id="category_id" class="form-select" required>
-
-                    @foreach ($categories as $categoryName => $categoryId)
-                    <option value="{{ $categoryId }}" {{ old('category_id', $meal->category_id) == $categoryId ? 'selected' : '' }}>
-                        {{ $categoryName }}
-                    </option>
-                    @endforeach
-
-
-
-                </select>
-            </div>
-
-
-            <div class="mb-4">
-                <label for="day_of_week" class="form-label">Dia da Semana</label>
-                <select name="day_of_week" id="day_of_week" class="form-select" required>
-                    @foreach ($daysOfWeek as $index => $day)
-                    <option value="{{ $index }}" {{ old('day_of_week', $meal->day_of_week) == $index ? 'selected' : '' }}>
-                        {{ $day }}
-                    </option>
-                    @endforeach
-                </select>
-            </div>
-
-
-
-
-
-
-
-
-            <div class="d-flex justify-content-between">
+            <div class="text-center d-flex justify-content-between">
                 <button type="button" class="btn btn-outline-secondary" id="prevBtn">Voltar</button>
                 <button type="button" class="btn btn-success" id="nextBtnStep2">Próximo</button>
             </div>
@@ -117,9 +75,22 @@
 
         <!-- Step 3 -->
         <div id="step-3" class="form-step d-none">
-            <div class="mb-4">
-                <label for="description" class="form-label">Descrição</label>
-                <textarea name="description" id="description" class="form-control" rows="4" required>{{ old('description', $meal->description) }}</textarea>
+            <div class="form-group">
+                <label for="password">Senha</label>
+                <input type="password" class="form-control" id="password" name="password" placeholder="Insira a senha" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password_confirmation">Confirme a Senha</label>
+                <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" placeholder="Confirme a senha" required>
+            </div>
+
+            <div class="form-group">
+                <label for="user_type">Tipo de Usuário</label>
+                <select class="form-control" id="user_type" name="user_type" required>
+                    <option value="1">Admin</option>
+                    <option value="2">Cliente</option>
+                </select>
             </div>
 
             <div class="d-flex justify-content-between">

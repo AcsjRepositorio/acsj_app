@@ -7,30 +7,33 @@ use Illuminate\Database\Eloquent\Model;
 
 class Meal extends Model
 {
+    use HasFactory;
 
     public $timestamps = false; // Desativa timestamps automáticos
+    protected $table = 'meals';
 
-    use HasFactory;
-    protected $table='meals';
-
-    protected $fillable=[
-
+    protected $fillable = [
         'name',
-        'desciption',
+        'description',
         'photo',
         'price',
-        'menu_id',        
+        'menu_id',
         'category_id',
-        'day_of_week'
+        'day_of_week',       // Para armazenar o nome do dia da semana
+        'day_week_start',    // Adicione este campo se ele for usado para armazenar a data
     ];
 
+    protected $casts = [
+        'day_week_start' => 'date', // Certifica-se de que 'day_week_start' é tratado como uma data
+    ];
 
-    public function menu(){
-
+    public function menu()
+    {
         return $this->belongsTo(Menu::class);
     }
 
-    public function category(){
+    public function category()
+    {
         return $this->belongsTo(Category::class);
     }
 
@@ -38,5 +41,4 @@ class Meal extends Model
     {
         return $this->belongsToMany(Order::class, 'orders_meals')->withPivot('quantity');
     }
-
 }

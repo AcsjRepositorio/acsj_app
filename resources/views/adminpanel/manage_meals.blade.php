@@ -6,7 +6,7 @@
 <div class="container mt-5">
     <div class="d-flex justify-content-between align-items-center mb-5">
         <h1 class="h2">Gerenciar Refeições</h1>
-        <a href="" class="btn btn-success">
+        <a href="{{route('meals.create')}}" class="btn btn-success">
             <i class="fa-solid fa-bowl-food me-2"></i> Inserir Refeição
         </a>
     </div>
@@ -36,11 +36,11 @@
 
                     <td class=" bg-black text-white justify-content-center  p-1" style="height: 50px; margin-right: 5px;">
                     <p class=" text-center  m-0" style="writing-mode: vertical-rl ; font-size: 12px;">
-                            {{$meal->day_of_week}}
+                        {{ ucfirst($meal->day_of_week) }}
                         </p>
                     
                     </td>
-    
+                
 
                      
 
@@ -63,7 +63,7 @@
                     <td class="align-middle text-center">{{ number_format($meal->price, 2, ',', '.') }}</td>
 
                     <!-- Categoria -->
-                    <td class="align-middle text-center">{{ $meal->category->meal_category }}</td>
+                    <td>{{ $meal->category->meal_category ?? 'Categoria não definida' }}</td> <!-- Nome da categoria -->
 
                     <!-- Ações -->
                     <td class="text-center align-middle">

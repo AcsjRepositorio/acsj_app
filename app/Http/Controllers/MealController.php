@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 use App\Models\Meal;
 
+use Carbon\Carbon;
 
 
+
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -27,17 +30,38 @@ class MealController extends Controller
 
     public function index()
     {
-        $meals= Meal::all();
-        
+        $meals = Meal::with('category')->get()->map(function ($meal) {
+            $meal->day_of_week = $meal->day_week_start 
+                ? Carbon::parse($meal->day_week_start)->locale('pt_BR')->dayName 
+                : 'Data não definida';
+            return $meal;
+        });
+    
         return view('adminpanel.manage_meals', compact('meals'));
     }
+    
 
     /**
      * Show the form for creating a new resource.
      */
     public function create()
     {
-        //
+
+        $categories = Category::pluck('meal_category', 'id'); 
+        // $daysOfWeek = [
+        //     '1' => 'Segunda-feira',
+        //     '2' => 'Terça-feira',
+        //     '3' => 'Quarta-feira',
+        //     '4' => 'Quinta-feira',
+        //     '5' => 'Sexta-feira',
+        //     '6' => 'Sábado',
+        //     '7' => 'Domingo',
+        // ];
+
+        //'daysOfWeek' eu exclui do compact
+    
+        return view('adminpanel.create_meals', compact('categories'));
+
     }
 
     /**
@@ -45,7 +69,46 @@ class MealController extends Controller
      */
     public function store(Request $request)
     {
-        //
+
+        $validated=$request->validate([
+
+
+            
+            'name' => 'required|string|max:255',
+            'description' => 'required',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'price' => 'required|numeric',
+            'category_id' => 'required|integer|in:1,2,3,4', // IDs das categorias
+            // 'day_of_week'=>'required|integer|in:1,2,3,4,5,6,7',//Ids dos dias 
+            'day_week_start' => 'required|date',
+            // 'day_week_end' => '|date|after_or_equal:day_week_start',
+                   
+            
+
+        ]);
+
+
+        $mealData = [
+            'name' => $validated['name'],
+            'description' => $validated['description'],
+            'price' => $validated['price'],
+            'category_id' => $validated['category_id'],
+            'day_week_start' => $validated['day_week_start'],
+            // 'day_week_end' => $validated['day_week_end'],
+        ];
+        
+        // Verifique se o campo `photo` foi enviado
+        if ($request->hasFile('photo')) {
+            $mealData['photo'] = $request->file('photo')->store('photos', 'public');
+        }
+        
+        Meal::create($mealData);
+        
+        return redirect('adminpanel/manage_meals')->with('success', 'Refeição alterada com sucesso!');
+
+       
+
+
     }
 
     /**
@@ -71,19 +134,19 @@ class MealController extends Controller
         ];
 
 
-        $daysOfWeek = [
-            1 => 'Segunda-feira',
-            2 => 'Terça-feira',
-            3 => 'Quarta-feira',
-            4 => 'Quinta-feira',
-            5 => 'Sexta-feira',
-            6 => 'Sábado',
-            7 => 'Domingo',
-        ];
+        // $daysOfWeek = [
+        //     1 => 'Segunda-feira',
+        //     2 => 'Terça-feira',
+        //     3 => 'Quarta-feira',
+        //     4 => 'Quinta-feira',
+        //     5 => 'Sexta-feira',
+        //     6 => 'Sábado',
+        //     7 => 'Domingo',
+        // ];
 
+        //'daysOfWeek' eu exclui do compact
 
-
-        return view('adminpanel.edit_meals',compact('meal','categories','daysOfWeek'));
+        return view('adminpanel.edit_meals',compact('meal','categories'));
     }
 
     /**
@@ -97,7 +160,7 @@ class MealController extends Controller
         'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         'price' => 'required|numeric',
         'category_id' => 'required|integer|in:1,2,3,4', // IDs das categorias
-        'day_of_week'=>'required|integer|in:1,2,3,4,5,6,7',//Ids dos dias 
+        // 'day_of_week'=>'required|integer|in:1,2,3,4,5,6,7',//Ids dos dias 
     ]);
 
    
@@ -108,7 +171,7 @@ class MealController extends Controller
     $meal->description = $request->description;
     $meal->price = $request->price;
     $meal->category_id=$request->category_id;
-    $meal->day_of_week=$request->day_of_week;
+    // $meal->day_of_week=$request->day_of_week;
 
     
     if ($request->hasFile('photo')) {

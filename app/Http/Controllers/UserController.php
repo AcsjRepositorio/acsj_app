@@ -26,6 +26,10 @@ class UserController extends Controller
      */
     public function create()
     {
+
+
+    return view('adminpanel.create_users');
+        
         
     }
 
@@ -34,7 +38,28 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        
+        $validated=$request->validate([
+
+            'name' => 'required|string|max:225',
+            'email' => 'required|string|email|max:225|unique:users,email',
+            'password' => 'required|string|min:8|confirmed', 
+            'user_type'=>'required|integer|in:1,2,3'
+            
+
+        ]);
+
+        User::create([
+            'name'=>$validated['name'],
+            'email'=>$validated['email'],
+            'password'=>$validated['password'],
+            'user_type'=>$validated['user_type']
+
+        ]);
+       
+
+        return redirect('/adminpanel/manage_users')->with('success', 'Usuário salvo  com sucesso!');
+
     }
 
     /**

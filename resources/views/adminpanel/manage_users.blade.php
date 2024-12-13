@@ -6,7 +6,7 @@
 <div class="container mt-5">
     <div class="d-flex justify-content-between align-items-center mb-5">
         <h1 class="h2">Gerenciar Usuários</h1>
-        <a href="" class="btn btn-success">
+        <a href="{{route('users.create')}}" class="btn btn-success">
             <i class="fas fa-user-plus me-2"></i>Novo Usuário
         </a>
     </div>

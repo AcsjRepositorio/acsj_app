@@ -1,11 +1,11 @@
 @extends('adminlte::page')
 
-@section('title', 'Dashboard - Editar refeição')
+@section('title', 'Dashboard - Inserir Refeição')
 
 @section('content')
 
 <div class="container mb-5" style="width: 70%; max-width: 800px;">
-    <h1 class="mb-3">Editar pratos do Cardápio</h1>
+    <h1 class="mb-3">Inserir refeição no Cardápio</h1>
     <h5>No painel abaixo, você pode editar as informações dos pratos disponíveis no menu da semana</h5>
     <ul>
         <li>Atualize apenas os campos necessários, revisando os dados antes de confirmar.</li>
@@ -16,9 +16,8 @@
 
 <div class="container p-4 bg-light rounded shadow-sm" style="max-width: 700px;">
     <!-- Multi-Step Form -->
-    <form action="{{ route('meals.update', $meal->id) }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('meals.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
-        @method('PUT')
 
         <!-- Step Indicators -->
         <div class="d-flex justify-content-center align-items-center mb-4">
@@ -40,24 +39,21 @@
         <!-- Step 1 -->
         <div id="step-1" class="form-step">
             <!-- Avatar -->
-
-
             <div class="mb-4 text-center">
                 <div class="bg-secondary rounded" style="width: 120px; height: 120px; margin: 0 auto;">
                     <img id="photoPreview"
-                        src="{{ $meal->photo ? asset('storage/' . $meal->photo) : asset('images/default-meal.jpg') }}"
+                        src="{{ asset('images/default-meal.jpg') }}"
                         alt="Foto do Prato"
                         class="img-fit rounded-circle border"
                         style="width: 100%; height: 100%; object-fit: cover;">
                 </div>
                 <input type="file" name="photo" class="form-control mt-3" accept="image/*" onchange="previewPhoto(event)">
-
             </div>
 
             <div class="mb-4">
                 <label for="name" class="form-label">Nome do prato</label>
                 <input type="text" name="name" id="name"
-                    value="{{ old('name', $meal->name) }}"
+                    value="{{ old('name') }}"
                     class="form-control" required>
             </div>
 
@@ -70,43 +66,33 @@
         <div id="step-2" class="form-step d-none">
             <div class="mb-4">
                 <label for="price" class="form-label">Preço</label>
-                <input type="number" name="price" id="price" value="{{ old('price', $meal->price) }}"
+                <input type="number" name="price" id="price" value="{{ old('price') }}"
                     class="form-control" step="0.01" required>
-
             </div>
 
             <div class="mb-4">
                 <label for="category_id" class="form-label">Tipo de Refeição</label>
                 <select name="category_id" id="category_id" class="form-select" required>
-
-                    @foreach ($categories as $categoryName => $categoryId)
-                    <option value="{{ $categoryId }}" {{ old('category_id', $meal->category_id) == $categoryId ? 'selected' : '' }}>
+                    @foreach ($categories as $categoryId => $categoryName)
+                    <option value="{{ $categoryId }}" {{ old('category_id') == $categoryId ? 'selected' : '' }}>
                         {{ $categoryName }}
                     </option>
                     @endforeach
-
-
-
                 </select>
             </div>
 
+            @if(isset($meals) && isset($meals->day_of_week))
+<td class="bg-black text-white justify-content-center p-1" style="height: 50px; margin-right: 5px;">
+    <p class="text-center m-0" style="writing-mode: vertical-rl; font-size: 12px;">
+        {{ ucfirst($meals->day_of_week) }}
+    </p>
+</td>
+@endif
 
-            <div class="mb-4">
-                <label for="day_of_week" class="form-label">Dia da Semana</label>
-                <select name="day_of_week" id="day_of_week" class="form-select" required>
-                    @foreach ($daysOfWeek as $index => $day)
-                    <option value="{{ $index }}" {{ old('day_of_week', $meal->day_of_week) == $index ? 'selected' : '' }}>
-                        {{ $day }}
-                    </option>
-                    @endforeach
-                </select>
+            <div>
+                <label for="day_week_start">Data de venda:</label>
+                <input type="date" name="day_week_start" id="day_week_start" required>
             </div>
-
-
-
-
-
-
 
 
             <div class="d-flex justify-content-between">
@@ -119,7 +105,7 @@
         <div id="step-3" class="form-step d-none">
             <div class="mb-4">
                 <label for="description" class="form-label">Descrição</label>
-                <textarea name="description" id="description" class="form-control" rows="4" required>{{ old('description', $meal->description) }}</textarea>
+                <textarea name="description" id="description" class="form-control" rows="4" required>{{ old('description') }}</textarea>
             </div>
 
             <div class="d-flex justify-content-between">
@@ -143,6 +129,7 @@
 @endsection
 
 @section('css')
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <style>
     .steps-container {
         display: flex;
@@ -233,5 +220,14 @@
             reader.readAsDataURL(file);
         }
     }
+
+    $(function() {
+        $("#day_week_start, #day_week_end").datepicker({
+            dateFormat: 'yy-mm-dd'
+        });
+    });
 </script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 @endsection
