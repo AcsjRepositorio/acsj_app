@@ -88,19 +88,29 @@ class MealController extends Controller
         ]);
 
 
+    
+        
+        
+        // if ($request->hasFile('photo')) {
+        //     $mealData['photo'] = $request->file('photo')->store('photos', 'public');
+        // }
+
+        
+
+
+        $photoPath = $request->hasFile('photo')
+        ? $request->file('photo')->store('photos', 'public')
+        :'images/default-meal.jpg' ;
+
         $mealData = [
             'name' => $validated['name'],
             'description' => $validated['description'],
             'price' => $validated['price'],
             'category_id' => $validated['category_id'],
             'day_week_start' => $validated['day_week_start'],
+            'photo' => $photoPath,
             // 'day_week_end' => $validated['day_week_end'],
         ];
-        
-        // Verifique se o campo `photo` foi enviado
-        if ($request->hasFile('photo')) {
-            $mealData['photo'] = $request->file('photo')->store('photos', 'public');
-        }
         
         Meal::create($mealData);
         
@@ -161,29 +171,36 @@ class MealController extends Controller
         'price' => 'required|numeric',
         'category_id' => 'required|integer|in:1,2,3,4', // IDs das categorias
         // 'day_of_week'=>'required|integer|in:1,2,3,4,5,6,7',//Ids dos dias 
+        'day_week_start' => 'required|date'
+        
     ]);
 
-   
     $meal = Meal::findOrFail($id);
+
+    // Verificar se uma nova foto foi enviada
+    if ($request->hasFile('photo')) {
+        // Excluir a foto antiga, se existir
+        if ($meal->photo && $meal->photo !== 'images/default-meal.jpg') {
+            Storage::disk('public')->delete($meal->photo);
+        }
+        $meal->photo = $request->file('photo')->store('photos', 'public');
+    }
+   
+   
+   
 
    
     $meal->name = $request->name;
     $meal->description = $request->description;
     $meal->price = $request->price;
     $meal->category_id=$request->category_id;
+    $meal->day_week_start=$request->day_week_start;
     // $meal->day_of_week=$request->day_of_week;
+    $meal->photo=$request->photo;
+    
 
     
-    if ($request->hasFile('photo')) {
-        // Excluir a foto antiga, se existir
-        if ($meal->photo) {
-            Storage::disk('public')->delete($meal->photo);
-        }
-
-        // Fazer o upload da nova foto
-        $photoPath = $request->file('photo')->store('photos', 'public');
-        $meal->photo = $photoPath;
-    }
+   
 
 
     

@@ -42,10 +42,13 @@
             <div class="mb-4 text-center">
                 <div class="bg-secondary rounded" style="width: 120px; height: 120px; margin: 0 auto;">
                     <img id="photoPreview"
-                        src="{{ asset('images/default-meal.jpg') }}"
+                        src="{{ asset('storage/images/default-meal.jpg') }}"
                         alt="Foto do Prato"
                         class="img-fit rounded-circle border"
                         style="width: 100%; height: 100%; object-fit: cover;">
+
+
+
                 </div>
                 <input type="file" name="photo" class="form-control mt-3" accept="image/*" onchange="previewPhoto(event)">
             </div>
@@ -82,12 +85,12 @@
             </div>
 
             @if(isset($meals) && isset($meals->day_of_week))
-<td class="bg-black text-white justify-content-center p-1" style="height: 50px; margin-right: 5px;">
-    <p class="text-center m-0" style="writing-mode: vertical-rl; font-size: 12px;">
-        {{ ucfirst($meals->day_of_week) }}
-    </p>
-</td>
-@endif
+            <td class="bg-black text-white justify-content-center p-1" style="height: 50px; margin-right: 5px;">
+                <p class="text-center m-0" style="writing-mode: vertical-rl; font-size: 12px;">
+                    {{ ucfirst($meals->day_of_week) }}
+                </p>
+            </td>
+            @endif
 
             <div>
                 <label for="day_week_start">Data de venda:</label>
@@ -114,6 +117,8 @@
             </div>
         </div>
     </form>
+
+    
 </div>
 
 @if ($errors->any())

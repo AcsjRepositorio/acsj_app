@@ -91,22 +91,23 @@
             </div>
 
 
-            <div class="mb-4">
-                <label for="day_of_week" class="form-label">Dia da Semana</label>
-                <select name="day_of_week" id="day_of_week" class="form-select" required>
-                    @foreach ($daysOfWeek as $index => $day)
-                    <option value="{{ $index }}" {{ old('day_of_week', $meal->day_of_week) == $index ? 'selected' : '' }}>
-                        {{ $day }}
-                    </option>
-                    @endforeach
-                </select>
+            @if(isset($meals) && isset($meals->day_of_week))
+            <td class="bg-black text-white justify-content-center p-1" style="height: 50px; margin-right: 5px;">
+                <p class="text-center m-0" style="writing-mode: vertical-rl; font-size: 12px;">
+                    {{ ucfirst($meals->day_of_week) }}
+                </p>
+            </td>
+            @endif
+             
+
+
+
+
+            <div>
+                <label for="day_week_start">Data de venda:</label>
+                <input type="date" name="day_week_start" id="day_week_start"
+                    value="{{ old('day_week_start', $meal->day_week_start) }}" required>
             </div>
-
-
-
-
-
-
 
 
             <div class="d-flex justify-content-between">
