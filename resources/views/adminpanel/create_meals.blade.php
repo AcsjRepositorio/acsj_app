@@ -19,6 +19,7 @@
     <form action="{{ route('meals.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
 
+
         <!-- Step Indicators -->
         <div class="d-flex justify-content-center align-items-center mb-4">
             <ul class="steps d-flex list-unstyled justify-content-center gap-2 align-items-center">
@@ -38,20 +39,21 @@
 
         <!-- Step 1 -->
         <div id="step-1" class="form-step">
-            <!-- Avatar -->
+            <!-- Foto de meal -->
             <div class="mb-4 text-center">
                 <div class="bg-secondary rounded" style="width: 120px; height: 120px; margin: 0 auto;">
-                    <img id="photoPreview"
-                        src="{{ asset('storage/images/default-meal.jpg') }}"
-                        alt="Foto do Prato"
-                        class="img-fit rounded-circle border"
-                        style="width: 100%; height: 100%; object-fit: cover;">
-
-
-
+                    <!-- Exibição da foto (default ou carregada) -->
+                    <img
+                        src="{{ asset('images/default-meal.jpg') }}"
+                        alt="Foto padrão"
+                        class="rounded-circle"
+                        style="width: 120px; height: 120px;">
                 </div>
-                <input type="file" name="photo" class="form-control mt-3" accept="image/*" onchange="previewPhoto(event)">
+
+
+                <input type="file" name="photo" class="form-control mt-3" accept="image/*">
             </div>
+
 
             <div class="mb-4">
                 <label for="name" class="form-label">Nome do prato</label>
@@ -94,7 +96,20 @@
 
             <div>
                 <label for="day_week_start">Data de venda:</label>
-                <input type="date" name="day_week_start" id="day_week_start" required>
+                <input type="date" name="day_week_start" id="day_week_start"  required>
+
+                @error('day_week_start')
+
+                <div class="invalid-feedback">
+
+                    Selecione uma data válida
+
+                </div>
+
+                @enderror
+
+
+
             </div>
 
 
@@ -111,6 +126,17 @@
                 <textarea name="description" id="description" class="form-control" rows="4" required>{{ old('description') }}</textarea>
             </div>
 
+
+            @error('description')
+
+                <div class="invalid-feedback">
+
+                    Cadê a descrição ? 
+
+                </div>
+
+                @enderror
+
             <div class="d-flex justify-content-between">
                 <button type="button" class="btn btn-outline-secondary" id="prevBtnStep3">Voltar</button>
                 <button type="submit" class="btn btn-success">Salvar</button>
@@ -118,7 +144,7 @@
         </div>
     </form>
 
-    
+
 </div>
 
 @if ($errors->any())
@@ -128,6 +154,13 @@
         <li>{{ $error }}</li>
         @endforeach
     </ul>
+</div>
+@endif
+
+
+@if (session('success'))
+<div class="alert alert-success">
+    {{ session('success') }}
 </div>
 @endif
 
@@ -213,18 +246,7 @@
         updateStepIndicator(currentStep);
     });
 
-    function previewPhoto(event) {
-        const file = event.target.files[0];
-        const reader = new FileReader();
 
-        reader.onload = function(e) {
-            document.getElementById('photoPreview').src = e.target.result;
-        };
-
-        if (file) {
-            reader.readAsDataURL(file);
-        }
-    }
 
     $(function() {
         $("#day_week_start, #day_week_end").datepicker({

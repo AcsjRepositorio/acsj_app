@@ -16,9 +16,7 @@
 
 <div class="container p-4 bg-light rounded shadow-sm" style="max-width: 700px;">
     <!-- Multi-Step Form -->
-    <form action="{{ route('meals.update', $meal->id) }}" method="POST" enctype="multipart/form-data">
-        @csrf
-        @method('PUT')
+   
 
         <!-- Step Indicators -->
         <div class="d-flex justify-content-center align-items-center mb-4">
@@ -36,6 +34,10 @@
                 </li>
             </ul>
         </div>
+
+        <form action="{{ route('meals.update', $meal->id) }}" method="POST" enctype="multipart/form-data">
+        @csrf
+        @method('PUT')
 
         <!-- Step 1 -->
         <div id="step-1" class="form-step">
@@ -125,7 +127,7 @@
 
             <div class="d-flex justify-content-between">
                 <button type="button" class="btn btn-outline-secondary" id="prevBtnStep3">Voltar</button>
-                <button type="submit" class="btn btn-success">Salvar</button>
+                <button type="submit" class="btn btn-success">Salvar Alterações </button>
             </div>
         </div>
     </form>

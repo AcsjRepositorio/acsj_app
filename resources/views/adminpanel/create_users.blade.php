@@ -38,21 +38,16 @@
 
         <!-- Step 1 -->
         <div id="step-1" class="form-step">
-            <!-- Avatar -->
-            <div class="mb-4 text-center">
-                <div class="bg-secondary rounded-circle" style="width: 120px; height: 120px; margin: 0 auto;">
-                    <img id="photoPreview"
-                        src="{{ asset('images/default_user_photo.png') }}"
-                        alt="Foto do Prato"
-                        class="img-fit rounded-circle border"
-                        style="width: 100%; height: 100%; object-fit: cover;">
-                </div>
-                <input type="file" name="photo" class="form-control mt-3" accept="image/*" onchange="previewPhoto(event)">
-            </div>
-
+           
+            
             <div class="form-group">
                 <label for="name">Nome</label>
                 <input type="text" class="form-control" id="name" name="name" placeholder="Insira o nome do usuário" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" class="form-control" id="email" name="email" placeholder="Insira o email" required>
             </div>
 
             <div class="text-center">
@@ -62,9 +57,15 @@
 
         <!-- Step 2 -->
         <div id="step-2" class="form-step d-none">
+            
+        <div class="form-group">
+                <label for="password">Senha</label>
+                <input type="password" class="form-control" id="password" name="password" placeholder="Insira a senha" required>
+            </div>
+
             <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" class="form-control" id="email" name="email" placeholder="Insira o email" required>
+                <label for="password_confirmation">Confirme a Senha</label>
+                <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" placeholder="Confirme a senha" required>
             </div>
 
             <div class="text-center d-flex justify-content-between">
@@ -75,15 +76,7 @@
 
         <!-- Step 3 -->
         <div id="step-3" class="form-step d-none">
-            <div class="form-group">
-                <label for="password">Senha</label>
-                <input type="password" class="form-control" id="password" name="password" placeholder="Insira a senha" required>
-            </div>
-
-            <div class="form-group">
-                <label for="password_confirmation">Confirme a Senha</label>
-                <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" placeholder="Confirme a senha" required>
-            </div>
+         
 
             <div class="form-group">
                 <label for="user_type">Tipo de Usuário</label>

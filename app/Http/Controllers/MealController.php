@@ -48,17 +48,9 @@ class MealController extends Controller
     {
 
         $categories = Category::pluck('meal_category', 'id'); 
-        // $daysOfWeek = [
-        //     '1' => 'Segunda-feira',
-        //     '2' => 'Terça-feira',
-        //     '3' => 'Quarta-feira',
-        //     '4' => 'Quinta-feira',
-        //     '5' => 'Sexta-feira',
-        //     '6' => 'Sábado',
-        //     '7' => 'Domingo',
-        // ];
+      
 
-        //'daysOfWeek' eu exclui do compact
+        
     
         return view('adminpanel.create_meals', compact('categories'));
 
@@ -79,28 +71,31 @@ class MealController extends Controller
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'price' => 'required|numeric',
             'category_id' => 'required|integer|in:1,2,3,4', // IDs das categorias
-            // 'day_of_week'=>'required|integer|in:1,2,3,4,5,6,7',//Ids dos dias 
+            
             'day_week_start' => 'required|date',
             // 'day_week_end' => '|date|after_or_equal:day_week_start',
                    
             
 
-        ]);
-
-
+        ],[
+            'name.required' => 'O nome do prato é obrigatório.',
+            'price.required' => 'O preço é obrigatório.',
+            'category_id.required' => 'O tipo de refeição é obrigatório.',
+            'day_week_start.required' => 'A data de venda é obrigatória.',
+            'description.required' => 'A descrição é obrigatória.',
+            'photo.image' => 'O arquivo enviado deve ser uma imagem.',
+        ]
     
-        
-        
-        // if ($request->hasFile('photo')) {
-        //     $mealData['photo'] = $request->file('photo')->store('photos', 'public');
-        // }
-
-        
+    );
 
 
-        $photoPath = $request->hasFile('photo')
-        ? $request->file('photo')->store('photos', 'public')
-        :'images/default-meal.jpg' ;
+        $photoPath = $request->hasFile('photo') 
+        ? $request->file('photo')->store('photos', 'public') 
+        : 'images/default-meal.jpg';
+
+
+
+
 
         $mealData = [
             'name' => $validated['name'],
@@ -144,17 +139,7 @@ class MealController extends Controller
         ];
 
 
-        // $daysOfWeek = [
-        //     1 => 'Segunda-feira',
-        //     2 => 'Terça-feira',
-        //     3 => 'Quarta-feira',
-        //     4 => 'Quinta-feira',
-        //     5 => 'Sexta-feira',
-        //     6 => 'Sábado',
-        //     7 => 'Domingo',
-        // ];
-
-        //'daysOfWeek' eu exclui do compact
+      
 
         return view('adminpanel.edit_meals',compact('meal','categories'));
     }
@@ -164,7 +149,7 @@ class MealController extends Controller
      */
     public function update(Request $request, string $id)
 {
-    $request->validate([
+    $validatedData=$request->validate([
         'name' => 'required|string|max:255',
         'description' => 'required|string',
         'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -173,18 +158,28 @@ class MealController extends Controller
         // 'day_of_week'=>'required|integer|in:1,2,3,4,5,6,7',//Ids dos dias 
         'day_week_start' => 'required|date'
         
+    ], [
+        'name.required' => 'O nome do prato é obrigatório.',
+        'price.required' => 'O preço é obrigatório.',
+        'category_id.required' => 'O tipo de refeição é obrigatório.',
+        'day_week_start.required' => 'A data de venda é obrigatória.',
+        'description.required' => 'A descrição é obrigatória.',
+        'photo.image' => 'O arquivo enviado deve ser uma imagem.',
     ]);
 
     $meal = Meal::findOrFail($id);
+    $meal->update($validatedData);
 
     // Verificar se uma nova foto foi enviada
+   
+   
     if ($request->hasFile('photo')) {
-        // Excluir a foto antiga, se existir
         if ($meal->photo && $meal->photo !== 'images/default-meal.jpg') {
             Storage::disk('public')->delete($meal->photo);
         }
         $meal->photo = $request->file('photo')->store('photos', 'public');
     }
+
    
    
    
@@ -196,13 +191,8 @@ class MealController extends Controller
     $meal->category_id=$request->category_id;
     $meal->day_week_start=$request->day_week_start;
     // $meal->day_of_week=$request->day_of_week;
-    $meal->photo=$request->photo;
-    
-
-    
+    $meal->photo = $meal->photo ?? 'images/default-meal.jpg';
    
-
-
     
     $meal->save();
 

@@ -44,16 +44,21 @@ class UserController extends Controller
             'name' => 'required|string|max:225',
             'email' => 'required|string|email|max:225|unique:users,email',
             'password' => 'required|string|min:8|confirmed', 
-            'user_type'=>'required|integer|in:1,2,3'
+            'user_type'=>'required|integer|in:1,2,3',
+            
             
 
         ]);
+
+
+      
 
         User::create([
             'name'=>$validated['name'],
             'email'=>$validated['email'],
             'password'=>$validated['password'],
-            'user_type'=>$validated['user_type']
+            'user_type'=>$validated['user_type'],
+            
 
         ]);
        
@@ -90,11 +95,14 @@ class UserController extends Controller
             'email' => 'required|email|unique:users,email,' . $id,
             'password' => 'nullable|string|min:6',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'user_type'=>'required|integer|in:1,2,3'
         ]);
 
         $user=User::findOrfail($id);
         $user->name=$request->name;
         $user->email=$request->email;
+        $user->user_type=$request->user_type;
+        
         if($request->password){
             $user->password = bcrypt($request->password);
         }

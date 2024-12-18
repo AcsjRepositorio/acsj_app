@@ -4,10 +4,11 @@
 
 @section('content')
 <div class="container mt-5">
-    <div class="d-flex justify-content-between align-items-center mb-5">
+    <div class="d-flex mt-5 justify-content-between align-items-center mb-5">
         <h1 class="h2">Gerenciar Usuários</h1>
         <a href="{{route('users.create')}}" class="btn btn-success">
-            <i class="fas fa-user-plus me-2"></i>Novo Usuário
+            <span class="gap-3">Novo Usuário </span>
+            <i class="fas fa-user-plus ms-2"></i>
         </a>
     </div>
 
@@ -20,7 +21,7 @@
     <table class="table table-bordered table-hover">
         <thead class="table-light">
             <tr>
-                <th>Foto</th>
+                
                 <th>Nome</th>
                 <th>Email</th>
                 <th>Tipo de usuário</th>
@@ -30,13 +31,7 @@
         <tbody>
             @foreach($users as $user)
                 <tr>
-                    <td class="text-center">
-                        @if($user->photo)
-                            <img src="{{ asset('storage/' . $user->photo) }}" alt="Foto de {{ $user->name }}" class="rounded-circle" style="width: 50px; height: 50px;">
-                        @else
-                            
-                        @endif
-                    </td>
+               
                     <td>{{ $user->name }}</td>
                     <td>{{ $user->email }}</td>
                     <td>

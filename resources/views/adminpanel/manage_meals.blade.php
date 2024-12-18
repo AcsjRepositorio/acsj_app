@@ -42,10 +42,14 @@
                 <!-- Foto -->
                 <td class="text-center align-middle">
                     <img
-                        src="{{ asset($meal->photo ? 'storage/' . $meal->photo : 'storage/images/default-meal.jpg') }}"
+                        src="{{ $meal->photo && file_exists(public_path('storage/' . $meal->photo)) 
+            ? asset('storage/' . $meal->photo) 
+            : asset('images/default-meal.jpg') }}"
                         alt="Foto de {{ $meal->name }}"
                         class="rounded-circle"
                         style="width: 50px; height: 50px;">
+
+
                 </td>
 
                 <!-- Nome -->
@@ -80,7 +84,7 @@
     </table>
 
     <!-- Navegação de Paginação -->
-   
+
 </div>
 @stop
 
