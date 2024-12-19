@@ -138,7 +138,7 @@ class MealController extends Controller
         'Lanche' => 4,
         ];
 
-
+        
       
 
         return view('adminpanel.edit_meals',compact('meal','categories'));
