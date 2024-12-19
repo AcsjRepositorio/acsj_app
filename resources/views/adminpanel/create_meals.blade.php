@@ -16,7 +16,7 @@
 
 <div class="container p-4 bg-light rounded shadow-sm" style="max-width: 700px;">
     <!-- Multi-Step Form -->
-    <form action="{{ route('meals.store') }}" method="POST" enctype="multipart/form-data">
+    <form class="was-validated" action="{{ route('meals.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
 
 
@@ -45,7 +45,7 @@
                     <!-- Exibição da foto (default ou carregada) -->
                     <img
                         src="{{ asset('images/default-meal.jpg') }}"
-                        alt="Foto padrão"
+                        alt="Foto padrão de refeição"
                         class="rounded-circle"
                         style="width: 120px; height: 120px;">
                 </div>
@@ -73,45 +73,46 @@
                 <label for="price" class="form-label">Preço</label>
                 <input type="number" name="price" id="price" value="{{ old('price') }}"
                     class="form-control" step="0.01" required>
+
+                <div class="invalid-feedback">
+                    Por favor, insira um preço válido.
+                </div>
+
             </div>
 
             <div class="mb-4">
                 <label for="category_id" class="form-label">Tipo de Refeição</label>
                 <select name="category_id" id="category_id" class="form-select" required>
+                    <option value="" selected disabled>Selecione um tipo de refeição</option>
                     @foreach ($categories as $categoryId => $categoryName)
                     <option value="{{ $categoryId }}" {{ old('category_id') == $categoryId ? 'selected' : '' }}>
                         {{ $categoryName }}
                     </option>
                     @endforeach
                 </select>
-            </div>
-
-            @if(isset($meals) && isset($meals->day_of_week))
-            <td class="bg-black text-white justify-content-center p-1" style="height: 50px; margin-right: 5px;">
-                <p class="text-center m-0" style="writing-mode: vertical-rl; font-size: 12px;">
-                    {{ ucfirst($meals->day_of_week) }}
-                </p>
-            </td>
-            @endif
-
-            <div>
-                <label for="day_week_start">Data de venda:</label>
-                <input type="date" name="day_week_start" id="day_week_start"  required>
-
-                @error('day_week_start')
 
                 <div class="invalid-feedback">
-
-                    Selecione uma data válida
-
+                    Por favor, selecione uma categoria de refeição.
                 </div>
-
-                @enderror
-
-
 
             </div>
 
+            <div class="mb-3">
+                <label for="day_week_start" class="form-label">Data de venda:</label>
+                <div class="input-group">
+                    <input type="date"
+                           class="form-control"
+                           name="day_week_start"
+                           id="day_week_start"
+                           required>
+                    <span class="input-group-text">
+                        <i class="bi bi-calendar3"></i>
+                    </span>
+                </div>
+                <div class="invalid-feedback">
+                    Por favor, selecione uma data de venda! 
+                </div>
+            </div>
 
             <div class="d-flex justify-content-between">
                 <button type="button" class="btn btn-outline-secondary" id="prevBtn">Voltar</button>
@@ -122,20 +123,14 @@
         <!-- Step 3 -->
         <div id="step-3" class="form-step d-none">
             <div class="mb-4">
-                <label for="description" class="form-label">Descrição</label>
+                <label for="validationTextarea" class="form-label">Descrição</label>
                 <textarea name="description" id="description" class="form-control" rows="4" required>{{ old('description') }}</textarea>
-            </div>
-
-
-            @error('description')
 
                 <div class="invalid-feedback">
-
-                    Cadê a descrição ? 
-
+                    Descreva um pouco do prato a ser oferecido .
                 </div>
 
-                @enderror
+            </div>
 
             <div class="d-flex justify-content-between">
                 <button type="button" class="btn btn-outline-secondary" id="prevBtnStep3">Voltar</button>
@@ -208,6 +203,7 @@
     const stepCircles = document.querySelectorAll('.step-circle');
     let currentStep = 0;
 
+    // Atualizar indicador de etapas
     function updateStepIndicator(step) {
         stepCircles.forEach((circle, index) => {
             if (index <= step) {
@@ -218,43 +214,44 @@
         });
     }
 
-    document.getElementById('nextBtn').addEventListener('click', () => {
-        steps[currentStep].classList.add('d-none');
-        currentStep++;
-        steps[currentStep].classList.remove('d-none');
-        updateStepIndicator(currentStep);
-    });
+    // Função de validação
+    function validateStep(step) {
+        const inputs = steps[step].querySelectorAll('input, select, textarea');
+        let isValid = true;
 
-    document.getElementById('nextBtnStep2').addEventListener('click', () => {
-        steps[currentStep].classList.add('d-none');
-        currentStep++;
-        steps[currentStep].classList.remove('d-none');
-        updateStepIndicator(currentStep);
-    });
-
-    document.getElementById('prevBtn').addEventListener('click', () => {
-        steps[currentStep].classList.add('d-none');
-        currentStep--;
-        steps[currentStep].classList.remove('d-none');
-        updateStepIndicator(currentStep);
-    });
-
-    document.getElementById('prevBtnStep3').addEventListener('click', () => {
-        steps[currentStep].classList.add('d-none');
-        currentStep--;
-        steps[currentStep].classList.remove('d-none');
-        updateStepIndicator(currentStep);
-    });
-
-
-
-    $(function() {
-        $("#day_week_start, #day_week_end").datepicker({
-            dateFormat: 'yy-mm-dd'
+        inputs.forEach(input => {
+            if (!input.checkValidity()) {
+                input.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                input.classList.remove('is-invalid');
+            }
         });
-    });
-</script>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+        return isValid;
+    }
+
+    // Avançar para a próxima etapa
+    function nextStep() {
+        if (validateStep(currentStep)) {
+            steps[currentStep].classList.add('d-none');
+            currentStep++;
+            steps[currentStep].classList.remove('d-none');
+            updateStepIndicator(currentStep);
+        }
+    }
+
+    // Voltar para a etapa anterior
+    function prevStep() {
+        steps[currentStep].classList.add('d-none');
+        currentStep--;
+        steps[currentStep].classList.remove('d-none');
+        updateStepIndicator(currentStep);
+    }
+
+    document.getElementById('nextBtn').addEventListener('click', nextStep);
+    document.getElementById('nextBtnStep2').addEventListener('click', nextStep);
+    document.getElementById('prevBtn').addEventListener('click', prevStep);
+    document.getElementById('prevBtnStep3').addEventListener('click', prevStep);
+</script>
 @endsection

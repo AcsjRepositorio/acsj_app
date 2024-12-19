@@ -16,7 +16,9 @@
 
 <div class="container p-4 bg-light rounded shadow-sm" style="max-width: 700px;">
     <!-- Multi-Step Form -->
-   
+    <form class="was-validated" action="{{ route('meals.update', $meal->id) }}" method="POST" enctype="multipart/form-data">
+        @csrf
+        @method('PUT')
 
         <!-- Step Indicators -->
         <div class="d-flex justify-content-center align-items-center mb-4">
@@ -35,15 +37,9 @@
             </ul>
         </div>
 
-        <form action="{{ route('meals.update', $meal->id) }}" method="POST" enctype="multipart/form-data">
-        @csrf
-        @method('PUT')
-
         <!-- Step 1 -->
         <div id="step-1" class="form-step">
-            <!-- Avatar -->
-
-
+            <!-- Foto do prato -->
             <div class="mb-4 text-center">
                 <div class="bg-secondary rounded" style="width: 120px; height: 120px; margin: 0 auto;">
                     <img id="photoPreview"
@@ -53,7 +49,6 @@
                         style="width: 100%; height: 100%; object-fit: cover;">
                 </div>
                 <input type="file" name="photo" class="form-control mt-3" accept="image/*" onchange="previewPhoto(event)">
-
             </div>
 
             <div class="mb-4">
@@ -61,6 +56,10 @@
                 <input type="text" name="name" id="name"
                     value="{{ old('name', $meal->name) }}"
                     class="form-control" required>
+
+                <div class="invalid-feedback">
+                    Adicione o nome do prato.
+                </div>
             </div>
 
             <div class="text-center">
@@ -75,42 +74,43 @@
                 <input type="number" name="price" id="price" value="{{ old('price', $meal->price) }}"
                     class="form-control" step="0.01" required>
 
+                <div class="invalid-feedback">
+                    Por favor, insira um preço válido.
+                </div>
             </div>
 
             <div class="mb-4">
                 <label for="category_id" class="form-label">Tipo de Refeição</label>
                 <select name="category_id" id="category_id" class="form-select" required>
-
+                    <option value="" selected disabled>Selecione um tipo de refeição</option>
                     @foreach ($categories as $categoryName => $categoryId)
                     <option value="{{ $categoryId }}" {{ old('category_id', $meal->category_id) == $categoryId ? 'selected' : '' }}>
                         {{ $categoryName }}
                     </option>
                     @endforeach
-
-
-
                 </select>
+
+                <div class="invalid-feedback">
+                    Por favor, selecione uma categoria de refeição.
+                </div>
             </div>
 
-
-            @if(isset($meals) && isset($meals->day_of_week))
-            <td class="bg-black text-white justify-content-center p-1" style="height: 50px; margin-right: 5px;">
-                <p class="text-center m-0" style="writing-mode: vertical-rl; font-size: 12px;">
-                    {{ ucfirst($meals->day_of_week) }}
-                </p>
-            </td>
-            @endif
-             
-
-
-
-
-            <div>
-                <label for="day_week_start">Data de venda:</label>
-                <input type="date" name="day_week_start" id="day_week_start"
-                    value="{{ old('day_week_start', $meal->day_week_start) }}" required>
+            <div class="mb-3">
+                <label for="day_week_start" class="form-label">Data de venda:</label>
+                <div class="input-group">
+                    <input type="date"
+                        class="form-control"
+                        name="day_week_start"
+                        id="day_week_start"
+                        value="{{ old('day_week_start', $meal->day_week_start ? $meal->day_week_start->format('Y-m-d') : '') }}">
+                    <span class="input-group-text">
+                        <i class="bi bi-calendar3"></i>
+                    </span>
+                </div>
+                <div class="invalid-feedback">
+                    Por favor, selecione uma data de venda!
+                </div>
             </div>
-
 
             <div class="d-flex justify-content-between">
                 <button type="button" class="btn btn-outline-secondary" id="prevBtn">Voltar</button>
@@ -123,12 +123,18 @@
             <div class="mb-4">
                 <label for="description" class="form-label">Descrição</label>
                 <textarea name="description" id="description" class="form-control" rows="4" required>{{ old('description', $meal->description) }}</textarea>
+
+                <div class="invalid-feedback">
+                    Por favor, descreva o prato.
+                </div>
             </div>
 
             <div class="d-flex justify-content-between">
                 <button type="button" class="btn btn-outline-secondary" id="prevBtnStep3">Voltar</button>
-                <button type="submit" class="btn btn-success">Salvar Alterações </button>
+                <button type="submit" class="btn btn-success">Salvar Alterações</button>
             </div>
+
+            
         </div>
     </form>
 </div>
@@ -186,6 +192,7 @@
     const stepCircles = document.querySelectorAll('.step-circle');
     let currentStep = 0;
 
+    // Atualizar indicador de etapas
     function updateStepIndicator(step) {
         stepCircles.forEach((circle, index) => {
             if (index <= step) {
@@ -196,34 +203,47 @@
         });
     }
 
-    document.getElementById('nextBtn').addEventListener('click', () => {
-        steps[currentStep].classList.add('d-none');
-        currentStep++;
-        steps[currentStep].classList.remove('d-none');
-        updateStepIndicator(currentStep);
-    });
+    // Função de validação
+    function validateStep(step) {
+        const inputs = steps[step].querySelectorAll('input, select, textarea');
+        let isValid = true;
 
-    document.getElementById('nextBtnStep2').addEventListener('click', () => {
-        steps[currentStep].classList.add('d-none');
-        currentStep++;
-        steps[currentStep].classList.remove('d-none');
-        updateStepIndicator(currentStep);
-    });
+        inputs.forEach(input => {
+            if (!input.checkValidity()) {
+                input.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                input.classList.remove('is-invalid');
+            }
+        });
 
-    document.getElementById('prevBtn').addEventListener('click', () => {
+        return isValid;
+    }
+
+    // Avançar para a próxima etapa
+    function nextStep() {
+        if (validateStep(currentStep)) {
+            steps[currentStep].classList.add('d-none');
+            currentStep++;
+            steps[currentStep].classList.remove('d-none');
+            updateStepIndicator(currentStep);
+        }
+    }
+
+    // Voltar para a etapa anterior
+    function prevStep() {
         steps[currentStep].classList.add('d-none');
         currentStep--;
         steps[currentStep].classList.remove('d-none');
         updateStepIndicator(currentStep);
-    });
+    }
 
-    document.getElementById('prevBtnStep3').addEventListener('click', () => {
-        steps[currentStep].classList.add('d-none');
-        currentStep--;
-        steps[currentStep].classList.remove('d-none');
-        updateStepIndicator(currentStep);
-    });
+    document.getElementById('nextBtn').addEventListener('click', nextStep);
+    document.getElementById('nextBtnStep2').addEventListener('click', nextStep);
+    document.getElementById('prevBtn').addEventListener('click', prevStep);
+    document.getElementById('prevBtnStep3').addEventListener('click', prevStep);
 
+    // Função para pré-visualizar foto
     function previewPhoto(event) {
         const file = event.target.files[0];
         const reader = new FileReader();

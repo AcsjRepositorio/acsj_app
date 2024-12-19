@@ -38,8 +38,8 @@
 
         <!-- Step 1 -->
         <div id="step-1" class="form-step">
-           
-            
+
+
             <div class="form-group">
                 <label for="name">Nome</label>
                 <input type="text" class="form-control" id="name" name="name" placeholder="Insira o nome do usuário" required>
@@ -57,8 +57,8 @@
 
         <!-- Step 2 -->
         <div id="step-2" class="form-step d-none">
-            
-        <div class="form-group">
+
+            <div class="form-group">
                 <label for="password">Senha</label>
                 <input type="password" class="form-control" id="password" name="password" placeholder="Insira a senha" required>
             </div>
@@ -76,8 +76,9 @@
 
         <!-- Step 3 -->
         <div id="step-3" class="form-step d-none">
-         
 
+    
+</div>
             <div class="form-group">
                 <label for="user_type">Tipo de Usuário</label>
                 <select class="form-control" id="user_type" name="user_type" required>
@@ -86,12 +87,17 @@
                 </select>
             </div>
 
-            <div class="d-flex justify-content-between">
+            <div class="d-flex justify-content-between align-items-center">
                 <button type="button" class="btn btn-outline-secondary" id="prevBtnStep3">Voltar</button>
                 <button type="submit" class="btn btn-success">Salvar</button>
+               
             </div>
+
         </div>
     </form>
+
+
+  
 </div>
 
 @if ($errors->any())
@@ -197,5 +203,8 @@
             reader.readAsDataURL(file);
         }
     }
+
+ 
+
 </script>
 @endsection
