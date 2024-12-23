@@ -19,13 +19,16 @@ class Meal extends Model
         'price',
         'menu_id',
         'category_id',
-        'day_of_week',       // Para armazenar o nome do dia da semana
-        'day_week_start',    // Adicione este campo se ele for usado para armazenar a data
+        'day_week_start',
+        'day_of_week' 
+           // Adicione este campo se ele for usado para armazenar a data
     ];
 
     protected $casts = [
-        'day_week_start' => 'date', // Certifica-se de que 'day_week_start' é tratado como uma data
-    ];
+    'day_week_start' => 'datetime',
+];
+
+   
 
     public function menu()
     {

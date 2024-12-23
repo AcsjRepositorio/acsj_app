@@ -96,23 +96,29 @@
                 </div>
 
             </div>
-
             <div class="mb-3">
-                <label for="day_week_start" class="form-label">Data de venda:</label>
-                <div class="input-group">
-                    <input type="date"
-                           class="form-control"
-                           name="day_week_start"
-                           id="day_week_start"
-                           required>
-                    <span class="input-group-text">
-                        <i class="bi bi-calendar3"></i>
-                    </span>
-                </div>
-                <div class="invalid-feedback">
-                    Por favor, selecione uma data de venda! 
-                </div>
-            </div>
+    <label for="day_week_start" class="form-label">Data de venda:</label>
+    <div class="input-group">
+        <input type="text" class="form-control" name="day_week_start" id="day_week_start" required>
+        <span class="input-group-text">
+            <i class="bi bi-calendar3"></i>
+        </span>
+
+
+        <input type="hidden" name="day_of_week" id="day_of_week"> <!-- Campo oculto -->
+    <div class="mt-2">
+        <p id="dayOfWeek" class="text-muted"></p>
+    </div>
+
+
+    </div>
+    <div class="mt-2">
+        <p id="dayOfWeek" class="text-muted"></p>
+    </div>
+    <div class="invalid-feedback">
+        Por favor, selecione uma data de venda! 
+    </div>
+</div>
 
             <div class="d-flex justify-content-between">
                 <button type="button" class="btn btn-outline-secondary" id="prevBtn">Voltar</button>
@@ -162,7 +168,12 @@
 @endsection
 
 @section('css')
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
 <style>
     .steps-container {
         display: flex;
@@ -198,6 +209,11 @@
 @endsection
 
 @section('js')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 <script>
     const steps = document.querySelectorAll('.form-step');
     const stepCircles = document.querySelectorAll('.step-circle');
@@ -253,5 +269,22 @@
     document.getElementById('nextBtnStep2').addEventListener('click', nextStep);
     document.getElementById('prevBtn').addEventListener('click', prevStep);
     document.getElementById('prevBtnStep3').addEventListener('click', prevStep);
+
+    $(function () {
+    $("#day_week_start").datepicker({
+        dateFormat: "yy-mm-dd",
+        onSelect: function (dateText) {
+            const date = new Date(dateText);
+            const dayOfWeek = date.toLocaleDateString('pt-PT', { weekday: 'long' });
+            $('#dayOfWeek').text(`Dia da semana: ${dayOfWeek}`);
+            $('#day_of_week').val(dayOfWeek); // Atualiza o campo oculto
+        }
+    });
+});
+
+
+
+
+
 </script>
 @endsection

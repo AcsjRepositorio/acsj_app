@@ -1,4 +1,4 @@
-@extends('layouts.masterlayout') {{-- Certifique-se de que este layout está correto --}}
+@extends('layouts.masterlayout') 
 
 @section('content')
     @auth
@@ -13,9 +13,15 @@
     <h1>Home Page</h1>
 
     <div class="meal-cards">
-        @foreach ($meals as $meal)
-            <x-cards.meal-week :meal="$meal" />
-        @endforeach
+    @foreach ($meals as $meal)
+    <x-cards.meal-week :meal="$meal" />
+@endforeach
     </div>
+
+
+
+    
+
+        
 @endsection
 

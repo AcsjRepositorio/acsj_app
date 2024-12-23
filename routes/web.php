@@ -38,8 +38,7 @@ Route::middleware('auth')->group(function () {
 
 
 
-//Rotas públicas sem autenticação 
-Route::get('/viewallmeals',[MealController::class,'viewallmeals'])->name('viewallmeals');
+
 
 
 

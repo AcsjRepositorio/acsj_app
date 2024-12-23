@@ -32,12 +32,17 @@
         </thead>
         <tbody>
             @foreach($meals as $meal)
+
             <tr>
-                <td class="bg-black text-white justify-content-center p-1" style="height: 50px; margin-right: 5px;">
-                    <p class="text-center m-0" style="writing-mode: vertical-rl; font-size: 12px;">
-                        {{ ucfirst($meal->day_of_week) }}
-                    </p>
-                </td>
+            <td class="bg-black text-white justify-content-center p-1" style="height: 50px; margin-right: 5px;">
+    <p class="text-center m-0" style="writing-mode: vertical-rl; font-size: 12px;">
+    {{ ucfirst($meal->day_of_week) }}
+    </p>
+</td>
+
+
+
+
 
                 <!-- Foto -->
                 <td class="text-center align-middle">
