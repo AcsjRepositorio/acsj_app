@@ -21,45 +21,17 @@
         <a type="button" class="button">Adicionar ao carrinho</a>
 
         <button
-    type="button"
-    class="btn btn-outline-secondary"
-    data-bs-toggle="modal"
-    data-bs-target="#mealModal"
-    data-meal-name="{{ $meal->name }}"
-    data-meal-photo="{{ $meal->photo && file_exists(public_path('storage/' . $meal->photo)) ? asset('storage/' . $meal->photo) : asset('images/default-meal.jpg') }}"
-    data-meal-description="{{ $meal->description }}"
-    data-meal-price="{{ $meal->price }}"
-    data-meal-day="{{ ucfirst($meal->day_of_week) }}">
-    Ver mais
-</button>
-
-
-    </div>
-</div>
-
-<!-- Modal Bootstrap -->
-<div class="modal fade" id="mealModal-{{ $meal->id }}" tabindex="-1" aria-labelledby="mealModalLabel-{{ $meal->id }}" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="mealModalLabel-{{ $meal->id }}">{{ $meal->name }}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <img
-                    src="{{ $meal->photo && file_exists(public_path('storage/' . $meal->photo)) 
-                            ? asset('storage/' . $meal->photo) 
-                            : asset('images/default-meal.jpg') }}"
-                    alt="Foto de {{ $meal->name }}"
-                    class="img-fluid rounded-lg mb-3">
-                <p class="text-gray-700">{{ $meal->description }}</p>
-                <p class="text-green-600 font-bold">Preço: €{{ $meal->price }}</p>
-                <p>Disponível: {{ ucfirst($meal->day_of_week) }}</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-            </div>
-        </div>
+            type="button"
+            class="btn btn-outline-secondary"
+            data-bs-toggle="modal"
+            data-bs-target="#mealModal"
+            data-meal-name="{{ $meal->name }}"
+            data-meal-photo="{{ $meal->photo && file_exists(public_path('storage/' . $meal->photo)) ? asset('storage/' . $meal->photo) : asset('images/default-meal.jpg') }}"
+            data-meal-description="{{ $meal->description }}"
+            data-meal-price="{{ $meal->price }}"
+            data-meal-day="{{ ucfirst($meal->day_of_week) }}">
+            Ver mais
+        </button>
     </div>
 </div>
 
@@ -150,32 +122,5 @@
 
     .button:hover {
         background-color: #6C757D;
-    }
-
-    /* Garantir que o modal funcione corretamente */
-    .modal-dialog {
-        max-width: 800px;
-        margin: 1.75rem auto;
-    }
-
-    .modal-content {
-        border-radius: 0.5rem;
-        overflow: hidden;
-    }
-
-    .btn-close {
-        all: unset;
-        cursor: pointer;
-        background-color: transparent;
-        width: 1.5rem;
-        height: 1.5rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .btn-close:hover {
-        background-color: #f0f0f0;
-        border-radius: 50%;
     }
 </style>
