@@ -1,12 +1,12 @@
 <?php
 
-namespace App\View\Components\modal;
+namespace App\View\Components\sidebart;
 
 use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 
-class meal-details extends Component
+class sideBarCart extends Component
 {
     /**
      * Create a new component instance.
@@ -21,6 +21,6 @@ class meal-details extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.modal.meal-details');
+        return view('components.sidebart.side-bar-cart');
     }
 }

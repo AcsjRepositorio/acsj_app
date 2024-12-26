@@ -1,67 +1,43 @@
 @props(['meal'])
 
 <div class="card">
-    <div class="price-badge">€{{$meal->price}}</div>
+    <div class="price-badge">€{{ $meal->price }}</div>
     <div class="image-wrapper">
         <img src="{{ $meal->photo && file_exists(public_path('storage/' . $meal->photo)) 
                 ? asset('storage/' . $meal->photo) 
                 : asset('images/default-meal.jpg') }}"
             alt="Foto de {{ $meal->name }}">
-        <div class="day-badge">
-            {{ ucfirst($meal->day_of_week) }}
-        </div>
     </div>
 
-    <h3 class="card-title">{{$meal->name}}</h3>
-    <p class="card-description">
-        {{$meal->description}}
-    </p>
+    <h3 class="card-title">{{ $meal->name }}</h3>
+    <p class="card-description">{{ $meal->description }}</p>
 
-    <div class="d-flex justify-content-between align-items-center">
-        <a type="button" class="button">Adicionar ao carrinho</a>
-
-        <button
-    type="button"
-    class="btn btn-outline-secondary"
-    data-bs-toggle="modal"
-    data-bs-target="#mealModal"
-    data-meal-name="{{ $meal->name }}"
-    data-meal-photo="{{ $meal->photo && file_exists(public_path('storage/' . $meal->photo)) ? asset('storage/' . $meal->photo) : asset('images/default-meal.jpg') }}"
-    data-meal-description="{{ $meal->description }}"
-    data-meal-price="{{ $meal->price }}"
-    data-meal-day="{{ ucfirst($meal->day_of_week) }}">
-    Ver mais
-</button>
-
-
-    </div>
+    <form method="POST" action="{{ route('cart.store') }}">
+        @csrf
+        <input type="hidden" name="meal_id" value="{{ $meal->id }}">
+        <button type="submit" class="button add-to-cart">Adicionar ao carrinho</button>
+    </form>
 </div>
 
-<!-- Modal Bootstrap -->
-<div class="modal fade" id="mealModal-{{ $meal->id }}" tabindex="-1" aria-labelledby="mealModalLabel-{{ $meal->id }}" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="mealModalLabel-{{ $meal->id }}">{{ $meal->name }}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <img
-                    src="{{ $meal->photo && file_exists(public_path('storage/' . $meal->photo)) 
-                            ? asset('storage/' . $meal->photo) 
-                            : asset('images/default-meal.jpg') }}"
-                    alt="Foto de {{ $meal->name }}"
-                    class="img-fluid rounded-lg mb-3">
-                <p class="text-gray-700">{{ $meal->description }}</p>
-                <p class="text-green-600 font-bold">Preço: €{{ $meal->price }}</p>
-                <p>Disponível: {{ ucfirst($meal->day_of_week) }}</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-            </div>
-        </div>
-    </div>
+
+    <!-- <button
+            type="button"
+            class="btn btn-outline-secondary"
+            data-bs-toggle="modal"
+            data-bs-target="#mealModal"
+            data-meal-name="{{ $meal->name }}"
+            data-meal-photo="{{ $meal->photo && file_exists(public_path('storage/' . $meal->photo)) ? asset('storage/' . $meal->photo) : asset('images/default-meal.jpg') }}"
+            data-meal-description="{{ $meal->description }}"
+            data-meal-price="{{ $meal->price }}"
+            data-meal-day="{{ ucfirst($meal->day_of_week) }}">
+            Ver mais
+        </button> -->
 </div>
+
+
+
+
+
 
 <style>
     .card {
@@ -104,8 +80,8 @@
 
     .price-badge {
         position: absolute;
-        top: -4.5px;
-        right: -4px;
+        top: 4.5px;
+        right: 4px;
         background-color: #00C49A;
         color: #fff;
         border-radius: 50%;
@@ -179,3 +155,61 @@
         border-radius: 50%;
     }
 </style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const mealModal = document.getElementById('mealModal');
+
+        mealModal.addEventListener('show.bs.modal', (event) => {
+            const button = event.relatedTarget;
+            const mealName = button.getAttribute('data-meal-name');
+            const mealPhoto = button.getAttribute('data-meal-photo');
+            const mealDescription = button.getAttribute('data-meal-description');
+            const mealPrice = button.getAttribute('data-meal-price');
+            const mealDay = button.getAttribute('data-meal-day');
+
+            document.getElementById('mealModalLabel').textContent = mealName;
+            document.getElementById('mealModalPhoto').setAttribute('src', mealPhoto);
+            document.getElementById('mealModalDescription').textContent = mealDescription;
+            document.getElementById('mealModalPrice').textContent = `Preço: €${mealPrice}`;
+            document.getElementById('mealModalDay').textContent = `Disponível: ${mealDay}`;
+        });
+    });
+</script>
+
+<!-- Lógica para adicionar ao carrinho pelo id  -->
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const addToCartForms = document.querySelectorAll(`form[action="${document.querySelector('meta[name="cart-route"]').content}"]`);
+    const cartSidebar = document.querySelector('#sideBarCart .offcanvas-body');
+
+    addToCartForms.forEach(form => {
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const formData = new FormData(form);
+
+            try {
+                await fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    },
+                    body: formData,
+                });
+
+                // Atualizar sidebar
+                const response = await fetch(document.querySelector('meta[name="cart-items-route"]').content);
+                const html = await response.text();
+                cartSidebar.innerHTML = html;
+            } catch (error) {
+                console.error('Erro ao adicionar ao carrinho:', error);
+            }
+        });
+    });
+});
+
+
+
+</script>

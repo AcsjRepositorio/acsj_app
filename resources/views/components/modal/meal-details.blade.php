@@ -1,116 +1,79 @@
-@props(['meal'])
+<!-- Notas -->
 
-<div class="card">
-    <div class="price-badge">€{{$meal->price}}</div>
-    <div class="image-wrapper">
-        <img src="{{ $meal->photo && file_exists(public_path('storage/' . $meal->photo)) 
-                ? asset('storage/' . $meal->photo) 
-                : asset('images/default-meal.jpg') }}"
-            alt="Foto de {{ $meal->name }}">
-        <div class="day-badge">
-            {{ ucfirst($meal->day_of_week) }}
+<!-- data-bs-dismiss="modal" faz com que saia do modal com classe Bootstrap -->
+<div class="modal fade" id="mealModal" tabindex="-1" aria-labelledby="mealModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header d-flex justify-content-between align-items-center">
+                <h5 class="modal-title" id="mealModalLabel"></h5>
+                <div class="d-flex gap-2">
+
+                    <a class="button" role="button" id="openSideBarButton">
+                        <i class="bi bi-cart" style="cursor: pointer;"></i>
+                    </a>
+
+                    <span aria-hidden="true" style="cursor: pointer;" data-bs-dismiss="modal">&times;</span>
+                </div>
+            </div>
+
+            <div class="modal-body d-flex flex-wrap">
+                <div class="col-md-4">
+                    <img id="mealModalPhoto" src="" alt="Foto do prato" class="img-fluid rounded mb-3">
+
+                    <!-- Controle de quantidade abaixo da imagem -->
+                    <div class="quantity-controls d-flex align-items-center justify-content-center mt-3">
+                        <button class="btn btn-secondary btn-sm">-</button>
+                        <input type="number" class="form-control text-center mx-2" value="1" min="1" style="width: 60px;">
+                        <button class="btn btn-secondary btn-sm">+</button>
+                    </div>
+                </div>
+
+                <div class="col-md-8 ps-4">
+                    <h3 id="mealModalTitle"></h3>
+
+                    <!-- Price acima de Description -->
+                    <h4 id="mealModalPrice" class="price text-success mb-2"></h4>
+                    <p id="mealModalDescription" class="text-muted"></p>
+
+                    <!-- Botões alinhados à direita -->
+                    <div class="d-flex justify-content-end align-items-center mt-4 gap-2">
+                        <button class="button">Pagar agora</button>
+                        <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Continuar a comprar</button>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
-
-    <h3 class="card-title">{{$meal->name}}</h3>
-    <p class="card-description">
-        {{$meal->description}}
-    </p>
-
-    <div class="d-flex justify-content-between align-items-center">
-        <a type="button" class="button">Adicionar ao carrinho</a>
-
-        <button
-            type="button"
-            class="btn btn-outline-secondary"
-            data-bs-toggle="modal"
-            data-bs-target="#mealModal"
-            data-meal-name="{{ $meal->name }}"
-            data-meal-photo="{{ $meal->photo && file_exists(public_path('storage/' . $meal->photo)) ? asset('storage/' . $meal->photo) : asset('images/default-meal.jpg') }}"
-            data-meal-description="{{ $meal->description }}"
-            data-meal-price="{{ $meal->price }}"
-            data-meal-day="{{ ucfirst($meal->day_of_week) }}">
-            Ver mais
-        </button>
     </div>
 </div>
 
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+<script>
+   
+
+    document.addEventListener('DOMContentLoaded', () => {
+    const mealModal = document.getElementById('mealModal');
+    const sideBarCart = document.getElementById('sideBarCart');
+    const openSideBarButton = document.getElementById('openSideBarButton');
+
+    // Quando clicar no botão, feche o modal e abra o offcanvas
+    openSideBarButton.addEventListener('click', () => {
+        // Fecha o modal atual
+        const bootstrapModal = bootstrap.Modal.getInstance(mealModal);
+        if (bootstrapModal) {
+            bootstrapModal.hide();
+        }
+
+        // Abre o offcanvas
+        const bootstrapOffcanvas = new bootstrap.Offcanvas(sideBarCart);
+        bootstrapOffcanvas.show();
+    });
+});
+
+</script>
+
 <style>
-    .card {
-        width: 300px;
-        border-radius: 15px;
-        background-color: #fff;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
-        position: relative;
-        padding: 16px;
-        text-align: center;
-    }
-
-    .image-wrapper {
-        position: relative;
-        width: 100%;
-        border-radius: 15px;
-        overflow: hidden;
-    }
-
-    .image-wrapper img {
-        width: 100%;
-        display: block;
-        border-radius: 15px;
-    }
-
-    .day-badge {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        background: rgba(0, 0, 0, 0.6);
-        color: #fff;
-        padding: 8px 0;
-        font-size: 14px;
-        text-align: center;
-        border-bottom-left-radius: 15px;
-        border-bottom-right-radius: 15px;
-    }
-
-    .price-badge {
-        position: absolute;
-        top: -4.5px;
-        right: -4px;
-        background-color: #00C49A;
-        color: #fff;
-        border-radius: 50%;
-        width: 60px;
-        height: 60px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-size: 18px;
-        font-weight: bold;
-        z-index: 1;
-    }
-
-    .card-title {
-        font-size: 18px;
-        font-weight: bold;
-        margin: 8px 0;
-    }
-
-    .card-description {
-        font-size: 14px;
-        color: #6c757d;
-        overflow: hidden;
-        display: -webkit-box;
-        -webkit-line-clamp: 4;
-        -webkit-box-orient: vertical;
-        text-overflow: ellipsis;
-    }
-
-    a {
-        text-decoration: none;
-    }
-
     .button {
         border-radius: 8px;
         padding: 6px;

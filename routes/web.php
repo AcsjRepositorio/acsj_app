@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\AdminAcess;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\MealController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
@@ -20,20 +21,22 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     //Esta rota foi criada para permitir o middleware AdminAcess
-        Route::middleware([AdminAcess::class])->group(function () {
-            Route::get('/dashboard', [DashboardController::class, 'dashboardView'])->name('dashboard');
-            Route::get('/adminpanel/manage_users', [UserController::class, 'index'])->name('adminpanel.manage.users');
+    Route::middleware([AdminAcess::class])->group(function () {
+        Route::get('/dashboard', [DashboardController::class, 'dashboardView'])->name('dashboard');
+        Route::get('/adminpanel/manage_users', [UserController::class, 'index'])->name('adminpanel.manage.users');
 
-            Route::get('/adminpanel/manage_meals', [MealController::class, 'index'])->name('adminpanel.manage.meals');
-            
+        Route::get('/adminpanel/manage_meals', [MealController::class, 'index'])->name('adminpanel.manage.meals');
 
-            Route::resource('users',UserController::class);
-            
-            Route::resource('meals',MealController::class);
 
-        });
-    
-    
+        Route::resource('users', UserController::class);
+
+        Route::resource('meals', MealController::class);
+
+
+
+        Route::post('/cart/store', [CartController::class, 'store'])->name('cart.store');
+        Route::get('/cart/items', [CartController::class, 'getCartItems'])->name('cart.items');
+    });
 });
 
 
@@ -47,4 +50,4 @@ Route::middleware('auth')->group(function () {
 
 
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
