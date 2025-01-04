@@ -13,3 +13,6 @@ class OrderMeal extends Pivot
 
     protected $fillable = ['quantity', 'day_of_week', 'order_id', 'meal_id'];
 }
+
+
+// Acredito qeu preciso de outros valores e não os que estão aqui 

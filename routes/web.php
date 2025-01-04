@@ -34,17 +34,15 @@ Route::middleware('auth')->group(function () {
 
 
 
-        Route::post('/cart/store', [CartController::class, 'store'])->name('cart.store');
-        Route::get('/cart/items', [CartController::class, 'getCartItems'])->name('cart.items');
+       
     });
 });
 
 
 
 
-
-
-
+Route::resource('cart', CartController::class)->only(['index', 'store', 'destroy']);
+Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
 
 
 

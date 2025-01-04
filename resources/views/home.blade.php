@@ -19,7 +19,7 @@
 
     <!-- Modal include -->
     <x-modal.meal-details />
-    <x-sidebar.side-bar-cart />
-
+    <x-cart />
+    
 
 @endsection

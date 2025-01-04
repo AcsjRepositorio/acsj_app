@@ -2,76 +2,56 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\DB; // Adicione esta linha
-use App\Models\Meal;
-use App\Models\CartItem;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Meal;
 
 class CartController extends Controller
 {
+    // Exibe o carrinho
     public function index()
     {
-        $cartItems = [];
-    
-        if (Auth::check()) {
-            // Carrinho para usuários autenticados
-            $cartItems = CartItem::where('user_id', Auth::id())->get();
-        } else {
-            // Carrinho para visitantes (sessão)
-            $cartSession = session('cart', []);
-    
-            foreach ($cartSession as $mealId => $item) {
-                $cartItems[] = (object) [
-                    'meal' => (object) [
-                        'name' => $item['name'],
-                        'photo' => $item['photo'],
-                        'price' => $item['price'],
-                    ],
-                    'quantity' => $item['quantity'],
-                ];
-            }
-        }
-    
-        // Passe a variável para a view correta
-        return view('components.sidebar.side-bar-cart', compact('cartItems'));
+        // Garante que o valor inicial do carrinho seja sempre um array
+        $cart = session()->get('cart', []); 
+        return view('cart.index', compact('cart'));
     }
 
-
+    // Adiciona item ao carrinho
     public function store(Request $request)
-{
-    $mealId = $request->input('meal_id');
-    $quantity = 1; // Padrão: 1 unidade por vez
+    {
+        $meal = Meal::findOrFail($request->meal_id);
+        $cart = session()->get('cart', []);
 
-    // Verifica se o usuário está autenticado
-    $userId = Auth::check() ? Auth::id() : null;
-    $sessionId = Auth::check() ? null : session()->getId();
+        if (isset($cart[$meal->id])) {
+            $cart[$meal->id]['quantity'] += 1; // Incrementa a quantidade se já existir
+        } else {
+            $cart[$meal->id] = [
+                'name' => $meal->name,
+                'price' => $meal->price,
+                'quantity' => 1,
+                'photo' => $meal->photo,
+                'day_of_week' => $meal->day_of_week
+            ];
+        }
 
-    // Salvar no banco de dados
-    $cartItem = CartItem::updateOrCreate(
-        [
-            'user_id' => $userId,
-            'session_id' => $sessionId,
-            'meal_id' => $mealId,
-        ],
-        [
-            'quantity' => DB::raw('quantity + 1'), // Incrementar quantidade
-        ]
-    );
+        session()->put('cart', $cart); // Salva na sessão
+        return redirect()->back()->with('success', 'Item adicionado ao carrinho!');
+    }
 
-    return response()->json([
-        'message' => 'Produto adicionado ao carrinho!',
-    ]);
-}
+    // Remove item do carrinho
+    public function destroy($id)
+    {
+        $cart = session()->get('cart', []);
+        if (isset($cart[$id])) {
+            unset($cart[$id]); // Remove o item
+            session()->put('cart', $cart); // Atualiza a sessão
+        }
+        return redirect()->back()->with('success', 'Item removido do carrinho!');
+    }
 
-
-public function getCartItems()
-{
-    $cartItems = Auth::check()
-        ? CartItem::with('meal')->where('user_id', Auth::id())->get()
-        : CartItem::with('meal')->where('session_id', session()->getId())->get();
-
-    return view('components.sidebar.side-bar-cart', compact('cartItems'));
-}
-
+    // Limpa o carrinho inteiro
+    public function clear()
+    {
+        session()->forget('cart'); // Remove o carrinho inteiro
+        return redirect()->route('cart.index')->with('success', 'Carrinho limpo com sucesso!');
+    }
 }
