@@ -117,7 +117,7 @@ class MealController extends Controller
             'category_id' => $validated['category_id'],
             'day_week_start' => $validated['day_week_start'],
             'photo' => $photoPath,
-            'day_of_week' => $validated['day_of_week'],
+           'day_of_week' => strtolower(Carbon::parse($validated['day_week_start'])->locale('pt_PT')->dayName), // Padronizar com letras minúsculas
             // 'day_week_end' => $validated['day_week_end'],
         ];
         

@@ -1,6 +1,7 @@
 <!-- Notas -->
 
 <!-- data-bs-dismiss="modal" faz com que saia do modal com classe Bootstrap -->
+
 <div class="modal fade" id="mealModal" tabindex="-1" aria-labelledby="mealModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -21,6 +22,7 @@
                     <img id="mealModalPhoto" src="" alt="Foto do prato" class="img-fluid rounded mb-3">
 
                     <!-- Controle de quantidade abaixo da imagem -->
+
                     <div class="quantity-controls d-flex align-items-center justify-content-center mt-3">
                         <button class="btn btn-secondary btn-sm">-</button>
                         <input type="number" class="form-control text-center mx-2" value="1" min="1" style="width: 60px;">
@@ -31,11 +33,11 @@
                 <div class="col-md-8 ps-4">
                     <h3 id="mealModalTitle"></h3>
 
-                    <!-- Price acima de Description -->
+                   
                     <h4 id="mealModalPrice" class="price text-success mb-2"></h4>
                     <p id="mealModalDescription" class="text-muted"></p>
 
-                    <!-- Botões alinhados à direita -->
+                    
                     <div class="d-flex justify-content-end align-items-center mt-4 gap-2">
                         <button class="button">Pagar agora</button>
                         <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Continuar a comprar</button>

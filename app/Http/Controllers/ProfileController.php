@@ -40,21 +40,21 @@ class ProfileController extends Controller
     /**
      * Delete the user's account.
      */
-    public function destroy(Request $request): RedirectResponse
-    {
+     public function destroy(Request $request): RedirectResponse
+ {
         $request->validateWithBag('userDeletion', [
-            'password' => ['required', 'current_password'],
+         'password' => ['required', 'current_password'],
         ]);
 
         $user = $request->user();
 
-        Auth::logout();
+     Auth::logout();
 
-        $user->delete();
+     $user->delete();
 
-        $request->session()->invalidate();
+     $request->session()->invalidate();
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
-    }
+ }
 }

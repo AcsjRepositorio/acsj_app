@@ -1,14 +1,12 @@
 @extends('layouts.masterlayout') 
 
+
+
 @section('content')
-    @auth
-        <x-user-dropdown :user="auth()->user()" />
-    @else
-        <a href="{{ route('login') }}" class="btn btn-primary">Log in</a>
-        @if (Route::has('register'))
-            <a href="{{ route('register') }}" class="btn btn-outline-primary">Register</a>
-        @endif
-    @endauth
+
+<x-navbar />
+
+<x-day-meal-component />
 
     <h1>Home Page</h1>
     <div class="meal-cards">
@@ -18,8 +16,12 @@
     </div>
 
     <!-- Modal include -->
+     
     <x-modal.meal-details />
-    <x-cart />
+    <x-cart/>
+
+
     
 
 @endsection
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous" ></script >
