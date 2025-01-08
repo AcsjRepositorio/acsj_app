@@ -52,6 +52,6 @@ class CartController extends Controller
     public function clear()
     {
         session()->forget('cart'); // Remove o carrinho inteiro
-        return redirect()->route('cart.index')->with('success', 'Carrinho limpo com sucesso!');
+        return redirect()->back()->with('success', 'Carrinho limpo com sucesso!');
     }
 }
