@@ -1,18 +1,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
     <div class="container-fluid">
         <!-- Logo -->
@@ -42,8 +30,16 @@
                 </li>
 
 
+
+
+                   <!-- Botão para acionar o sidebar do carrinho  -->
+
                 <li class="nav-item">
-                    <a class="nav-link" href="/carrinho">
+                    <a class="nav-link" href="/carrinho"
+                    data-bs-toggle="offcanvas" 
+                    data-bs-target="#offcanvasCart" 
+                    aria-controls="offcanvasCart"
+                    >
                         <i class="bi bi-cart"></i>
                     </a>
                 </li>
