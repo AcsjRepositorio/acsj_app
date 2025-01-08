@@ -4,21 +4,39 @@
 
 @section('content')
 
+<!-- componente navbar -->
 <x-navbar />
 
+
+<!-- componente com o banner do prato do dia -->
 <x-day-meal-component />
 
-    
-<x-cards.meal-carousel :meals="$meals" />
-    
+    <!-- componente Carrossel com cards dos pratos -->
 
-    <!-- Modal include -->
-     
-    <x-modal.meal-details />
+ <!-- <x-cards.meal-carousel :meals="$meals" /> -->
+    
+<!-- Componente modal com detalhes do prato -->
+    
+<x-modal.meal-details />
+
+
+    <!-- Componente do carrinho -->
     <x-cart/>
 
 
  
+    <!-- @php
+    // Chama o método estático e obtém a collection agrupada
+    $mealsByDay = \App\Models\Meal::getAllMealsByDay();
+@endphp -->
+
+<!-- Agora passa essa variável para o seu componente -->
+
+
+
+<!-- Componente "ficheiro" com os dias da semana -->
+<x-meal-tabs :mealsByDay="$mealsByDay" />
+
 
 
 @endsection

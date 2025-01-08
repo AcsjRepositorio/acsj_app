@@ -1,113 +1,108 @@
-<!-- Usei o  OFFCANVAS (SIDEBAR)   -->
+<!-- Usei o OFFCANVAS (SIDEBAR) -->
 <div class="offcanvas offcanvas-end"
-    tabindex="-1"
-    id="offcanvasCart"
-    aria-labelledby="offcanvasCartLabel">
+     tabindex="-1"
+     id="offcanvasCart"
+     aria-labelledby="offcanvasCartLabel">
 
     <div class="offcanvas-header">
         <h5 class="offcanvas-title" id="offcanvasCartLabel">Seu Carrinho</h5>
         <button type="button" class="btn-close text-reset"
-            data-bs-dismiss="offcanvas"
-            aria-label="Close"></button>
+                data-bs-dismiss="offcanvas"
+                aria-label="Close"></button>
     </div>
 
     <div class="offcanvas-body">
 
-        <!-- código do carrinho  -->
+        <!-- código do carrinho -->
         @if (session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
+            <div class="alert alert-success">{{ session('success') }}</div>
         @endif
 
         @if (is_array($cart) && count($cart) > 0)
+            
+            <!-- Exemplo de repetição para cada item do carrinho -->
+            @foreach ($cart as $id => $item)
+                <div class="shadow p-3 mb-5 bg-body rounded"
+                     id="produto-{{ $id }}"
+                     data-preco="{{ $item['price'] }}"> <!-- Guardamos o preço no data attribute -->
 
+                    <div class="d-flex justify-content-between ">
+                        <b>{{ $item['name'] }}</b>
+                        <!-- Form de excluir item -->
+                        <form method="POST" action="{{ route('cart.destroy', $id) }}">
+                            @csrf
+                            @method('DELETE')
+                            <a href="javascript:void(0);" style="color: gray; text-decoration: none;"
+                               onclick="this.closest('form').submit();">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </form>
+                    </div>
 
-        <!-- Exemplo de repetição para cada item do carrinho -->
-        @foreach ($cart as $id => $item)
-        <div class="shadow p-3 mb-5 bg-body rounded"
-            id="produto-{{ $id }}"
-            data-preco="{{ $item['price'] }}"> <!-- Guardamos o preço no data attribute -->
+                    <!-- Imagem -->
+                    <img src="{{ $item['photo'] ? asset('storage/' . $item['photo']) : asset('images/default-meal.jpg') }}"
+                         alt="{{ $item['name'] }}"
+                         width="80">
 
-            <div class="d-flex justify-content-between ">
-                <b>{{ $item['name'] }}</b>
-                <!-- Form de excluir item -->
-                <form method="POST" action="{{ route('cart.destroy', $id) }}">
-                    @csrf
-                    @method('DELETE')
-                    <a href="javascript:void(0);" style="color: gray; text-decoration: none;"
-                        onclick="this.closest('form').submit();">
-                        <i class="bi bi-trash"></i>
-                    </a>
-                </form>
-            </div>
+                    <!-- Quantidade de itens (inicial) -->
+                    <span>Quantidade:
+                        <b id="quant-{{ $id }}">{{ $item['quantity'] }}</b>
+                    </span>
 
-            <!-- Imagem -->
-            <img src="{{ $item['photo'] ? asset('storage/' . $item['photo']) : asset('images/default-meal.jpg') }}"
-                alt="{{ $item['name'] }}"
-                width="80">
+                    <!-- Preço unitário -->
+                    <span>€{{ number_format($item['price'], 2) }}</span>
 
-            <!-- Quantidade de itens (inicial) -->
-            <span>Quantidade:
-                <b id="quant-{{ $id }}">{{ $item['quantity'] }}</b>
-            </span>
+                    <div class="d-flex justify-content-between mt-3">
+                        <!-- Botões para alterar quantidade -->
+                        <div data-app="product.quantity" id="quantidade-{{ $id }}">
+                            <input type="button" value="-" onclick="processarQuantidade({{ $id }}, -1)" />
+                            <input id="campo-quant-{{ $id }}"
+                                   class="text"
+                                   size="1"
+                                   type="text"
+                                   value="{{ $item['quantity'] }}"
+                                   maxlength="5"
+                                   onblur="atualizarQuantidade({{ $id }})" />
+                            <input type="button" value="+" onclick="processarQuantidade({{ $id }}, 1)" />
+                        </div>
 
-            <!-- Preço unitário -->
-            <span>€{{ number_format($item['price'], 2) }}</span>
+                        <!-- Subtotal (inicial) -->
+                        <div class="gap-3">
+                            <span><b>Subtoal:</b></span>
+                            <span>
+                                <b id="total-{{ $id }}">
+                                    €{{ number_format($item['price'] * $item['quantity'], 2) }}
+                                </b>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
 
             <div class="d-flex justify-content-between mt-3">
-                <!-- Botões para alterar quantidade -->
-                <div data-app="product.quantity" id="quantidade-{{ $id }}">
-                    <input type="button" value="-" onclick="processarQuantidade({{ $id }}, -1)" />
-                    <input id="campo-quant-{{ $id }}"
-                        class="text"
-                        size="1"
-                        type="text"
-                        value="{{ $item['quantity'] }}"
-                        maxlength="5"
-                        onblur="atualizarQuantidade({{ $id }})" />
-                    <input type="button" value="+" onclick="processarQuantidade({{ $id }}, 1)" />
-                </div>
+                <form method="POST" action="{{ route('cart.clear') }}">
+                    @csrf
+                    <button type="submit" class="btn btn-warning">Limpar Carrinho</button>
+                </form>
 
-                <!-- Total (inicial) -->
-                <div class="gap-3">
-                    <span><b>Subtoal:</b></span>
-                    <span>
-                        <b id="total-{{ $id }}">
-                            €{{ number_format($item['price'] * $item['quantity'], 2) }}
-                        </b>
-                    </span>
+                <!-- Campo para exibir o total do carrinho -->
+                <div>
+                    <label for=""><b>Total do carrinho:</b></label>
+                    <span id="carrinho-total"><b>€ 0.00</b></span>
                 </div>
             </div>
-        </div>
-        @endforeach
-
-
-
-
-        <div class="d-flex justify-content-between mt-3">
-            <form method="POST" action="{{ route('cart.clear') }}">
-                @csrf
-                <button type="submit" class="btn btn-warning">Limpar Carrinho</button>
-            </form>
-
-            <!-- Campo para exibir o total do carrinho -->
-            <div>
-                <label for=""><b>Total do carrinho:</b></label>
-                <span id="carrinho-total"><b>€ 0.00</b></span>
-            </div>
-        </div>
-
-
 
         @else
-        <p>O carrinho está vazio.</p>
+            <p>O carrinho está vazio.</p>
         @endif
-
 
     </div>
 </div>
 
-
+<!-- Script do Bootstrap -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Se ainda precisar dessa função 'process', mantenha-a ou remova se não estiver usando -->
 <script>
     function process(quant) {
         var value = parseInt(document.getElementById("quant").value);
@@ -120,23 +115,24 @@
     }
 </script>
 
+<!-- Scripts para recalcular totais -->
 <script>
-    // Continua igual a sua função que atualiza subtotal de 1 item
+    // Função para alterar a quantidade de acordo com clique em +/-:
     function processarQuantidade(itemId, delta) {
         const campoQuant = document.getElementById('campo-quant-' + itemId);
         let valorAtual = parseInt(campoQuant.value);
 
-        // Atualiza o valor (somando delta: -1 ou +1)
         valorAtual += delta;
         if (valorAtual < 1) {
             valorAtual = 1;
         }
         campoQuant.value = valorAtual;
-
+        
         // Atualiza subtotal daquele item
         recalcularTotal(itemId, valorAtual);
     }
 
+    // Caso o usuário digite manualmente a quantidade:
     function atualizarQuantidade(itemId) {
         const campoQuant = document.getElementById('campo-quant-' + itemId);
         let valorDigitado = parseInt(campoQuant.value);
@@ -148,15 +144,16 @@
         recalcularTotal(itemId, valorDigitado);
     }
 
+    // Recalcula o subtotal de 1 item
     function recalcularTotal(itemId, novaQuantidade) {
-        // Pega o preço a partir do data-attribute
+        // Pega o preço do data-attribute
         const produtoDiv = document.getElementById('produto-' + itemId);
         const preco = parseFloat(produtoDiv.getAttribute('data-preco'));
 
-        // Calcula o novo subtotal
+        // Novo subtotal
         const novoTotal = preco * novaQuantidade;
 
-        // Atualiza o elemento de subtotal do item
+        // Atualiza o elemento de subtotal
         const totalElement = document.getElementById('total-' + itemId);
         totalElement.textContent = '€' + novoTotal.toFixed(2);
 
@@ -164,34 +161,30 @@
         const labelQuant = document.getElementById('quant-' + itemId);
         labelQuant.textContent = novaQuantidade;
 
-        // *** Chama a função para recalcular o total do carrinho ***
+        // Atualiza o total do carrinho
         recalcularTotalDoCarrinho();
     }
 
-    // Função para recalcular o total do carrinho somando todos os itens
+    // Soma os subtotais de todos os itens e exibe no 'carrinho-total'
     function recalcularTotalDoCarrinho() {
         let totalCarrinho = 0;
-
-        // Seleciona todos os "cards" de produto (a div com id="produto-XX")
         const produtos = document.querySelectorAll('[id^="produto-"]');
         
         produtos.forEach((produto) => {
-            // ID do produto (ex.: produto-1 => 1)
             const itemId = produto.id.replace('produto-', '');
-            
-            // Preço unitário
             const preco = parseFloat(produto.getAttribute('data-preco'));
-            
-            // Quantidade digitada no input
             const campoQuant = document.getElementById('campo-quant-' + itemId);
             const quantidade = parseInt(campoQuant.value) || 0;
             
-            // Soma no total do carrinho
             totalCarrinho += preco * quantidade;
         });
 
-        // Atualiza o span do total do carrinho
         const carrinhoTotal = document.getElementById('carrinho-total');
-        carrinhoTotal.textContent = '€' + totalCarrinho.toFixed(2);
+        carrinhoTotal.textContent = '€ ' + totalCarrinho.toFixed(2);
     }
+
+    // Chama a função para recalcular o total ao carregar a página (ou offcanvas)
+    document.addEventListener('DOMContentLoaded', function() {
+        recalcularTotalDoCarrinho();
+    });
 </script>

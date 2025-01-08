@@ -26,8 +26,11 @@ class MealController extends Controller
      public static function getAllMeals()
     {
         return Meal::all();
+
+        
     }
      
+
 
     public function index()
     {

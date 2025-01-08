@@ -44,4 +44,10 @@ class Meal extends Model
     {
         return $this->belongsToMany(Order::class, 'orders_meals')->withPivot('quantity');
     }
+
+    public static function getAllMealsByDay()
+    {
+        $meals = self::all();
+        return $meals->groupBy('day_of_week');
+    }
 }
