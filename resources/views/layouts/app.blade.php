@@ -8,9 +8,13 @@
 
         <title>{{ config('app.name', 'Laravel') }}</title>
 
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+    
+        <!-- Fonts Nunito e Roboto -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -40,3 +44,17 @@
 
 
 <script src="//unpkg.com/alpinejs" defer></script>
+
+<style>
+
+body {
+    font-family: 'Roboto', sans-serif;
+}
+
+h1, h2, h3,h4,h5 {
+   
+    font-family: 'Nunito', sans-serif;
+}
+
+
+</style>

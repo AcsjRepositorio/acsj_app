@@ -8,14 +8,13 @@
 <x-navbar />
 
 
+<x-banner-hero/>
+
 <!-- componente com o banner do prato do dia -->
-<x-day-meal-component />
+{{--<x-day-meal-component />--}}
 
-    <!-- componente Carrossel com cards dos pratos -->
+<!-- componente Carrossel com cards dos pratos -->
 
- <!-- <x-cards.meal-carousel :meals="$meals" /> -->
-    
-<!-- Componente modal com detalhes do prato -->
     
 <x-modal.meal-details />
 
@@ -24,6 +23,8 @@
     <x-cart/>
 
 
+
+    
  
     <!-- @php
     // Chama o método estático e obtém a collection agrupada
@@ -37,7 +38,9 @@
 <!-- Componente "ficheiro" com os dias da semana -->
 <x-meal-tabs :mealsByDay="$mealsByDay" />
 
-
+<x-cards.meal-carousel :meals="$meals" /> 
+    
+    <!-- Componente modal com detalhes do prato -->
 
 @endsection
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous" ></script >

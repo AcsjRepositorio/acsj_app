@@ -1,14 +1,21 @@
 @props(['meals'])
 
+
+
+
 <div class="container mt-5">
     <!-- Swiper container -->
     <div class="swiper mySwiper">
         <div class="swiper-wrapper">
+        
             @foreach($meals as $meal)
+            @if($meal->category_id===4)
                 <div class="swiper-slide">
                     <x-cards.meal-week :meal="$meal" />
                 </div>
+            @endif
             @endforeach
+         
         </div>
         
         <!-- Setas de navegação (opcional) -->
@@ -19,6 +26,8 @@
         <div class="swiper-pagination"></div>
     </div>
 </div>
+
+
 
 <!-- CSS do Swiper -->
 <link

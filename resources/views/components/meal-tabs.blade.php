@@ -22,9 +22,12 @@
             @endphp
 
             @if($meals->count() > 0)
+            
                 <div class="cards-wrapper">
                     @foreach($meals as $meal)
+                    @if($meal->category_id===2)
                         <x-cards.meal-week :meal="$meal" />
+                    @endif
                     @endforeach
                 </div>
             @else
