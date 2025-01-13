@@ -8,32 +8,35 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Order extends Model
 {
     use HasFactory;
-    protected $table='orders';
 
-    protected $fillable=[
+    protected $table = 'orders';
 
-        'created_at',
-        'total_amount',
-        'delivery_status',
-        'invoice_id',
-        'reservation_code',
+    protected $fillable = [
+        'order_id',
+        'amount',
+        'currency',
+        'status',
+        'customer_name',
+        'customer_email',
         'payment_status',
-        'user_id'
-
+        'user_id',
     ];
 
-     public function user(){
-
-        return $this->belongsTo(User::class);
-     }
-
-     //Referencia a tabela pivot Orders_meals
-     public function meals()
+    /**
+     * Relação com o usuário que fez o pedido.
+     */
+    public function user()
     {
-        return $this->belongsToMany(Meal::class, 'orders_meals')->withPivot('quantity', 'day_of_week');
+        return $this->belongsTo(User::class);
     }
 
-    public function invoice(){
-        return $this->hasOne(Invoice::class);
+    /**
+     * Relação muitos-para-muitos com Meal.
+     */
+    public function meals()
+    {
+        return $this->belongsToMany(Meal::class, 'order_meal')
+                    ->withPivot('quantity')
+                    ->withTimestamps();
     }
 }

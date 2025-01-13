@@ -27,7 +27,7 @@
       seus pratos favoritos para semana e aproveite mais do dia
       </p>
       <p class="lead mt-5">
-      <button type="submit" class="button add-to-cart">Adicionar ao carrinho</button>
+      <button type="submit" class="button add-to-cart">Iniciar pedido</button>
       </p>
     </div>
     

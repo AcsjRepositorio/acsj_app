@@ -26,7 +26,7 @@
                     <a class="nav-link {{ request()->is('comprar-refeicao') ? 'active' : '' }}" href="/comprar-refeicao">Comprar Refeição</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->is('contato') ? 'active' : '' }}" href="/contato">Contato</a>
+                    <a class="nav-link {{ request()->is('contato') ? 'active' : '' }}" href="/contato">Contacto</a>
                 </li>
 
 
