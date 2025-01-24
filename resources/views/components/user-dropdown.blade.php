@@ -25,8 +25,8 @@
         <!-- Dashboard para admin -->
         @if ($user->user_type === 1)
         <li>
-            <a class="dropdown-item d-flex align-items-center justify-content-between" href="{{ route('dashboard') }}" style="padding: 5px 10px;">
-                <span>Dashboard</span>
+            <a class="dropdown-item d-flex align-items-center justify-content-between" href="{{ route('adminpanel.manage.order') }}" style="padding: 5px 10px;">
+                <span>Dashboard </span>
                 <i class="bi bi-speedometer2" style="width: 20px; text-align: center;"></i>
             </a>
         </li>

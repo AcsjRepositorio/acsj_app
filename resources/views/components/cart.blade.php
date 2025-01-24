@@ -1,4 +1,4 @@
-<!-- Usei o OFFCANVAS (SIDEBAR) -->
+<!-- resources/views/cart.blade.php -->
 <div class="offcanvas offcanvas-end"
     tabindex="-1"
     id="offcanvasCart"
@@ -13,24 +13,22 @@
 
     <div class="offcanvas-body">
 
-        <!-- Mensagens de sucesso ou erro -->
+        <!-- Mensagens de sucesso/erro -->
         @if (session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
         @endif
-
         @if (session('error'))
         <div class="alert alert-danger">{{ session('error') }}</div>
         @endif
 
         @if (is_array($cart) && count($cart) > 0)
-
-        <!-- Repetição para cada item do carrinho -->
+        <!-- LISTA DE ITENS -->
         @foreach ($cart as $id => $item)
         <div class="shadow p-3 mb-5 bg-body rounded"
             id="produto-{{ $id }}"
-            data-preco="{{ $item['price'] }}"> <!-- Guardamos o preço no data attribute -->
+            data-preco="{{ $item['price'] }}">
 
-            <div class="d-flex justify-content-between ">
+            <div class="d-flex justify-content-between">
                 <b>{{ $item['name'] }}</b>
                 <!-- Form de excluir item -->
                 <form method="POST" action="{{ route('cart.destroy', $id) }}">
@@ -48,16 +46,8 @@
                 alt="{{ $item['name'] }}"
                 width="80">
 
-            <!-- Quantidade de itens (inicial) -->
-            <span>Quantidade:
-                <b id="quant-{{ $id }}">{{ $item['quantity'] }}</b>
-            </span>
-
-            <!-- Preço unitário -->
-            <span>€{{ number_format($item['price'], 2) }}</span>
-
             <div class="d-flex justify-content-between mt-3">
-                <!-- Botões para alterar quantidade -->
+                <!-- Botões +/- -->
                 <div data-app="product.quantity" id="quantidade-{{ $id }}">
                     <input type="button" value="-" onclick="processarQuantidade({{ $id }}, -1)" />
                     <input id="campo-quant-{{ $id }}"
@@ -70,7 +60,7 @@
                     <input type="button" value="+" onclick="processarQuantidade({{ $id }}, 1)" />
                 </div>
 
-                <!-- Subtotal (inicial) -->
+                <!-- Subtotal -->
                 <div class="gap-3">
                     <span><b>Subtotal:</b></span>
                     <span>
@@ -80,121 +70,144 @@
                     </span>
                 </div>
             </div>
+
+        
         </div>
         @endforeach
 
+        <!-- Botão Limpar Carrinho e Total -->
         <div class="d-flex justify-content-between mt-3">
             <form method="POST" action="{{ route('cart.clear') }}">
                 @csrf
                 <button type="submit" class="btn btn-warning">Limpar Carrinho</button>
             </form>
 
-            <!-- Campo para exibir o total do carrinho -->
             <div>
-                <label for=""><b>Total do carrinho:</b></label>
+                <label><b>Total do carrinho:</b></label>
                 <span id="carrinho-total"><b>€ 0.00</b></span>
             </div>
         </div>
 
-        <div class="d-flex align-items-center mt-3">
-            <!-- Form para finalizar compra -->
-            <form action="{{ route('checkout') }}" method="POST">
-    @csrf
-    <!-- Outras opções de pagamento -->
-    <div class="mb-3">
-        <label for="payment_method" class="form-label">Método de Pagamento</label>
-        <select name="payment_method" id="payment_method" class="form-select">
-            <option value="card">Cartão de Crédito</option>
-            <option value="multibanco">Multibanco</option>
-            <!-- Adicione mais métodos conforme necessário -->
-        </select>
-    </div>
-    <button type="submit" class="btn btn-primary">Finalizar Compra</button>
-</form>
+        <!-- Form para finalizar compra -->
+        
 
-            <a href="#">Continuar a comprar</a>
-        </div>
 
+        <!-- btn para seguir para checkout -->
+
+        <a type="button" class="btn btn-primary" href= "{{route ('checkout') }}">Checkout</a>
+        
+        
         @else
-        <p>O carrinho está vazio.</p>
+        <p class="text-muted">O carrinho está vazio.</p>
         @endif
-
     </div>
 </div>
 
 <!-- Scripts do Bootstrap -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- Scripts para recalcular totais -->
 <script>
-    // Função para alterar a quantidade de acordo com clique em +/-:
-    function processarQuantidade(itemId, delta) {
-        const campoQuant = document.getElementById('campo-quant-' + itemId);
-        let valorAtual = parseInt(campoQuant.value);
+    // Função para aumentar ou diminuir a quantidade
+    function processarQuantidade(id, delta) {
+        const campoQuant = document.getElementById('campo-quant-' + id);
+        let quantidadeAtual = parseInt(campoQuant.value) || 1;
+        quantidadeAtual += delta;
 
-        valorAtual += delta;
-        if (valorAtual < 1) {
-            valorAtual = 1;
+        // Garantir que a quantidade não seja menor que 1
+        if (quantidadeAtual < 1) {
+            quantidadeAtual = 1;
         }
-        campoQuant.value = valorAtual;
 
-        // Atualiza subtotal daquele item
-        recalcularTotal(itemId, valorAtual);
+        // Atualiza o campo de quantidade
+        campoQuant.value = quantidadeAtual;
+
+        // Atualiza o subtotal do item e o total do carrinho
+        atualizarQuantidade(id, quantidadeAtual);
     }
 
-    // Caso o usuário digite manualmente a quantidade:
-    function atualizarQuantidade(itemId) {
-        const campoQuant = document.getElementById('campo-quant-' + itemId);
-        let valorDigitado = parseInt(campoQuant.value);
-
-        if (isNaN(valorDigitado) || valorDigitado < 1) {
-            valorDigitado = 1;
-            campoQuant.value = 1;
-        }
-        recalcularTotal(itemId, valorDigitado);
-    }
-
-    // Recalcula o subtotal de 1 item
-    function recalcularTotal(itemId, novaQuantidade) {
-        // Pega o preço do data-attribute
-        const produtoDiv = document.getElementById('produto-' + itemId);
+    // Função para atualizar a quantidade ao sair do campo de texto
+    function atualizarQuantidade(id, quantidade) {
+        const campoQuant = document.getElementById('campo-quant-' + id);
+        const produtoDiv = document.getElementById('produto-' + id);
         const preco = parseFloat(produtoDiv.getAttribute('data-preco'));
 
-        // Novo subtotal
-        const novoTotal = preco * novaQuantidade;
+        // Calcula o novo subtotal
+        const subtotal = preco * quantidade;
 
-        // Atualiza o elemento de subtotal
-        const totalElement = document.getElementById('total-' + itemId);
-        totalElement.textContent = '€' + novoTotal.toFixed(2);
-
-        // Atualiza a exibição da quantidade
-        const labelQuant = document.getElementById('quant-' + itemId);
-        labelQuant.textContent = novaQuantidade;
+        // Atualiza o subtotal do item
+        const totalElement = document.getElementById('total-' + id);
+        totalElement.textContent = '€' + subtotal.toFixed(2);
 
         // Atualiza o total do carrinho
-        recalcularTotalDoCarrinho();
+        recalcularTotalCarrinho();
+
+        // Atualiza a quantidade no servidor
+        atualizarQuantidadeServidor(id, quantidade);
     }
 
-    // Soma os subtotais de todos os itens e exibe no 'carrinho-total'
-    function recalcularTotalDoCarrinho() {
+    // Função para recalcular o total do carrinho
+    function recalcularTotalCarrinho() {
         let totalCarrinho = 0;
-        const produtos = document.querySelectorAll('[id^="produto-"]');
 
-        produtos.forEach((produto) => {
-            const itemId = produto.id.replace('produto-', '');
+        // Itera sobre todos os itens no carrinho
+        document.querySelectorAll('[id^="produto-"]').forEach((produto) => {
             const preco = parseFloat(produto.getAttribute('data-preco'));
-            const campoQuant = document.getElementById('campo-quant-' + itemId);
-            const quantidade = parseInt(campoQuant.value) || 0;
+            const campoQuant = produto.querySelector('[id^="campo-quant-"]');
+            const quantidade = parseInt(campoQuant.value) || 1;
 
             totalCarrinho += preco * quantidade;
         });
 
+        // Atualiza o total do carrinho na interface
         const carrinhoTotal = document.getElementById('carrinho-total');
         carrinhoTotal.textContent = '€ ' + totalCarrinho.toFixed(2);
     }
 
-    // Chama a função para recalcular o total ao carregar a página (ou offcanvas)
-    document.addEventListener('DOMContentLoaded', function() {
-        recalcularTotalDoCarrinho();
+    // Função para enviar a nova quantidade ao servidor
+    function atualizarQuantidadeServidor(id, quantidade) {
+        fetch("{{ route('cart.updateQuantity') }}", {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                // ATENÇÃO: trocamos "item_id" para "meal_id"
+                meal_id: id,
+                quantity: quantidade,
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('Quantidade atualizada com sucesso no servidor.');
+            } else {
+                console.error('Erro ao atualizar quantidade no servidor:', data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Erro na comunicação com o servidor:', error);
+        });
+    }
+
+    // Inicializa o total do carrinho ao carregar a página
+    document.addEventListener('DOMContentLoaded', function () {
+        recalcularTotalCarrinho();
     });
+
+    // Exemplo de função para exibir/esconder nota
+    function toggleNoteField(button, id) {
+        const noteField = document.getElementById('noteField-' + id);
+        if (noteField.style.display === 'none') {
+            noteField.style.display = 'block';
+        } else {
+            noteField.style.display = 'none';
+        }
+    }
+
+    // Exemplo de função para capturar horário selecionado
+    function atualizarHorarioSelecionado(select, id) {
+        const selectedHorario = select.value;
+        console.log('Horário selecionado para o item ' + id + ': ' + selectedHorario);
+    }
 </script>

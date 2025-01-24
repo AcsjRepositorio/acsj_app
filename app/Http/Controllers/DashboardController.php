@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Order;
 use Illuminate\Http\Request;
 
 
@@ -11,18 +12,20 @@ class DashboardController extends Controller
    
     
     /**
-     * Display a listing of the resource.
+     * Este controller foi criado com o intuito de dividir funções que não se encaixam em outros controllers e mesmo assim, permanecer no mesmo folder (adminpanel) já que este folder reúne outras funções administrativas(no dashboard), protegidas por um middleweare. 
      */
 
      public function dashboardView(){
-        return view('dashboard');
+        return view('adminpanel.manage_order');
      }
 
      
-    public function index()
-    {
-       
-    }
+     public function index()
+     {
+         // Busca todas as ordens com os pratos relacionados
+         $orders=Order::with('meals')->get();
+         return view('adminpanel.order_overview', compact('orders'));
+     }
 
     /**
      * Show the form for creating a new resource.

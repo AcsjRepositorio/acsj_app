@@ -9,10 +9,13 @@ class OrderMeal extends Pivot
 {
     use HasFactory;
 
-    protected $table = 'orders_meals';
+    protected $table = 'order_meal';
 
-    protected $fillable = ['quantity', 'day_of_week', 'order_id', 'meal_id'];
+    protected $fillable = [
+        'quantity',
+        'day_of_week',
+        'order_id',
+        'meal_id',
+    ];
 }
 
-
-// Acredito qeu preciso de outros valores e não os que estão aqui 

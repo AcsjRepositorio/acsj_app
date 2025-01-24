@@ -379,7 +379,7 @@ return [
         ['header' => 'Ações'],
 
         [
-            'text' => 'Adcionar refeições',
+            'text' => 'Adicionar refeições',
                
             'url' => 'adminpanel/manage_meals',
         ],
@@ -391,10 +391,18 @@ return [
             'url' => 'adminpanel/manage_users',
         ],
        
+      
+
         [
-            'text' => 'Consultar pedidos',
+            'text' => 'Gerenciar pedidos do dia',
             // 'icon_color' => 'cyan',
-            'url' => '#',
+            'url' => 'adminpanel/manage_order',
+        ],
+        
+        [
+            'text' => 'Pedidos - visão Geral ',
+            // 'icon_color' => 'cyan',
+            'url' => 'adminpanel/order_overview',
         ],
     ],
 

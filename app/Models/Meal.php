@@ -24,9 +24,8 @@ class Meal extends Model
            // Adicione este campo se ele for usado para armazenar a data
     ];
 
-    protected $casts = [
-    'day_week_start' => 'datetime',
-];
+  
+    
 
    
 
