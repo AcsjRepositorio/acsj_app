@@ -54,9 +54,15 @@ class Order extends Model
      */
     public function meals()
     {
-        return $this
-            ->belongsToMany(Meal::class, 'order_meal')
-            ->withPivot('quantity', 'day_of_week')
-            ->withTimestamps();
+        return $this->belongsToMany(Meal::class, 'order_meal')
+                    ->withPivot([
+                        'quantity',
+                        'day_of_week',
+                        'pickup_time',
+                        'note',
+                        'disponivel_preparo',
+                        'entregue',
+                    ])
+                    ->withTimestamps();
     }
 }

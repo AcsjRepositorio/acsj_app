@@ -14,8 +14,11 @@ class OrderMeal extends Pivot
     protected $fillable = [
         'quantity',
         'day_of_week',
+        'pickup_time',
+        'note',
+        'disponivel_preparo',
+        'entregue',
         'order_id',
         'meal_id',
     ];
 }
-

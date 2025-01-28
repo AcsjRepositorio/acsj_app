@@ -5,10 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\MealController;
 use App\Http\Controllers\UserController;
-
-//Para integração com o Ifthenpay
 use App\Http\Controllers\PaymentController;
-
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\DashboardController;
@@ -21,8 +18,6 @@ Route::get('/', function () {
 
 Route::resource('cart', CartController::class)->only(['index', 'store', 'destroy']);
 Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
-
-// Rotas de pagamento
 
 // Rotas protegidas por autenticação
 Route::middleware('auth')->group(function () {
@@ -39,6 +34,9 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/adminpanel/manage_order', [DashboardController::class, 'dashboardView'])->name('adminpanel.manage.order');
 
+        // Rota para atualizar os pedidos
+        Route::put('/adminpanel/manage_order/update', [DashboardController::class, 'update'])->name('adminpanel.manage.order.update');
+
         Route::get('/adminpanel/order_overview', [DashboardController::class, 'index'])->name('adminpanel.order.overview');
         
         Route::resource('users', UserController::class);
@@ -47,8 +45,7 @@ Route::middleware('auth')->group(function () {
     
 });
 
-
-//Rotas para pagamento(ifthenpay) Não precisam de autenticação(O usuário pode comprar sem login)
+// Rotas para pagamento (ifthenpay) Não precisam de autenticação (O usuário pode comprar sem login)
 Route::post('/payment/process', [PaymentController::class, 'process'])->name('payment.process');
 Route::get('/payment/success', [PaymentController::class, 'success'])->name('payment.success');
 Route::get('/payment/error', [PaymentController::class, 'error'])->name('payment.error');
@@ -59,15 +56,4 @@ Route::post('/cart/update-quantity', [CartController::class, 'updateQuantity'])-
 
 Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
 
-
-
-
-
-
-
-
-
-
-
 require __DIR__ . '/auth.php';
-

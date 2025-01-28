@@ -11,26 +11,54 @@ class PaymentController extends Controller
 {
     public function process(Request $request)
     {
-        // 1) Pegar método de pagamento
+        // Construímos um array de regras.
+        // Vamos sempre exigir 'items.*.pickup_time' e 'payment_method'.
+        $rules = [
+            'items'                    => 'required|array',
+            'items.*.pickup_time'      => 'required|string',
+            'payment_method'           => 'required|string',
+        ];
+
+        // Mensagens personalizadas
+        $messages = [
+            'items.*.pickup_time.required' => 'Por favor selecione o horário de pickup para cada refeição.',
+            'payment_method.required'      => 'Por favor selecione um método de pagamento.',
+            'payment_method.string'        => 'Método de pagamento inválido.',
+        ];
+
+        // Se o usuário NÃO estiver logado, então exigimos nome e email
+        if (!Auth::check()) {
+            $rules['customer_name']  = 'required|string';
+            $rules['customer_email'] = 'required|email';
+            
+            $messages['customer_name.required']   = 'Por favor insira seu nome.';
+            $messages['customer_email.required']  = 'Por favor insira seu e-mail.';
+            $messages['customer_email.email']     = 'Por favor insira um e-mail válido.';
+        }
+
+        // 1) Valida os campos de acordo com as regras (se falhar, redireciona com erros)
+        $request->validate($rules, $messages);
+
+        // 2) Pegar método de pagamento
         $paymentMethod = $request->input('payment_method');
 
-        // 2) Pegar carrinho
+        // 3) Pegar carrinho
         $cart = session()->get('cart', []);
         if (empty($cart)) {
             return redirect()->back()->with('error', 'Carrinho está vazio!');
         }
 
-        // 3) Calcular total
+        // 4) Calcular total
         $amount = 0;
         foreach ($cart as $id => $item) {
             $amount += ($item['price'] * $item['quantity']);
         }
         $amount = number_format($amount, 2, '.', '');
 
-        // 4) Criar orderId p/ IfthenPay
+        // 5) Criar orderId p/ IfthenPay (exemplo)
         $ifthenOrderId = 'ORD' . rand(1000, 9999);
 
-        // 5) Criar pedido (status pending)
+        // 6) Criar pedido (status pending)
         $order = new Order();
         $order->order_id       = $ifthenOrderId;
         $order->amount         = $amount;
@@ -38,36 +66,39 @@ class PaymentController extends Controller
         $order->status         = 'pending';
         $order->payment_status = 'pending';
 
-        // Se estiver logado, pegar do Auth
+        // Se estiver logado, pegar do Auth; caso contrário, usar o input
         if (Auth::check()) {
             $order->user_id        = Auth::id();
             $order->customer_name  = Auth::user()->name;
             $order->customer_email = Auth::user()->email;
         } else {
-            // Se não estiver logado, pegar do formulário
             $order->customer_name  = $request->input('customer_name');
             $order->customer_email = $request->input('customer_email');
         }
 
-        // 6) Salvar a descrição do pedido, se fornecida
+        // 7) (Opcional) Salvar descrição extra
         if ($request->input('add_order_info') === 'yes') {
             $order->order_description = $request->input('order_description');
         }
 
         $order->save();
 
-        // 7) Associar itens do carrinho na pivot
+        // 8) Associar itens do carrinho na pivot + incluir pickup_time e note
         foreach ($cart as $mealId => $item) {
             $quantity  = $item['quantity'];
-            $dayOfWeek = $item['day_of_week'] ?? null; // se você usa
+            $dayOfWeek = $item['day_of_week'] ?? null; 
+            $note       = $request->input("items.$mealId.note");         
+            $pickupTime = $request->input("items.$mealId.pickup_time"); 
 
             $order->meals()->attach($mealId, [
                 'quantity'    => $quantity,
                 'day_of_week' => $dayOfWeek,
+                'pickup_time' => $pickupTime,
+                'note'        => $note,
             ]);
         }
 
-        // 8) Chamar IfthenPay
+        // 9) Chamar IfthenPay (ou outro gateway)
         try {
             switch ($paymentMethod) {
                 case 'multibanco':
@@ -89,11 +120,8 @@ class PaymentController extends Controller
         }
     }
 
-
-
     private function processMultibanco($orderId, $amount)
     {
-        // Gerar referência MB, etc.
         return redirect()->back()->with('success', 'Pagamento MULTIBANCO gerado (exemplo).');
     }
 
@@ -104,7 +132,7 @@ class PaymentController extends Controller
         }
 
         $mbWayKey = env('IFTHENPAY_MBWAY_KEY');
-        $endpoint = env('IFTHENPAY_MBWAY_ENDPOINT'); // Ex.: https://api.ifthenpay.com/spg/payment/mbway
+        $endpoint = env('IFTHENPAY_MBWAY_ENDPOINT');
 
         $body = [
             'mbWayKey'     => $mbWayKey,
@@ -152,7 +180,7 @@ class PaymentController extends Controller
             $requestId  = $result['RequestId'] ?? null;
             session()->put('card_request_id', $requestId);
 
-            // Redirecionar o cliente para a página da IfthenPay (dados de cartão lá)
+            // Redirecionar para página da IfthenPay (dados de cartão)
             return redirect($paymentUrl);
         } else {
             $message = $result['Message'] ?? 'Erro ao iniciar pagamento por cartão.';
@@ -162,15 +190,12 @@ class PaymentController extends Controller
 
     public function success(Request $request)
     {
-        // IfthenPay redireciona com ?id=...&amount=...&requestId=...
         $ifthenOrderId = $request->query('id');
-
         $order = Order::where('order_id', $ifthenOrderId)->first();
         if ($order) {
-            $order->status = 'completed';
+            $order->status         = 'completed';
             $order->payment_status = 'paid';
             $order->save();
-
             session()->forget('cart');
         }
 
@@ -196,3 +221,4 @@ class PaymentController extends Controller
         return response('OK', 200);
     }
 }
+

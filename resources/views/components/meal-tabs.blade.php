@@ -1,7 +1,7 @@
 @props(['mealsByDay' => collect()])
 
 @php
-    $daysOfWeek = ['segunda'=>'Seg','terça'=>'Ter','quarta'=>'Qua','quinta'=>'Qui','sexta'=>'Sex'];
+    $daysOfWeek = ['segunda'=>'Segunda','terça'=>'Terça','quarta'=>'Quarta','quinta'=>'Quinta','sexta'=>'Sexta'];
 @endphp
 
 <div class="meal-tabs-background shadow p-3 mb-5 bg-body rounded"> <!-- Novo wrapper com background e border radius -->

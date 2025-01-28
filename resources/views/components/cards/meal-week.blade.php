@@ -1,5 +1,9 @@
 @props(['meal'])
 
+@php
+    use Carbon\Carbon;
+@endphp
+
 
 <div class="card">
     <div class="price-badge">€{{ $meal->price }}</div>
@@ -9,7 +13,12 @@
                 : asset('images/default-meal.jpg') }}"
             alt="Foto de {{ $meal->name }}">
         <!-- Elemento de texto sobre a imagem -->
-        <p class="day-badge"> {{$meal->day_week_start}} -  {{ $meal->day_of_week }} </p> 
+        <p class="day-badge">
+        <p class="day-badge">
+    {{ Carbon::parse($meal->day_week_start)->format('d-m-Y') }} - {{ ucfirst($meal->day_of_week) }}
+</p>
+</p>
+
     </div>
     <h3 class="card-title">{{ $meal->name }}</h3>
     <p class="card-description">{{ $meal->description }}</p>

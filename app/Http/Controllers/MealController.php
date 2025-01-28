@@ -39,7 +39,8 @@ class MealController extends Controller
                 $meal->day_of_week = ucfirst(Carbon::parse($meal->day_week_start)
                     ->locale('pt_PT')
                     ->dayName);
-                $meal->formatted_date = Carbon::parse($meal->day_week_start)->format('dd/md/YY');
+                // Corrigindo o formato da data
+                $meal->formatted_date = Carbon::parse($meal->day_week_start)->format('d-m-Y');
             } else {
                 $meal->day_of_week = 'Data não definida';
                 $meal->formatted_date = 'Data não definida';
@@ -49,6 +50,7 @@ class MealController extends Controller
     
         return view('adminpanel.manage_meals', compact('meals'));
     }
+    
     
     
     
