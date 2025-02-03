@@ -1,9 +1,8 @@
 <!-- resources/views/checkout.blade.php -->
+<div class="container mt-4">
+    <h1 class="text-center">Checkout</h1>
 
-<div class="container">
-    <h1>Checkout</h1>
-
-    <!-- BLOCO DE ERROS DE VALIDAÇÃO (NOVO) -->
+    <!-- Exibe erros de validação -->
     @if ($errors->any())
         <div class="alert alert-danger">
             <ul>
@@ -14,181 +13,188 @@
         </div>
     @endif
 
-    <!-- Mensagens de sucesso/erro do sistema -->
+    <!-- Exibe mensagens de sucesso/erro -->
     @if (session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
+        <div class="alert alert-success text-center">{{ session('success') }}</div>
     @endif
     @if (session('error'))
-        <div class="alert alert-danger">{{ session('error') }}</div>
+        <div class="alert alert-danger text-center">{{ session('error') }}</div>
     @endif
 
     @php
-        // Recuperar carrinho da sessão (ou do controller)
+        // Recupera o carrinho da sessão
         $cart = session()->get('cart', []);
     @endphp
 
     @if (is_array($cart) && count($cart) > 0)
-        <!-- Loop dos itens do carrinho (fora do form de pagamento) -->
-        @foreach ($cart as $id => $item)
-            <div class="shadow p-3 mb-5 bg-body rounded" 
-                 id="produto-{{ $id }}" 
-                 data-preco="{{ $item['price'] }}">
-
-                <!-- Título + botão remover item -->
-                <div class="d-flex justify-content-between">
-                    <b>{{ $item['name'] }}</b>
-
-                    <!-- Form (ou link) para remover item SEM aninhar -->
-                    <form method="POST" action="{{ route('cart.destroy', $id) }}">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" style="background:none;border:none;color:gray;">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </form>
-                </div>
-
-                <!-- Imagem (opcional) -->
-                <img src="{{ $item['photo'] ? asset('storage/' . $item['photo']) : asset('images/default-meal.jpg') }}"
-                     alt="{{ $item['name'] }}"
-                     width="80">
-
-                <!-- Quantidade e subtotal -->
-                <div class="d-flex justify-content-between mt-3">
-                    <!-- Botões +/- -->
-                    <div data-app="product.quantity" id="quantidade-{{ $id }}">
-                        <input type="button" value="-" onclick="processarQuantidade({{ $id }}, -1)" />
-                        <input id="campo-quant-{{ $id }}"
-                               class="text"
-                               size="1"
-                               type="text"
-                               value="{{ $item['quantity'] }}"
-                               maxlength="5"
-                               onblur="atualizarQuantidade({{ $id }})" />
-                        <input type="button" value="+" onclick="processarQuantidade({{ $id }}, 1)" />
-                    </div>
-
-                    <!-- Subtotal -->
-                    <div class="gap-3">
-                        <span><b>Subtotal:</b></span>
-                        <span>
-                            <b id="total-{{ $id }}">
-                                €{{ number_format($item['price'] * $item['quantity'], 2) }}
-                            </b>
-                        </span>
-                    </div>
-                </div>
-
-                <!-- Nota (fora do form) -->
-                <div class="mb-3 mt-3">
-                    <button class="btn btn-outline-secondary" type="button" onclick="toggleNoteField(this, {{ $id }})">
-                        <i class="bi bi-bookmark-plus"></i> Insira uma nota
-                    </button>
-                    <div class="mt-2" id="noteField-{{ $id }}" style="display: none;">
-                        <!-- Textarea normal, mas sem name="..." -->
-                        <!-- Vamos copiar o valor depois, via JS -->
-                        <textarea class="form-control"
-                                  rows="3"
-                                  id="input-note-{{ $id }}"
-                                  placeholder="Digite sua nota aqui..."></textarea>
+        <!-- Grid dos cards dos itens (centralizados) -->
+        <div class="row row-cols-1 row-cols-md-3 g-4 justify-content-center">
+            @foreach ($cart as $id => $item)
+                <div class="col">
+                    <div class="card h-100 shadow-sm" id="produto-{{ $id }}" data-preco="{{ $item['price'] }}" data-nome="{{ $item['name'] }}">
+                        <div class="card-body d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h5 class="card-title mb-0">{{ $item['name'] }}</h5>
+                                <form method="POST" action="{{ route('cart.destroy', $id) }}">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" style="background:none;border:none;color:gray;">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                            <!-- Imagem do item sem corte -->
+                            <img src="{{ $item['photo'] ? asset('storage/' . $item['photo']) : asset('images/default-meal.jpg') }}"
+                                 alt="{{ $item['name'] }}"
+                                 class="img-fluid mb-3"
+                                 style="max-height: 200px; object-fit: contain;">
+                            <div class="mt-auto">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <input type="button" value="-" onclick="processarQuantidade({{ $id }}, -1)" />
+                                        <input id="campo-quant-{{ $id }}" class="text-center" style="width:40px; display:inline-block;" type="text" value="{{ $item['quantity'] }}" maxlength="5" onblur="atualizarQuantidade({{ $id }})" />
+                                        <input type="button" value="+" onclick="processarQuantidade({{ $id }}, 1)" />
+                                    </div>
+                                    <span><b id="total-{{ $id }}">€{{ number_format($item['price'] * $item['quantity'], 2) }}</b></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <button class="btn btn-outline-secondary w-100 mb-2" type="button" onclick="toggleNoteField({{ $id }})">
+                                <i class="bi bi-bookmark-plus"></i> Nota
+                            </button>
+                            <div id="noteField-{{ $id }}" style="display: none;">
+                                <textarea class="form-control mb-2" rows="2" id="input-note-{{ $id }}" placeholder="Digite sua nota..."></textarea>
+                            </div>
+                            <select class="form-select" id="horarios-{{ $id }}">
+                                <option value="" disabled selected>Selecione um horário</option>
+                                <option value="12h15 - 12h30">12h15 - 12h30</option>
+                                <option value="12h30 - 13h00">12h30 - 13h00</option>
+                                <option value="13h00 - 13h30">13h00 - 13h30</option>
+                                <option value="13h30 - 14h00">13h30 - 14h00</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
+            @endforeach
+        </div>
 
-                <!-- Select com horários (fora do form) -->
-                <div class="mt-3">
-                    <label for="horarios-{{ $id }}" class="form-label">Escolha um horário</label>
-                    <select class="form-select"
-                            id="horarios-{{ $id }}"
-                            onchange="atualizarHorarioSelecionado(this, {{ $id }})">
-                        <option value="" disabled selected>Selecione um horário</option>
-                        <option value="12h15 - 12h30">12h15 - 12h30</option>
-                        <option value="12h30 - 13h00">12h30 - 13h00</option>
-                        <option value="13h00 - 13h30">13h00 - 13h30</option>
-                        <option value="13h30 - 14h00">13h30 - 14h00</option>
-                    </select>
-                </div>
-            </div>
-        @endforeach
-
-        <!-- Botão Limpar Carrinho (fora do form) -->
-        <div class="d-flex justify-content-between mt-3">
-            <form method="POST" action="{{ route('cart.clear') }}">
-                @csrf
-                <button type="submit" class="btn btn-warning">Limpar Carrinho</button>
-            </form>
-
+        <!-- Limpar Carrinho e total -->
+        <div class="d-flex justify-content-center align-items-center mt-4">
+          
             <div>
                 <label><b>Total do carrinho:</b></label>
                 <span id="carrinho-total"><b>€ 0.00</b></span>
             </div>
         </div>
 
-        <!-- AGORA SIM: Form principal para FINALIZAR COMPRA -->
-        <!-- Ele não está envolvendo o loop dos itens (para evitar forms aninhados) -->
-        <form method="POST" action="{{ route('payment.process') }}" class="mt-4" onsubmit="prepararCamposHidden()">
+        <!-- Formulário de pagamento -->
+        <form method="POST" action="{{ route('payment.process') }}" class="mt-5" onsubmit="return prepararCamposHidden(event)">
             @csrf
-
-            <!-- Se usuário não estiver logado, pedir nome/e-mail -->
             @if (!Auth::check())
-                <div class="mb-3">
+                <div class="mb-3 text-center">
                     <label for="customer_name" class="form-label">Nome</label>
-                    <!-- USAMOS old() PARA REPREENCHER SE VALIDAÇÃO FALHAR -->
-                    <input type="text"
-                           id="customer_name"
-                           name="customer_name"
-                           class="form-control"
-                           value="{{ old('customer_name') }}"
-                           required>
+                    <input type="text" id="customer_name" name="customer_name" class="form-control d-inline-block" style="max-width: 300px;" value="{{ old('customer_name') }}" required>
                 </div>
-                <div class="mb-3">
+                <div class="mb-3 text-center">
                     <label for="customer_email" class="form-label">E-mail</label>
-                    <input type="email"
-                           id="customer_email"
-                           name="customer_email"
-                           class="form-control"
-                           value="{{ old('customer_email') }}"
-                           required>
+                    <input type="email" id="customer_email" name="customer_email" class="form-control d-inline-block" style="max-width: 300px;" value="{{ old('customer_email') }}" required>
                 </div>
             @endif
 
-            <!-- Método de pagamento -->
-            <div class="mb-3">
-                <label for="payment_method" class="form-label">Método de Pagamento</label>
-                <select name="payment_method" id="payment_method" class="form-select" required>
-                    <option value="" disabled selected>Selecione o método</option>
-                    <option value="multibanco" {{ old('payment_method') == 'multibanco' ? 'selected' : '' }}>
-                        Multibanco
-                    </option>
-                    <option value="mbway" {{ old('payment_method') == 'mbway' ? 'selected' : '' }}>
-                        MBWay
-                    </option>
-                    <option value="card" {{ old('payment_method') == 'card' ? 'selected' : '' }}>
-                        Cartão de Crédito
-                    </option>
-                </select>
+            <!-- Seleção do método de pagamento -->
+            <div class="text-center my-4">
+                <h5 class="mb-3">Selecione o método de pagamento:</h5>
+                <div class="row justify-content-center g-4">
+                    <!-- MULTIBANCO -->
+                    <div class="col-auto text-center">
+                        <div class="metodo-pg" onclick="selecionarMetodoPagamento('multibanco', this)">
+                            <img src="{{ asset('images/paymentmethods/multibanco.png') }}"
+                                 alt="Multibanco"
+                                 class="payment-icon">
+                        </div>
+                    </div>
+                    <!-- MB WAY -->
+                    <div class="col-auto text-center">
+                        <div class="metodo-pg" onclick="selecionarMetodoPagamento('mbway', this)">
+                            <img src="{{ asset('images/paymentmethods/mbway.png') }}"
+                                 alt="MBWay"
+                                 class="payment-icon">
+                        </div>
+                    </div>
+                    <!-- CARTÃO (Visa + MasterCard) -->
+                    <div class="col-auto text-center">
+                        <div class="metodo-pg" onclick="selecionarMetodoPagamento('card', this)">
+                            <img src="{{ asset('images/paymentmethods/visa.png') }}"
+                                 alt="Visa"
+                                 class="payment-icon me-1">
+                            <img src="{{ asset('images/paymentmethods/mastercard.png') }}"
+                                 alt="MasterCard"
+                                 class="payment-icon">
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <!-- Aqui guardaremos inputs hidden para note e pickup_time de cada item -->
-            <div id="hidden-fields-container"></div>
-            <div id="noteField-{{ $id }}"></div>
+            <!-- Campo hidden para o método de pagamento -->
+            <input type="hidden" name="payment_method" id="payment_method" value="">
 
-            <button type="submit" class="btn btn-primary w-100">Finalizar Compra</button>
+            <!-- Campo para telefone MBWay (exibido somente se MBWay for selecionado) -->
+            <div id="mbway-phone-field" style="display: none;" class="mb-3 text-center">
+                <label for="mbway_phone" class="form-label">Telefone MBWay</label>
+                <input type="text" id="mbway_phone" name="mbway_phone" class="form-control d-inline-block" style="max-width: 300px;" placeholder="ex: 912345678" value="{{ old('mbway_phone') }}">
+            </div>
+
+            <!-- Inputs hidden para note, pickup_time e quantity de cada item -->
+            <div id="hidden-fields-container"></div>
+
+            <!-- Botão "Finalizar Compra": inicia desativado -->
+            <div class="text-center">
+                <button type="submit" id="finalizar-btn" class="btn btn-primary px-5" disabled style="opacity: 0.6;">
+                    Finalizar Compra 
+                </button>
+            </div>
         </form>
     @else
-        <p class="text-muted">O carrinho está vazio.</p>
+        <p class="text-muted text-center mt-5">O carrinho está vazio.</p>
     @endif
 </div>
 
-<!-- Bootstrap CSS e Icons -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+<!-- Bootstrap e Bootstrap Icons -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
-<!-- Bootstrap JS -->
+<!-- CSS Customizado -->
+<style>
+    /* Tamanho fixo e uniforme para as imagens dos métodos de pagamento */
+    .payment-icon {
+        width: 120px;      /* ajuste conforme necessário */
+        height: 40px;      /* ajuste conforme necessário */
+        object-fit: contain;
+        transition: transform 0.2s;
+    }
+    .payment-icon:hover {
+        transform: scale(1.05);
+    }
+    /* Container dos métodos de pagamento */
+    .metodo-pg {
+        cursor: pointer;
+        padding: 5px;
+        transition: border 0.2s;
+    }
+    /* Borda de destaque para o método selecionado */
+    .metodo-pg.selected {
+        border: 2px solid #0d6efd;
+        border-radius: 6px;
+    }
+</style>
+
+<!-- JavaScript do Bootstrap -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
+<!-- JavaScript Customizado -->
 <script>
-    // 1) Botões +/- (igual ao seu código)
+    // Funções para manipulação da quantidade e atualização de subtotais/total
     function processarQuantidade(id, delta) {
         const campoQuant = document.getElementById('campo-quant-' + id);
         let quantidadeAtual = parseInt(campoQuant.value) || 1;
@@ -202,30 +208,19 @@
 
     function atualizarQuantidade(id, quantidade) {
         const produtoDiv = document.getElementById('produto-' + id);
-        const preco      = parseFloat(produtoDiv.getAttribute('data-preco'));
-        const subtotal   = preco * quantidade;
-
-        // Atualizar subtotal
+        const preco = parseFloat(produtoDiv.getAttribute('data-preco'));
+        const subtotal = preco * quantidade;
         document.getElementById('total-' + id).textContent = '€' + subtotal.toFixed(2);
-
-        // Recalcular total do carrinho
         recalcularTotalCarrinho();
-
-        // Atualizar servidor
-        atualizarQuantidadeServidor(id, quantidade);
-    }
-
-    function atualizarQuantidadeServidor(id, quantidade) {
+        
+        // Exemplo de atualização via AJAX
         fetch("{{ route('cart.updateQuantity') }}", {
             method: 'POST',
             headers: {
                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                meal_id: id,
-                quantity: quantidade,
-            }),
+            body: JSON.stringify({ meal_id: id, quantity: quantidade }),
         })
         .then(response => response.json())
         .then(data => {
@@ -234,70 +229,103 @@
             }
         })
         .catch(error => {
-            console.error('Erro comunicação com o servidor:', error);
+            console.error('Erro na comunicação com o servidor:', error);
         });
     }
 
     function recalcularTotalCarrinho() {
         let totalCarrinho = 0;
-        document.querySelectorAll('[id^="produto-"]').forEach((produto) => {
+        document.querySelectorAll('[id^="produto-"]').forEach(produto => {
             const preco = parseFloat(produto.getAttribute('data-preco'));
             const campoQuant = produto.querySelector('[id^="campo-quant-"]');
             const quantidade = parseInt(campoQuant.value) || 1;
-            totalCarrinho += (preco * quantidade);
+            totalCarrinho += preco * quantidade;
         });
         document.getElementById('carrinho-total').textContent = '€ ' + totalCarrinho.toFixed(2);
     }
 
-    document.addEventListener('DOMContentLoaded', function () {
-        recalcularTotalCarrinho();
-    });
-
-    // 2) Mostrar/esconder textarea de nota
-    function toggleNoteField(button, id) {
+    // Função para alternar a exibição do campo Nota
+    function toggleNoteField(id) {
         const noteField = document.getElementById('noteField-' + id);
         noteField.style.display = (noteField.style.display === 'none') ? 'block' : 'none';
     }
 
-    // 3) Capturar escolha de horário (opcional)
-    function atualizarHorarioSelecionado(select, id) {
-        console.log('Horário para item ' + id + ': ' + select.value);
+    // Função para seleção do método de pagamento
+    function selecionarMetodoPagamento(metodo, elementoClicado) {
+        // Remove a classe 'selected' de todos os containers
+        document.querySelectorAll('.metodo-pg').forEach(el => {
+            el.classList.remove('selected');
+        });
+        // Adiciona a classe 'selected' ao container clicado (mesmo que o clique seja na imagem interna)
+        if (elementoClicado.classList.contains('metodo-pg')) {
+            elementoClicado.classList.add('selected');
+        } else {
+            elementoClicado.closest('.metodo-pg').classList.add('selected');
+        }
+        // Define o método selecionado no campo hidden
+        document.getElementById('payment_method').value = metodo;
+        // Se o método for MBWay, exibe o campo do telefone; caso contrário, esconde
+        if (metodo === 'mbway') {
+            document.getElementById('mbway-phone-field').style.display = 'block';
+        } else {
+            document.getElementById('mbway-phone-field').style.display = 'none';
+        }
+        // Ativa o botão "Finalizar Compra"
+        const btn = document.getElementById('finalizar-btn');
+        btn.disabled = false;
+        btn.style.opacity = 1;
     }
 
-    // 4) Antes de submeter o FORM de pagamento, criamos inputs hidden
-    //    para "note" e "pickup_time" de cada item
-    function prepararCamposHidden() {
+    // Função para criar inputs hidden e validar os horários antes de submeter o formulário
+    function prepararCamposHidden(event) {
+        event.preventDefault();
         const container = document.getElementById('hidden-fields-container');
-        container.innerHTML = ''; // reset
-
-        // Loop em cada produto
-        document.querySelectorAll('[id^="produto-"]').forEach((produto) => {
-            const itemId     = produto.id.replace('produto-', '');
-            const note       = document.getElementById('input-note-' + itemId)?.value || '';
+        container.innerHTML = '';
+        let itensSemHorario = [];
+        document.querySelectorAll('[id^="produto-"]').forEach(produto => {
+            const itemId = produto.id.replace('produto-', '');
+            const nomeItem = produto.getAttribute('data-nome') || ('Item ' + itemId);
+            const note = document.getElementById('input-note-' + itemId)?.value || '';
             const pickupTime = document.getElementById('horarios-' + itemId)?.value || '';
-            const quantity   = document.getElementById('campo-quant-' + itemId)?.value || '1';
-
-            // Criar <input type="hidden" name="items[itemId][note]">
-            const hiddenNote = document.createElement('input');
-            hiddenNote.type  = 'hidden';
-            hiddenNote.name  = `items[${itemId}][note]`;
+            const quantity = document.getElementById('campo-quant-' + itemId)?.value || '1';
+            if (!pickupTime) {
+                itensSemHorario.push(nomeItem);
+            }
+            let hiddenNote = document.createElement('input');
+            hiddenNote.type = 'hidden';
+            hiddenNote.name = `items[${itemId}][note]`;
             hiddenNote.value = note;
             container.appendChild(hiddenNote);
-
-            // Criar <input type="hidden" name="items[itemId][pickup_time]">
-            const hiddenPickup = document.createElement('input');
-            hiddenPickup.type  = 'hidden';
-            hiddenPickup.name  = `items[${itemId}][pickup_time]`;
+            let hiddenPickup = document.createElement('input');
+            hiddenPickup.type = 'hidden';
+            hiddenPickup.name = `items[${itemId}][pickup_time]`;
             hiddenPickup.value = pickupTime;
             container.appendChild(hiddenPickup);
-
-            // Se no PaymentController você usa 'quantity', guarde também:
-            const hiddenQty = document.createElement('input');
-            hiddenQty.type  = 'hidden';
-            hiddenQty.name  = `items[${itemId}][quantity]`;
+            let hiddenQty = document.createElement('input');
+            hiddenQty.type = 'hidden';
+            hiddenQty.name = `items[${itemId}][quantity]`;
             hiddenQty.value = quantity;
             container.appendChild(hiddenQty);
         });
+        if (itensSemHorario.length > 0) {
+            alert("Por favor, selecione o horário nos itens:\n\n- " + itensSemHorario.join("\n- "));
+            return false;
+        }
+        event.target.submit();
     }
-</script>
 
+    document.addEventListener('DOMContentLoaded', function () {
+        recalcularTotalCarrinho();
+        // Caso haja um valor antigo para payment_method, reativa o botão (opcional)
+        @if (old('payment_method') === 'mbway')
+            document.getElementById('payment_method').value = 'mbway';
+            document.getElementById('mbway-phone-field').style.display = 'block';
+            document.getElementById('finalizar-btn').disabled = false;
+            document.getElementById('finalizar-btn').style.opacity = 1;
+        @elseif (old('payment_method') === 'multibanco' || old('payment_method') === 'card')
+            document.getElementById('payment_method').value = '{{ old('payment_method') }}';
+            document.getElementById('finalizar-btn').disabled = false;
+            document.getElementById('finalizar-btn').style.opacity = 1;
+        @endif
+    });
+</script>

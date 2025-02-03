@@ -10,7 +10,7 @@ use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
-    public function dashboardView()
+    public function dashboardView(Request $request) // <--- Recebe o $request
     {
         // Busca todas as ordens com os pratos relacionados e carrega a relação 'meal'
         $orders = Order::with('meals')->get();
@@ -21,6 +21,7 @@ class DashboardController extends Controller
         foreach ($orders as $order) {
             foreach ($order->meals as $meal) {
                 // Obter a data a partir de 'day_week_start' na tabela 'meals'
+                // Formato dd/mm/yyyy para bater com o datepicker
                 $date = Carbon::parse($meal->day_week_start)->format('d/m/Y');
 
                 // Obter pickup_time
@@ -46,6 +47,26 @@ class DashboardController extends Controller
             }
         }
 
+        // (NOVO) Captura a data selecionada no filtro (ex.: "06/01/2025")
+        $selectedDate = $request->input('selectedDate');
+
+        // (NOVO) Se existe data, filtrar $groupedData
+        if ($selectedDate) {
+            $filteredData = [];
+
+            // Percorre todas as chaves do array (que são datas "dd/mm/yyyy")
+            foreach ($groupedData as $rawDate => $horarios) {
+                // Se a data bater com a do usuário...
+                if ($rawDate === $selectedDate) {
+                    $filteredData[$rawDate] = $horarios;
+                }
+            }
+
+            // Substitui o array original pelo filtrado
+            $groupedData = $filteredData;
+        }
+
+        // Retorna a view com o array (filtrado ou não) em $groupedData
         return view('adminpanel.manage_order', compact('groupedData'));
     }
 
