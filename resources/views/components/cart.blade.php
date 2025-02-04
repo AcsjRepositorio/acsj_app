@@ -1,5 +1,6 @@
 <!-- resources/views/cart.blade.php -->
 <div class="offcanvas offcanvas-end"
+ data-bs-backdrop="false"
     tabindex="-1"
     id="offcanvasCart"
     aria-labelledby="offcanvasCartLabel">
@@ -98,7 +99,10 @@
         
         
         @else
-        <p class="text-muted">O carrinho está vazio.</p>
+        <div class="shadow p-4 mt-5 bg-body rounded text-center mx-auto" style="max-width: 300px; width: 100%;">
+        <img src="/images/icons/emptycart.png" alt="Empty Folder" class="img-fluid" style="max-height: 120px; object-fit: contain;">
+        <p class="mt-2">Seu carrinho está vazio!</p>
+    </div>
         @endif
     </div>
 </div>

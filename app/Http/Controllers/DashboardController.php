@@ -29,7 +29,7 @@ class DashboardController extends Controller
         if ($queryParam) {
             $orders = Order::with('meals')
                 ->where(function($q) use ($queryParam) {
-                    // Aqui pode ser feito filtro exato ou com LIKE conforme sua necessidade
+                    // Filtra por order_id ou nome do cliente (usando LIKE)
                     $q->where('order_id', 'like', "%{$queryParam}%")
                       ->orWhere('customer_name', 'like', "%{$queryParam}%");
                 })
@@ -120,7 +120,7 @@ class DashboardController extends Controller
     {
         $query = $request->input('query');
         
-        // Se não for informado nenhum termo, redireciona para a tela principal
+        // Se não for informado nenhum termo, redireciona para a tela principal de gestão
         if (!$query) {
             return redirect()->route('adminpanel.manage.order');
         }
@@ -160,6 +160,9 @@ class DashboardController extends Controller
             ->with('search_query', $query);
     }
 
+    /**
+     * Exibe uma overview simples dos pedidos.
+     */
     public function index()
     {
         $orders = Order::with('meals')->get();
@@ -205,5 +208,67 @@ class DashboardController extends Controller
             return redirect()->route('adminpanel.manage.order')
                              ->with('error', 'Erro ao atualizar os pedidos: ' . $e->getMessage());
         }
+    }
+
+    //////////////////////////
+    // Métodos para Overview
+    //////////////////////////
+
+    /**
+     * Exibe a página de overview dos pedidos sem filtros.
+     */
+    public function overview(Request $request)
+    {
+        $orders = Order::with('meals')->get();
+        return view('adminpanel.order_overview', compact('orders'));
+    }
+
+    /**
+     * Realiza a busca por pedido ou nome do cliente na visão de overview.
+     */
+    public function overviewSearch(Request $request)
+    {
+        $query = $request->input('query', '');
+
+        $orders = Order::with('meals')
+            ->where(function ($q) use ($query) {
+                $q->where('order_id', 'like', "%{$query}%")
+                  ->orWhere('customer_name', 'like', "%{$query}%");
+            })
+            ->get();
+
+        return view('adminpanel.order_overview', compact('orders'));
+    }
+
+    /**
+     * Aplica os filtros na visão de overview.
+     * Filtra por data do pedido, status do pagamento e método de pagamento.
+     */
+    public function overviewFilter(Request $request)
+    {
+        $selectedDate   = $request->input('selectedDate', '');
+        $paymentStatus  = $request->input('payment_status', '');
+        $paymentMethod  = $request->input('payment_method', '');
+
+        $ordersQuery = Order::with('meals');
+
+        // Filtra por data do pedido (campo created_at; formato esperado: yyyy-mm-dd)
+        if (!empty($selectedDate)) {
+            $ordersQuery->whereDate('created_at', $selectedDate);
+        }
+
+        // Filtra por status do pagamento (ex.: pending ou paid)
+        if (!empty($paymentStatus)) {
+            $ordersQuery->where('payment_status', $paymentStatus);
+        }
+
+        // Filtra por método de pagamento (ex.: card, mbway, multibanco)
+        if (!empty($paymentMethod)) {
+            $ordersQuery->where('payment_method', $paymentMethod);
+        }
+
+        $orders = $ordersQuery->get();
+
+        return view('adminpanel.order_overview', compact('orders'));
     }
 }

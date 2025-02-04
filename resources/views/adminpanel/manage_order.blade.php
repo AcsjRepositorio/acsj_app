@@ -7,7 +7,7 @@
 @stop
 
 @section('content')
-<div class="container mt-5">
+<div class="container mt-8">
 
     @if(session('success'))
     <div class="alert alert-success">{{ session('success') }}</div>
@@ -16,34 +16,36 @@
     <div class="alert alert-danger">{{ session('error') }}</div>
     @endif
 
-<!-- Bloco sombreado centralizado -->
-<div class="d-flex justify-content-center">
-    <div class="shadow p-3 bg-body rounded" style="max-width: 800px; width: 100%;">
-        
-        <!-- FORMULÁRIO DE BUSCA (CENTRALIZADO) -->
-        <form action="{{ route('adminpanel.manage.order.search') }}" method="GET" id="searchForm" class="mb-3">
-            <div class="input-group">
-                <input type="text"
-                    id="searchQuery"
-                    name="query"
-                    class="form-control form-control-sm"
-                    placeholder="Busque por pedido, nome do cliente"
-                    value="{{ request('query') }}">
-                <button type="submit" class="btn btn-success btn-sm">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                </button>
-            </div>
-        </form>
-        <!-- FIM DO FORMULÁRIO DE BUSCA -->
+    <!-- Bloco sombreado centralizado -->
 
-        <!-- FORMULÁRIO DE FILTRO -->
-        <form action="{{ route('adminpanel.manage.order') }}" method="GET" id="filterForm">
-            <div class="row align-items-end">
-                <!-- Data (Com Ícone de Calendário) --> 
-                <div class="col-md-3">
-                    <label for="selectedDate"><strong>Data:</strong></label>
+    <div class="d-flex justify-content-center">
+        <div class="shadow p-3 bg-body rounded" style="max-width: 800px; width: 100%;">
+
+            <div class="d-flex justify-content-center">
+
+                <form action="{{ route('adminpanel.manage.order.search') }}" method="GET" id="searchForm" class="mb-3 w-100">
                     <div class="input-group">
                         <input type="text"
+                            id="searchQuery"
+                            name="query"
+                            class="form-control form-control-sm"
+                            placeholder="Busque por pedido, nome do cliente"
+                            value="{{ request('query') }}">
+                        <button type="submit" class="btn btn-success btn-sm">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+
+            <!-- div do filtro -->
+            <div class="d-flex justify-content-center align-items-center">
+                <form action="{{ route('adminpanel.manage.order') }}" method="GET" id="filterForm" class="d-flex flex-row gap-2">
+
+                    <div class="input-group">
+                        <input type="text"
+                            placeholder="selecione uma data"
                             id="selectedDate"
                             name="selectedDate"
                             class="form-control form-control-sm"
@@ -53,25 +55,19 @@
                             <i class="fa-solid fa-calendar-days"></i>
                         </span>
                     </div>
-                </div>
 
-                <!-- Filtro Adicional -->
-                <div class="col-md-2">
-                    <label for="additionalFilter"><strong>Filtro Adicional:</strong></label>
-                    <select name="additional_filter" id="additionalFilter" class="form-control form-control-sm w-100">
-                        <option value="">Selecione...</option>
-                        <option value="horario" {{ request('additional_filter') == 'horario' ? 'selected' : '' }}>Horário de Pickup</option>
-                        <option value="disponivel" {{ request('additional_filter') == 'disponivel' ? 'selected' : '' }}>Disponível para Preparo</option>
-                        <option value="entregue" {{ request('additional_filter') == 'entregue' ? 'selected' : '' }}>Entregue</option>
-                    </select>
-                </div>
-
-                <!-- Janela de Horário (Com Ícone de Relógio) -->
-                <div class="col-md-2" id="pickupWindowContainer" style="display: none;">
-                    <label for="pickupWindow"><strong>Janela de Horário:</strong></label>
                     <div class="input-group">
+                        <select name="additional_filter" id="additionalFilter" class="form-control form-control-sm w-100">
+                            <option value="">Escolha uma categoria</option>
+                            <option value="horario" {{ request('additional_filter') == 'horario' ? 'selected' : '' }}>Horário de Pickup</option>
+                            <option value="disponivel" {{ request('additional_filter') == 'disponivel' ? 'selected' : '' }}>Disponível para Preparo</option>
+                            <option value="entregue" {{ request('additional_filter') == 'entregue' ? 'selected' : '' }}>Entregue</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group" id="pickupWindowContainer" style="display: none;">
                         <select name="pickup_window" id="pickupWindow" class="form-control form-control-sm">
-                            <option value="">Selecione...</option>
+                            <option value="">Horários...</option>
                             <option value="12h15 - 12h30" {{ request('pickup_window') === '12h15 - 12h30' ? 'selected' : '' }}>12h15 - 12h30</option>
                             <option value="12h30 - 13h00" {{ request('pickup_window') === '12h30 - 13h00' ? 'selected' : '' }}>12h30 - 13h00</option>
                             <option value="13h00 - 13h30" {{ request('pickup_window') === '13h00 - 13h30' ? 'selected' : '' }}>13h00 - 13h30</option>
@@ -81,29 +77,27 @@
                             <i class="fa-solid fa-clock"></i>
                         </span>
                     </div>
-                </div>
 
-                <!-- Botão Filtrar (Agora no final da linha) -->
-                <div class="col-md-3 text-end">
-                    <button type="submit" class="btn btn-success btn-sm">
-                        <i class="fa-solid fa-filter"></i>
-                    </button>
-                </div>
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-success btn-sm">
+                            <i class="fa-solid fa-filter"></i>
+                        </button>
+
+                    </div>
+
+
+
+                </form>
             </div>
-        </form>
-        <!-- FIM DO FORMULÁRIO DE FILTRO -->
+            <!-- Botão de Limpar Filtros -->
+            <div class="col-md-12 text-end mt-2">
+                <a href="{{ route('adminpanel.manage.order') }}" class="btn btn-success">
+                    Limpar filtros
+                </a>
+            </div>
 
+        </div>
     </div>
-</div>
-
-
-
-        
-
-
-
-
-
 
     @if(!empty($groupedData))
     <form action="{{ route('adminpanel.manage.order.update') }}" method="POST">
@@ -173,12 +167,21 @@
 
         <button type="submit" class="btn btn-primary mt-3">Salvar Alterações</button>
     </form>
+    @else
+
+    <div class="shadow p-4 mt-5 bg-body rounded text-center mx-auto" style="max-width: 300px; width: 100%;">
+        <img src="/images/icons/emptyfolder.png" alt="Empty Folder" class="img-fluid" style="max-height: 120px; object-fit: contain;">
+        <p class="mt-2">A busca não retornou resultados</p>
+    </div>
+
     @endif
 </div>
 @stop
 
+
 @section('css')
 <!-- Bootstrap 5 + Datepicker CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
     rel="stylesheet"
     integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
