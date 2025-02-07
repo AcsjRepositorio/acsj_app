@@ -11,54 +11,47 @@ class PaymentController extends Controller
 {
     public function process(Request $request)
     {
-        // Construímos um array de regras.
-        // Vamos sempre exigir 'items.*.pickup_time' e 'payment_method'.
+        // Regras e mensagens para validação
         $rules = [
-            'items'                    => 'required|array',
-            'items.*.pickup_time'      => 'required|string',
-            'payment_method'           => 'required|string',
+            'items'               => 'required|array',
+            'items.*.pickup_time' => 'required|string',
+            'payment_method'      => 'required|string',
         ];
 
-        // Mensagens personalizadas
         $messages = [
             'items.*.pickup_time.required' => 'Por favor selecione o horário de pickup para cada refeição.',
             'payment_method.required'      => 'Por favor selecione um método de pagamento.',
             'payment_method.string'        => 'Método de pagamento inválido.',
         ];
 
-        // Se o usuário NÃO estiver logado, então exigimos nome e email
         if (!Auth::check()) {
             $rules['customer_name']  = 'required|string';
             $rules['customer_email'] = 'required|email';
             
-            $messages['customer_name.required']   = 'Por favor insira seu nome.';
-            $messages['customer_email.required']  = 'Por favor insira seu e-mail.';
-            $messages['customer_email.email']     = 'Por favor insira um e-mail válido.';
+            $messages['customer_name.required']  = 'Por favor insira seu nome.';
+            $messages['customer_email.required'] = 'Por favor insira seu e-mail.';
+            $messages['customer_email.email']    = 'Por favor insira um e-mail válido.';
         }
 
-        // 1) Valida os campos de acordo com as regras (se falhar, redireciona com erros)
         $request->validate($rules, $messages);
 
-        // 2) Pegar método de pagamento
         $paymentMethod = $request->input('payment_method');
-
-        // 3) Pegar carrinho
         $cart = session()->get('cart', []);
         if (empty($cart)) {
             return redirect()->back()->with('error', 'Carrinho está vazio!');
         }
 
-        // 4) Calcular total
+        // Calcular o total
         $amount = 0;
         foreach ($cart as $id => $item) {
             $amount += ($item['price'] * $item['quantity']);
         }
         $amount = number_format($amount, 2, '.', '');
 
-        // 5) Criar orderId p/ IfthenPay (exemplo)
+        // Gerar um orderId para o gateway
         $ifthenOrderId = 'ORD' . rand(1000, 9999);
 
-        // 6) Criar pedido (status pending)
+        // Criar o pedido com status pending
         $order = new Order();
         $order->order_id       = $ifthenOrderId;
         $order->amount         = $amount;
@@ -66,7 +59,6 @@ class PaymentController extends Controller
         $order->status         = 'pending';
         $order->payment_status = 'pending';
 
-        // Se estiver logado, pegar do Auth; caso contrário, usar o input
         if (Auth::check()) {
             $order->user_id        = Auth::id();
             $order->customer_name  = Auth::user()->name;
@@ -76,14 +68,13 @@ class PaymentController extends Controller
             $order->customer_email = $request->input('customer_email');
         }
 
-        // 7) (Opcional) Salvar descrição extra
         if ($request->input('add_order_info') === 'yes') {
             $order->order_description = $request->input('order_description');
         }
 
         $order->save();
 
-        // 8) Associar itens do carrinho na pivot + incluir pickup_time e note
+        // Associar os itens do carrinho ao pedido
         foreach ($cart as $mealId => $item) {
             $quantity  = $item['quantity'];
             $dayOfWeek = $item['day_of_week'] ?? null; 
@@ -98,7 +89,7 @@ class PaymentController extends Controller
             ]);
         }
 
-        // 9) Chamar IfthenPay (ou outro gateway)
+        // Chamada para o gateway de pagamento
         try {
             switch ($paymentMethod) {
                 case 'multibanco':
@@ -149,7 +140,6 @@ class PaymentController extends Controller
         if (isset($result['Status']) && $result['Status'] === '000') {
             $requestId = $result['RequestId'] ?? null;
             session()->put('mbway_request_id', $requestId);
-
             return redirect()->back()->with('success', 'MBWAY iniciado! Verifique a app MBWAY.');
         } else {
             $message = $result['Message'] ?? 'Erro ao inicializar MBWAY.';
@@ -179,8 +169,6 @@ class PaymentController extends Controller
             $paymentUrl = $result['PaymentUrl'] ?? null;
             $requestId  = $result['RequestId'] ?? null;
             session()->put('card_request_id', $requestId);
-
-            // Redirecionar para página da IfthenPay (dados de cartão)
             return redirect($paymentUrl);
         } else {
             $message = $result['Message'] ?? 'Erro ao iniciar pagamento por cartão.';
@@ -193,6 +181,16 @@ class PaymentController extends Controller
         $ifthenOrderId = $request->query('id');
         $order = Order::where('order_id', $ifthenOrderId)->first();
         if ($order) {
+            // Decrementar o estoque conforme os itens do pedido
+            $order->load('meals');
+            foreach ($order->meals as $meal) {
+                $quantity = $meal->pivot->quantity;
+                if ($meal->stock >= $quantity) {
+                    $meal->decrement('stock', $quantity);
+                } else {
+                    \Log::warning("Estoque insuficiente para a refeição ID {$meal->id}. Estoque atual: {$meal->stock}, quantidade pedida: {$quantity}.");
+                }
+            }
             $order->status         = 'completed';
             $order->payment_status = 'paid';
             $order->save();
@@ -215,10 +213,8 @@ class PaymentController extends Controller
         return view('payments.cancel');
     }
 
-    // (opcional) Callback MBWAY, se precisar
     public function mbwayCallback(Request $request)
     {
         return response('OK', 200);
     }
 }
-

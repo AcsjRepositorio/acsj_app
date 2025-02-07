@@ -66,6 +66,11 @@
                 <!-- Preço -->
                 <td class="align-middle text-center">€ {{ number_format($meal->price, 2, ',', '.') }}</td>
 
+
+                <!-- Stock -->
+                
+                
+               
                 <!-- Categoria -->
                 <td>{{ $meal->category->meal_category ?? 'Categoria não definida' }}</td>
 

@@ -12,7 +12,7 @@
     }
 @endphp
 
-<div class="card {{ ($meal->category_id == 2 && $menuExpirado) ? 'expired' : '' }}">
+<div class="card {{ (($meal->category_id == 2 && $menuExpirado) || $meal->stock <= 0) ? 'expired' : '' }}">
     <div class="price-badge">€{{ $meal->price }}</div>
     <div class="image-wrapper">
         <img src="{{ $meal->photo && file_exists(public_path('storage/' . $meal->photo)) 
@@ -22,6 +22,10 @@
 
         @if($meal->category_id == 2 && $menuExpirado)
             <div class="sold-out-badge">Menu esgotado</div>
+        @endif
+
+        @if($meal->stock <= 0)
+            <div class="sold-out-badge">Esgotado</div>
         @endif
 
         @if($meal->category_id == 2 && $meal->day_week_start)
@@ -43,7 +47,7 @@
         <form method="POST" action="{{ route('cart.store') }}">
             @csrf
             <input type="hidden" name="meal_id" value="{{ $meal->id }}">
-            <button type="submit" class="button add-to-cart" {{ ($meal->category_id == 2 && $menuExpirado) ? 'disabled' : '' }}>
+            <button type="submit" class="button add-to-cart" {{ (($meal->category_id == 2 && $menuExpirado) || $meal->stock <= 0) ? 'disabled' : '' }}>
                 Adicionar ao carrinho
             </button>
         </form>
@@ -99,7 +103,7 @@
     z-index: 10;
   }
 
-  /* Badge "Menu Esgotado" */
+  /* Badge "Menu Esgotado" e "Esgotado" */
   .sold-out-badge {
     position: absolute;
     top: 5px;
@@ -114,7 +118,7 @@
     z-index: 1000;
   }
 
-  /* Card com aparência alterada quando expirado */
+  /* Card com aparência alterada quando expirado ou sem estoque */
   .card.expired {
     background-color: rgba(187, 201, 59, 0.65);
     opacity: 0.6;
@@ -193,3 +197,4 @@
     cursor: not-allowed;
   }
 </style>
+

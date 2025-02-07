@@ -20,8 +20,8 @@ class Meal extends Model
         'menu_id',
         'category_id',
         'day_week_start',
-        'day_of_week' 
-           // Adicione este campo se ele for usado para armazenar a data
+        'day_of_week' ,
+        'stock'
     ];
 
   

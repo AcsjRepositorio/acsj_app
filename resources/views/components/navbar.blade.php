@@ -37,7 +37,7 @@
                         <i class="bi bi-cart"></i>
                         @if(session('cart') && count(session('cart')) > 0)
                             <span class="cart-badge">{{ count(session('cart')) }}</span>
-                            <x-cart/>
+                            
                         @endif
                     </a>
                 </li>

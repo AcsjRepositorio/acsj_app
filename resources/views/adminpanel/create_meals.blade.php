@@ -38,24 +38,18 @@
 
         <!-- Step 1 -->
         <div id="step-1" class="form-step">
-            <!-- Foto de meal -->
+            <!-- Foto da refeição -->
             <div class="mb-4 text-center">
                 <div class="bg-secondary rounded" style="width: 120px; height: 120px; margin: 0 auto;">
-                    <!-- Exibição da foto (default ou carregada) -->
-                    <img
-                        src="{{ asset('images/default-meal.jpg') }}"
-                        alt="Foto padrão de refeição"
-                        class="rounded-circle"
-                        style="width: 120px; height: 120px;">
+                    <img src="{{ asset('images/default-meal.jpg') }}" alt="Foto padrão de refeição"
+                        class="rounded-circle" style="width: 120px; height: 120px;">
                 </div>
                 <input type="file" name="photo" class="form-control mt-3" accept="image/*">
             </div>
 
             <div class="mb-4">
                 <label for="name" class="form-label">Nome do prato</label>
-                <input type="text" name="name" id="name"
-                    value="{{ old('name') }}"
-                    class="form-control" required>
+                <input type="text" name="name" id="name" value="{{ old('name') }}" class="form-control" required>
             </div>
 
             <div class="text-center">
@@ -64,13 +58,23 @@
         </div>
 
         <!-- Step 2 -->
-        <div id="step-2" class="form-step d-none">
-            <div class="mb-4">
-                <label for="price" class="form-label">Preço</label>
-                <input type="number" name="price" id="price" value="{{ old('price') }}"
-                    class="form-control" step="0.01" required>
-                <div class="invalid-feedback">
-                    Por favor, insira um preço válido.
+        <div id="step-2" class="form-step d-none mb-5">
+            <div style="width: 100%; display: flex; justify-content: space-between;">
+                <!-- Campo para o Preço -->
+                <div class="mb-4" style="width: 30%;">
+                    <label for="price" class="form-label">Preço</label>
+                    <input type="number" name="price" id="price" value="{{ old('price') }}" class="form-control" step="0.01" required>
+                    <div class="invalid-feedback">
+                        Por favor, insira um preço válido.
+                    </div>
+                </div>
+                <!-- Campo para o Estoque -->
+                <div class="mb-4" style="width: 30%;">
+                    <label for="stock" class="form-label">Estoque</label>
+                    <input type="number" name="stock" id="stock" value="{{ old('stock', 0) }}" class="form-control" min="0" required>
+                    <div class="invalid-feedback">
+                        Por favor, insira a quantidade disponível.
+                    </div>
                 </div>
             </div>
 
@@ -89,7 +93,7 @@
                 </div>
             </div>
 
-            <!-- Container do Datepicker com id para facilitar a manipulação -->
+            <!-- Container do Datepicker -->
             <div class="mb-3" id="sale-date-container">
                 <label for="day_week_start" class="form-label">Data de venda:</label>
                 <div class="input-group">
@@ -97,13 +101,13 @@
                     <span class="input-group-text">
                         <i class="bi bi-calendar3"></i>
                     </span>
-                    <input type="hidden" name="day_of_week" id="day_of_week"> <!-- Campo oculto -->
+                    <input type="hidden" name="day_of_week" id="day_of_week">
                 </div>
                 <div class="mt-2">
                     <p id="dayOfWeek" class="text-muted"></p>
                 </div>
                 <div class="invalid-feedback">
-                    Por favor, selecione uma data de venda! 
+                    Por favor, selecione uma data de venda!
                 </div>
             </div>
 
@@ -153,7 +157,6 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
-<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <style>
     .steps-container {
         display: flex;
@@ -187,14 +190,12 @@
 @section('js')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
-
 <script>
     // Controle dos passos do formulário
     const steps = document.querySelectorAll('.form-step');
     const stepCircles = document.querySelectorAll('.step-circle');
     let currentStep = 0;
 
-    // Atualizar indicador de etapas
     function updateStepIndicator(step) {
         stepCircles.forEach((circle, index) => {
             if (index <= step) {
@@ -205,11 +206,9 @@
         });
     }
 
-    // Função de validação do step atual
     function validateStep(step) {
         const inputs = steps[step].querySelectorAll('input, select, textarea');
         let isValid = true;
-
         inputs.forEach(input => {
             if (!input.checkValidity()) {
                 input.classList.add('is-invalid');
@@ -218,11 +217,9 @@
                 input.classList.remove('is-invalid');
             }
         });
-
         return isValid;
     }
 
-    // Avançar para a próxima etapa
     function nextStep() {
         if (validateStep(currentStep)) {
             steps[currentStep].classList.add('d-none');
@@ -232,7 +229,6 @@
         }
     }
 
-    // Voltar para a etapa anterior
     function prevStep() {
         steps[currentStep].classList.add('d-none');
         currentStep--;
@@ -246,24 +242,22 @@
     document.getElementById('prevBtnStep3').addEventListener('click', prevStep);
 
     // Inicialização do datepicker
-    $(function () {
+    $(function() {
         $("#day_week_start").datepicker({
             dateFormat: "yy-mm-dd",
-            onSelect: function (dateText) {
+            onSelect: function(dateText) {
                 const date = new Date(dateText);
                 const dayOfWeek = date.toLocaleDateString('pt-PT', { weekday: 'long' });
                 $('#dayOfWeek').text(`Dia da semana: ${dayOfWeek}`);
-                $('#day_of_week').val(dayOfWeek); // Atualiza o campo oculto
+                $('#day_of_week').val(dayOfWeek);
             }
         });
     });
 
-    // Função para exibir ou ocultar o campo de data conforme a categoria selecionada
+    // Exibir ou ocultar o campo de data conforme a categoria selecionada
     $(document).ready(function() {
         function toggleSaleDate() {
-            // Recupera o texto da opção selecionada
             var selectedOption = $('#category_id option:selected').text().trim();
-            // Se for "Almoço", mostra o campo; caso contrário, oculta e remove o required
             if (selectedOption === "Almoço") {
                 $('#sale-date-container').show();
                 $('#day_week_start').attr('required', true);
@@ -272,8 +266,6 @@
                 $('#day_week_start').removeAttr('required');
             }
         }
-        
-        // Executa ao mudar a categoria e também na inicialização, caso já haja um valor selecionado
         $('#category_id').on('change', toggleSaleDate);
         toggleSaleDate();
     });
