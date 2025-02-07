@@ -81,17 +81,19 @@ Route::middleware('auth')->group(function () {
             ->name('adminpanel.manage.order.overview.filter');
     });
 
-    // Rotas para pagamento (ifthenpay) – não precisam de autenticação
-    Route::post('/payment/process', [PaymentController::class, 'process'])->name('payment.process');
-    Route::get('/payment/success', [PaymentController::class, 'success'])->name('payment.success');
-    Route::get('/payment/error', [PaymentController::class, 'error'])->name('payment.error');
-    Route::get('/payment/cancel', [PaymentController::class, 'cancel'])->name('payment.cancel');
-
-    // Rota para atualizar quantidades dos itens do carrinho
-    Route::post('/cart/update-quantity', [CartController::class, 'updateQuantity'])->name('cart.updateQuantity');
-
-    // Checkout
-    Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
-
-    require __DIR__ . '/auth.php';
+   
 });
+
+ // Rotas para pagamento (ifthenpay) – não precisam de autenticação
+ Route::post('/payment/process', [PaymentController::class, 'process'])->name('payment.process');
+ Route::get('/payment/success', [PaymentController::class, 'success'])->name('payment.success');
+ Route::get('/payment/error', [PaymentController::class, 'error'])->name('payment.error');
+ Route::get('/payment/cancel', [PaymentController::class, 'cancel'])->name('payment.cancel');
+
+ // Rota para atualizar quantidades dos itens do carrinho
+ Route::post('/cart/update-quantity', [CartController::class, 'updateQuantity'])->name('cart.updateQuantity');
+
+ // Checkout
+ Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
+
+ require __DIR__ . '/auth.php';

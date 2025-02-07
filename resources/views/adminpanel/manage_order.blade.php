@@ -3,26 +3,23 @@
 @section('title', 'Consultar Pedidos')
 
 @section('content_header')
-<h1>Dashboard - Consulta de Pedidos</h1>
+    <h1>Dashboard - Consulta de Pedidos</h1>
 @stop
 
 @section('content')
 <div class="container mt-8">
 
     @if(session('success'))
-    <div class="alert alert-success">{{ session('success') }}</div>
+        <div class="alert alert-success">{{ session('success') }}</div>
     @endif
     @if(session('error'))
-    <div class="alert alert-danger">{{ session('error') }}</div>
+        <div class="alert alert-danger">{{ session('error') }}</div>
     @endif
 
     <!-- Bloco sombreado centralizado -->
-
     <div class="d-flex justify-content-center">
         <div class="shadow p-3 bg-body rounded" style="max-width: 800px; width: 100%;">
-
             <div class="d-flex justify-content-center">
-
                 <form action="{{ route('adminpanel.manage.order.search') }}" method="GET" id="searchForm" class="mb-3 w-100">
                     <div class="input-group">
                         <input type="text"
@@ -36,21 +33,19 @@
                         </button>
                     </div>
                 </form>
-
             </div>
 
-            <!-- div do filtro -->
+            <!-- Div do filtro -->
             <div class="d-flex justify-content-center align-items-center">
                 <form action="{{ route('adminpanel.manage.order') }}" method="GET" id="filterForm" class="d-flex flex-row gap-2">
-
                     <div class="input-group">
                         <input type="text"
-                            placeholder="selecione uma data"
-                            id="selectedDate"
-                            name="selectedDate"
-                            class="form-control form-control-sm"
-                            value="{{ request('selectedDate') }}"
-                            autocomplete="off">
+                               placeholder="selecione uma data"
+                               id="selectedDate"
+                               name="selectedDate"
+                               class="form-control form-control-sm"
+                               value="{{ request('selectedDate') }}"
+                               autocomplete="off">
                         <span class="input-group-text bg-white">
                             <i class="fa-solid fa-calendar-days"></i>
                         </span>
@@ -82,20 +77,15 @@
                         <button type="submit" class="btn btn-success btn-sm">
                             <i class="fa-solid fa-filter"></i>
                         </button>
-
                     </div>
-
-
-
                 </form>
             </div>
             <!-- Botão de Limpar Filtros -->
-            <div class="col-md-12 text-end mt-2">
-                <a href="{{ route('adminpanel.manage.order') }}" class="btn btn-success">
+            <div class="col-md-12 text-start mt-2">
+                <a href="{{ route('adminpanel.manage.order') }}" class="btn btn-danger">
                     Limpar filtros
                 </a>
             </div>
-
         </div>
     </div>
 
@@ -105,154 +95,154 @@
         @method('PUT')
 
         @forelse($groupedData as $rawDate => $horarios)
-        @php
-        try {
-        $carbonDate = \Carbon\Carbon::createFromFormat('d/m/Y', $rawDate)->locale('pt_PT');
-        $formatada = $carbonDate->format('d/m/Y');
-        $diaDaSemana = ucfirst($carbonDate->isoFormat('dddd'));
-        } catch (\Exception $e) {
-        $formatada = $rawDate;
-        $diaDaSemana = '';
-        }
-        @endphp
+            @php
+                try {
+                    $carbonDate = \Carbon\Carbon::createFromFormat('d/m/Y', $rawDate)->locale('pt_PT');
+                    $formatada = $carbonDate->format('d/m/Y');
+                    $diaDaSemana = ucfirst($carbonDate->isoFormat('dddd'));
+                } catch (\Exception $e) {
+                    $formatada = $rawDate;
+                    $diaDaSemana = '';
+                }
+            @endphp
 
-        <h3 class="mt-4">Data: {{ $formatada }} ({{ $diaDaSemana }})</h3>
+            <h3 class="mt-4">Data: {{ $formatada }} ({{ $diaDaSemana }})</h3>
 
-        @foreach($horarios as $pickupTime => $items)
-        <h5 class="mt-3">Horário: {{ $pickupTime }}</h5>
-        <table class="table table-bordered text-center">
-            <thead>
-                <tr>
-                    <th>Order ID</th>
-                    <th>Nome do Cliente</th>
-                    <th>Email</th>
-                    <th>Prato</th>
-                    <th>Qtd</th>
-                    <th>Obs</th>
-                    <th>Pickup Time</th>
-                    <th>Disp. Preparo</th>
-                    <th>Entregue</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($items as $item)
-                <tr class="{{ $item['entregue'] ? 'entregue-sim' : '' }}">
-                    <td>{{ $item['order_id'] }}</td>
-                    <td>{{ $item['customer_name'] }}</td>
-                    <td>{{ $item['customer_email'] }}</td>
-                    <td>{{ $item['meal_name'] }}</td>
-                    <td>{{ $item['quantity'] }}</td>
-                    <td>{{ $item['note'] }}</td>
-                    <td>{{ $item['pickup_time'] }}</td>
-                    <td>
-                        <select name="disponivel_preparo[{{ $item['order_meal_id'] }}]" class="form-control">
-                            <option value="sim" {{ $item['disponivel_preparo'] ? 'selected' : '' }}>Sim</option>
-                            <option value="nao" {{ !$item['disponivel_preparo'] ? 'selected' : '' }}>Não</option>
-                        </select>
-                    </td>
-                    <td>
-                        <select name="entregue[{{ $item['order_meal_id'] }}]" class="form-control entregue-select">
-                            <option value="sim" {{ $item['entregue'] ? 'selected' : '' }}>Sim</option>
-                            <option value="nao" {{ !$item['entregue'] ? 'selected' : '' }}>Não</option>
-                        </select>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-        @endforeach
+            @foreach($horarios as $pickupTime => $items)
+                <h5 class="mt-3">Horário: {{ $pickupTime }}</h5>
+                <table class="table table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Nome do Cliente</th>
+                            <th>Email</th>
+                            <th>Prato</th>
+                            <th>Qtd</th>
+                            <th>Obs</th>
+                            <th>Pickup Time</th>
+                            <th>Disp. Preparo</th>
+                            <th>Entregue</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($items as $item)
+                            <tr class="{{ $item['entregue'] ? 'entregue-sim' : '' }}">
+                                <td>{{ $item['order_id'] }}</td>
+                                <td>{{ $item['customer_name'] }}</td>
+                                <td>{{ $item['customer_email'] }}</td>
+                                <td>{{ $item['meal_name'] }}</td>
+                                <td>{{ $item['quantity'] }}</td>
+                                <td>{{ $item['note'] }}</td>
+                                <td>{{ $item['pickup_time'] }}</td>
+                                <td>
+                                    <select name="disponivel_preparo[{{ $item['order_meal_id'] }}]" class="form-control">
+                                        <option value="sim" {{ $item['disponivel_preparo'] ? 'selected' : '' }}>Sim</option>
+                                        <option value="nao" {{ !$item['disponivel_preparo'] ? 'selected' : '' }}>Não</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select name="entregue[{{ $item['order_meal_id'] }}]" class="form-control entregue-select">
+                                        <option value="sim" {{ $item['entregue'] ? 'selected' : '' }}>Sim</option>
+                                        <option value="nao" {{ !$item['entregue'] ? 'selected' : '' }}>Não</option>
+                                    </select>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            @endforeach
         @empty
-        <p>Nenhum pedido encontrado.</p>
+            <p>Nenhum pedido encontrado.</p>
         @endforelse
 
         <button type="submit" class="btn btn-primary mt-3">Salvar Alterações</button>
     </form>
     @else
-
-    <div class="shadow p-4 mt-5 bg-body rounded text-center mx-auto" style="max-width: 300px; width: 100%;">
-        <img src="/images/icons/emptyfolder.png" alt="Empty Folder" class="img-fluid" style="max-height: 120px; object-fit: contain;">
-        <p class="mt-2">A busca não retornou resultados</p>
-    </div>
-
+        <div class="shadow p-4 mt-5 bg-body rounded text-center mx-auto" style="max-width: 300px; width: 100%;">
+            <img src="/images/icons/emptyfolder.png" alt="Empty Folder" class="img-fluid" style="max-height: 120px; object-fit: contain;">
+            <p class="mt-2">A busca não retornou resultados</p>
+        </div>
     @endif
 </div>
 @stop
 
-
 @section('css')
-<!-- Bootstrap 5 + Datepicker CSS -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-    rel="stylesheet"
-    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
-    crossorigin="anonymous">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/css/bootstrap-datepicker.min.css">
-<!-- Font Awesome para os ícones -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<style>
-    .entregue-sim {
-        background-color: #d4edda !important;
-        /* verde claro */
-    }
-</style>
+    <!-- Estilos e dependências -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+          crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/css/bootstrap-datepicker.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Classe para o fundo verde com transparência */
+        .entregue-sim {
+            background-color: rgba(212, 237, 218, 0.5) !important;
+        }
+    </style>
 @stop
 
 @section('js')
-<!-- Bootstrap 5 + Datepicker JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-    crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/js/bootstrap-datepicker.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.pt-BR.min.js"></script>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Inicializa o Datepicker
-        $('#selectedDate').datepicker({
-            format: 'dd/mm/yyyy',
-            language: 'pt-BR',
-            autoclose: true,
-            todayHighlight: true
-        });
-
-        // Ao mudar o filtro adicional, se "horario" for escolhido, exibe o select de janela de horário;
-        // Se não houver data selecionada, alerta e reseta.
-        $('#additionalFilter').on('change', function() {
-            var selectedVal = $(this).val();
-            var dateVal = $('#selectedDate').val();
-            if (selectedVal === 'horario') {
-                if (!dateVal) {
-                    alert("Por favor, selecione uma data antes de escolher 'Horário de Pickup'.");
-                    $(this).val('');
+    <!-- Carregue o jQuery PRIMEIRO para que os scripts dependentes funcionem -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Outros scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/js/bootstrap-datepicker.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.pt-BR.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Inicializa o Datepicker
+            $('#selectedDate').datepicker({
+                format: 'dd/mm/yyyy',
+                language: 'pt-BR',
+                autoclose: true,
+                todayHighlight: true
+            });
+    
+            // Exibe/oculta o container de horário conforme o filtro adicional
+            $('#additionalFilter').on('change', function() {
+                var selectedVal = $(this).val();
+                var dateVal = $('#selectedDate').val();
+                if (selectedVal === 'horario') {
+                    if (!dateVal) {
+                        alert("Por favor, selecione uma data antes de escolher 'Horário de Pickup'.");
+                        $(this).val('');
+                        $('#pickupWindowContainer').hide();
+                    } else {
+                        $('#pickupWindowContainer').show();
+                    }
+                } else {
                     $('#pickupWindowContainer').hide();
-                } else {
-                    $('#pickupWindowContainer').show();
                 }
-            } else {
-                $('#pickupWindowContainer').hide();
+            });
+    
+            if ($('#additionalFilter').val() === 'horario') {
+                $('#pickupWindowContainer').show();
             }
-        });
-
-        // Se a página for recarregada e o filtro adicional for "horario", mostra o container (caso já tenha valor)
-        if ($('#additionalFilter').val() === 'horario') {
-            $('#pickupWindowContainer').show();
-        }
-
-        // Exemplo: colorir linhas onde "Entregue" = sim
-        const entregueSelects = document.querySelectorAll('.entregue-select');
-        entregueSelects.forEach(select => {
-            const row = select.closest('tr');
-            if (select.value === 'sim') {
-                row.classList.add('entregue-sim');
-            }
-            select.addEventListener('change', () => {
-                if (select.value === 'sim') {
-                    row.classList.add('entregue-sim');
+    
+            // --- Alteração mínima para atualizar o background da linha conforme o valor do select "Entregue" ---
+            // Ao carregar a página, verifica cada select e, se o valor for "sim", adiciona a classe para fundo verde
+            $('.entregue-select').each(function() {
+                var $select = $(this);
+                var $row = $select.closest('tr');
+                if ($select.val() === 'sim') {
+                    $row.addClass('entregue-sim');
+                }
+            });
+    
+            // Ao mudar o valor do select, atualiza a classe da linha
+            $('.entregue-select').on('change', function() {
+                var $select = $(this);
+                var $row = $select.closest('tr');
+                if ($select.val() === 'sim') {
+                    $row.addClass('entregue-sim');
                 } else {
-                    row.classList.remove('entregue-sim');
+                    $row.removeClass('entregue-sim');
                 }
             });
         });
-    });
-</script>
+    </script>
 @stop

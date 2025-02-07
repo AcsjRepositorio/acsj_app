@@ -171,9 +171,13 @@ class DashboardController extends Controller
 
     /**
      * Atualiza os campos "Disponível para Preparo" e "Entregue" dos pedidos.
+     *
+     * Alteramos aqui o update para combinar as atualizações em um único loop, garantindo que
+     * o campo 'entregue' seja atualizado corretamente.
      */
     public function update(Request $request)
     {
+        // Valida os valores recebidos do formulário
         $request->validate([
             'disponivel_preparo.*' => 'required|in:sim,nao',
             'entregue.*'           => 'required|in:sim,nao',
@@ -182,31 +186,26 @@ class DashboardController extends Controller
         $disponivelPreparo = $request->input('disponivel_preparo', []);
         $entregue = $request->input('entregue', []);
 
+        // Obtém todos os IDs enviados (pode ser que alguma linha exista em apenas um dos arrays)
+        $orderMealIds = array_unique(array_merge(array_keys($disponivelPreparo), array_keys($entregue)));
+
         DB::beginTransaction();
         try {
-            foreach ($disponivelPreparo as $orderMealId => $value) {
-                $orderMeal = OrderMeal::find($orderMealId);
-                if ($orderMeal) {
-                    $orderMeal->disponivel_preparo = ($value === 'sim');
-                    $orderMeal->save();
-                }
-            }
+            foreach ($orderMealIds as $orderMealId) {
+                $dpValue = isset($disponivelPreparo[$orderMealId]) ? $disponivelPreparo[$orderMealId] : 'nao';
+                $entValue = isset($entregue[$orderMealId]) ? $entregue[$orderMealId] : 'nao';
 
-            foreach ($entregue as $orderMealId => $value) {
-                $orderMeal = OrderMeal::find($orderMealId);
-                if ($orderMeal) {
-                    $orderMeal->entregue = ($value === 'sim');
-                    $orderMeal->save();
-                }
+                OrderMeal::where('id', $orderMealId)->update([
+                    'disponivel_preparo' => ($dpValue === 'sim'),
+                    'entregue'           => ($entValue === 'sim'),
+                ]);
             }
 
             DB::commit();
-            return redirect()->route('adminpanel.manage.order')
-                             ->with('success', 'Pedidos atualizados com sucesso.');
+            return redirect()->back()->with('success', 'Pedidos atualizados com sucesso!');
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->route('adminpanel.manage.order')
-                             ->with('error', 'Erro ao atualizar os pedidos: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Erro ao atualizar pedidos: ' . $e->getMessage());
         }
     }
 

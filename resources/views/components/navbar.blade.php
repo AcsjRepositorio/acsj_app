@@ -37,6 +37,7 @@
                         <i class="bi bi-cart"></i>
                         @if(session('cart') && count(session('cart')) > 0)
                             <span class="cart-badge">{{ count(session('cart')) }}</span>
+                            <x-cart/>
                         @endif
                     </a>
                 </li>
@@ -44,7 +45,7 @@
                 <!-- Ícone de login -->
                 @auth
                     <li class="nav-item">
-                        <x-user-dropdown :user="auth()->user()" />
+                        <x-user-dropdown :user="auth()->user()" />  
                     </li>
                 @else
                     <li class="nav-item">

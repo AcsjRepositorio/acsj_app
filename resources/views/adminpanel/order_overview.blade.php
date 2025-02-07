@@ -50,8 +50,8 @@
                     <i class="fa-solid fa-filter"></i>
                 </button>
             </div>
-            <div class="col-md-12 text-end mt-3">
-                <a href="{{ route('adminpanel.order.overview') }}" class="btn btn-success btn-sm">
+            <div class="col-md-12 text-start mt-3">
+                <a href="{{ route('adminpanel.order.overview') }}" class="btn btn-danger btn-sm">
                     Limpar filtros
                 </a>
             </div>

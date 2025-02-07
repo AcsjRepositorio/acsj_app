@@ -99,11 +99,26 @@
         
         
         @else
-        <div class="shadow p-4 mt-5 bg-body rounded text-center mx-auto" style="max-width: 300px; width: 100%;">
-        <img src="/images/icons/emptycart.png" alt="Empty Folder" class="img-fluid" style="max-height: 120px; object-fit: contain;">
-        <p class="mt-2">Seu carrinho está vazio!</p>
+    <div class="shadow-lg p-4 mt-5 bg-body rounded text-center mx-auto" style="max-width: 350px; width: 100%;">
+        <img src="/images/icons/emptydish.png" alt=" prato Vazio" class="img-fluid empty-cart-img" style="max-height: 140px; object-fit: contain;">
+        <h5 class="mb-3 text-secondary">Por hora, o seu prato está vazio!</h5>
+        <button type="button" class="button mt-3"
+            data-bs-dismiss="offcanvas"
+            aria-label="Close">Ver Refeições</button>
     </div>
-        @endif
+
+    <style>
+        .empty-cart-img {
+            filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.2));
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .empty-cart-img:hover {
+            transform: scale(1.05);
+        }
+    </style>
+@endif
+
     </div>
 </div>
 

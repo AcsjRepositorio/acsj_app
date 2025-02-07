@@ -1,37 +1,27 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\Meal;
-
-use Carbon\Carbon;
-
-
-
 use App\Models\Category;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class MealController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Retorna todas as refeições.
+     * (Esta função é utilizada em rotas públicas)
      */
-
-     // Criei esta função para pegar através de um Get,  sendo apenas esta função acessada por rotas de users 
-     // não autenticados e o endereço da página tb não fica como "adminPanel" e sim como viewallmeal
-
-
-
-     public static function getAllMeals()
+    public static function getAllMeals()
     {
         return Meal::all();
-
-        
     }
-     
 
-
+    /**
+     * Exibe a lista de refeições.
+     */
     public function index()
     {
         $meals = Meal::all()->map(function ($meal) {
@@ -47,96 +37,79 @@ class MealController extends Controller
             }
             return $meal;
         });
-    
+
         return view('adminpanel.manage_meals', compact('meals'));
     }
-    
-    
-    
-    
-    
-    
 
     /**
-     * Show the form for creating a new resource.
+     * Exibe o formulário para criar uma nova refeição.
      */
     public function create()
     {
-
-        $categories = Category::pluck('meal_category', 'id'); 
-      
-
-        
-    
+        // Pega as categorias: a chave é o ID e o valor é o nome da categoria
+        $categories = Category::pluck('meal_category', 'id');
         return view('adminpanel.create_meals', compact('categories'));
-
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Armazena uma nova refeição no banco de dados.
      */
     public function store(Request $request)
     {
+        // Validação condicional: 
+        // Os campos day_week_start e day_of_week são obrigatórios somente se a categoria for "Almoço" (id = 2)
+        $validated = $request->validate([
+            'name'           => 'required|string|max:255',
+            'description'    => 'required',
+            'photo'          => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'price'          => 'required|numeric',
+            'category_id'    => 'required|integer|in:1,2,3,4',
+            'day_week_start' => 'required_if:category_id,2|nullable|date',
+            'day_of_week'    => 'required_if:category_id,2|nullable|string|max:50',
+        ], [
+            'name.required'              => 'O nome do prato é obrigatório.',
+            'price.required'             => 'O preço é obrigatório.',
+            'category_id.required'       => 'O tipo de refeição é obrigatório.',
+            'day_week_start.required_if' => 'A data de venda é obrigatória para refeições do tipo Almoço.',
+            'description.required'       => 'A descrição é obrigatória.',
+            'photo.image'                => 'O arquivo enviado deve ser uma imagem.',
+        ]);
 
-        $validated=$request->validate([
+        // Tratamento da imagem
+        $photoPath = $request->hasFile('photo')
+            ? $request->file('photo')->store('photos', 'public')
+            : 'images/default-meal.jpg';
 
+        // Se a categoria for "Almoço" (id = 2), os campos de data serão salvos; caso contrário, eles serão nulos.
+        if ($validated['category_id'] == 2) {
+            $mealData = [
+                'name'           => $validated['name'],
+                'description'    => $validated['description'],
+                'price'          => $validated['price'],
+                'category_id'    => $validated['category_id'],
+                'day_week_start' => $validated['day_week_start'],
+                'day_of_week'    => strtolower(Carbon::parse($validated['day_week_start'])->locale('pt_PT')->dayName),
+                'photo'          => $photoPath,
+            ];
+        } else {
+            $mealData = [
+                'name'           => $validated['name'],
+                'description'    => $validated['description'],
+                'price'          => $validated['price'],
+                'category_id'    => $validated['category_id'],
+                'day_week_start' => null,
+                'day_of_week'    => null,
+                'photo'          => $photoPath,
+            ];
+        }
 
-            
-            'name' => 'required|string|max:255',
-            'description' => 'required',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'price' => 'required|numeric',
-            'category_id' => 'required|integer|in:1,2,3,4', // IDs das categorias
-            'day_of_week' => 'required|string|max:50',
-            
-            'day_week_start' => 'required|date',
-            // 'day_week_end' => '|date|after_or_equal:day_week_start',
-                   
-            
-
-        ],[
-            'name.required' => 'O nome do prato é obrigatório.',
-            'price.required' => 'O preço é obrigatório.',
-            'category_id.required' => 'O tipo de refeição é obrigatório.',
-            'day_week_start.required' => 'A data de venda é obrigatória.',
-            'description.required' => 'A descrição é obrigatória.',
-            'photo.image' => 'O arquivo enviado deve ser uma imagem.',
-            
-        ]
-    
-    );
-
-
-        $photoPath = $request->hasFile('photo') 
-        ? $request->file('photo')->store('photos', 'public') 
-        : 'images/default-meal.jpg';
-
-
-
-
-
-        $mealData = [
-            'name' => $validated['name'],
-            'description' => $validated['description'],
-            'price' => $validated['price'],
-            'category_id' => $validated['category_id'],
-            'day_week_start' => $validated['day_week_start'],
-            'photo' => $photoPath,
-           'day_of_week' => strtolower(Carbon::parse($validated['day_week_start'])->locale('pt_PT')->dayName), // Padronizar com letras minúsculas
-            // 'day_week_end' => $validated['day_week_end'],
-        ];
-        
         Meal::create($mealData);
-        
-        return redirect('adminpanel/manage_meals')->with('success', 'Refeição alterada com sucesso!');
 
-       
-
-
+        return redirect('adminpanel/manage_meals')->with('success', 'Refeição criada com sucesso!');
     }
 
     /**
-     * Display the specified resource.
+     * Exibe os detalhes de uma refeição (não implementado).
      */
     public function show(string $id)
     {
@@ -144,77 +117,81 @@ class MealController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Exibe o formulário para editar uma refeição.
      */
     public function edit(string $id)
     {
-        $meal=Meal::findOrfail($id);
-
-        $categories=[
-        'Pequeno almoço' => 1,
-        'Almoço' => 2,
-        'Jantar' => 3,
-        'Lanche' => 4,
+        $meal = Meal::findOrFail($id);
+        // Mapeamento de categorias: chave => nome, onde os IDs são definidos manualmente.
+        $categories = [
+            'Pequeno almoço' => 1,
+            'Almoço'         => 2,
+            'Jantar'         => 3,
+            'Lanche'         => 4,
         ];
 
-        
-      
-
-        return view('adminpanel.edit_meals',compact('meal','categories'));
+        return view('adminpanel.edit_meals', compact('meal', 'categories'));
     }
 
     /**
-     * Update the specified resource in storage.
+     * Atualiza uma refeição existente no banco de dados.
      */
-   public function update(Request $request, string $id)
-{
-    $validatedData = $request->validate([
-        'name' => 'required|string|max:255',
-        'description' => 'required|string',
-        'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        'price' => 'required|numeric',
-        'category_id' => 'required|integer|in:1,2,3,4', // IDs das categorias
-        'day_week_start' => 'nullable|date', // Permitir nulo
-        'day_of_week' => 'nullable|string|max:50', // Permitir nulo
-    ], [
-        'name.required' => 'O nome do prato é obrigatório.',
-        'price.required' => 'O preço é obrigatório.',
-        'category_id.required' => 'O tipo de refeição é obrigatório.',
-        'description.required' => 'A descrição é obrigatória.',
-        'photo.image' => 'O arquivo enviado deve ser uma imagem.',
-        
-    ]);
+    public function update(Request $request, string $id)
+    {
+        $validatedData = $request->validate([
+            'name'           => 'required|string|max:255',
+            'description'    => 'required|string',
+            'photo'          => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'price'          => 'required|numeric',
+            'category_id'    => 'required|integer|in:1,2,3,4',
+            'day_week_start' => 'required_if:category_id,2|nullable|date',
+            'day_of_week'    => 'required_if:category_id,2|nullable|string|max:50',
+        ], [
+            'name.required'              => 'O nome do prato é obrigatório.',
+            'price.required'             => 'O preço é obrigatório.',
+            'category_id.required'       => 'O tipo de refeição é obrigatório.',
+            'day_week_start.required_if' => 'A data de venda é obrigatória para refeições do tipo Almoço.',
+            'description.required'       => 'A descrição é obrigatória.',
+            'photo.image'                => 'O arquivo enviado deve ser uma imagem.',
+        ]);
 
-    $meal = Meal::findOrFail($id);
+        $meal = Meal::findOrFail($id);
 
-    // Se a data não foi alterada, mantém o valor atual
-    $validatedData['day_week_start'] = $request->day_week_start ?: $meal->day_week_start;
-    $validatedData['day_of_week'] = $request->day_of_week ?: ucfirst(Carbon::parse($validatedData['day_week_start'])->locale('pt_PT')->dayName);
+        // Se o campo day_week_start estiver vazio no request, mantém o valor atual se existir
+        $dayWeekStart = $request->input('day_week_start') ?: $meal->day_week_start;
 
-    // Atualizar dados gerais
-    $meal->update($validatedData);
-
-    // Verificar se uma nova foto foi enviada
-    if ($request->hasFile('photo')) {
-        if ($meal->photo && $meal->photo !== 'images/default-meal.jpg') {
-            Storage::disk('public')->delete($meal->photo);
+        // Se a categoria for "Almoço" (id = 2) e houver data definida, atualiza os campos de data;
+        // Caso contrário, define como null.
+        if ($validatedData['category_id'] == 2 && $dayWeekStart) {
+            $validatedData['day_week_start'] = $dayWeekStart;
+            $validatedData['day_of_week'] = strtolower(Carbon::parse($dayWeekStart)->locale('pt_PT')->dayName);
+        } else {
+            $validatedData['day_week_start'] = null;
+            $validatedData['day_of_week'] = null;
         }
-        $meal->photo = $request->file('photo')->store('photos', 'public');
-        $meal->save();
+
+        $meal->update($validatedData);
+
+        // Se uma nova foto for enviada, faz o upload e remove a antiga (se não for a imagem padrão)
+        if ($request->hasFile('photo')) {
+            if ($meal->photo && $meal->photo !== 'images/default-meal.jpg') {
+                Storage::disk('public')->delete($meal->photo);
+            }
+            $meal->photo = $request->file('photo')->store('photos', 'public');
+            $meal->save();
+        }
+
+        return redirect('adminpanel/manage_meals')->with('success', 'Refeição alterada com sucesso!');
     }
 
-    return redirect('adminpanel/manage_meals')->with('success', 'Refeição alterada com sucesso!');
-}
-
-
     /**
-     * Remove the specified resource from storage.
+     * Remove uma refeição do banco de dados.
      */
     public function destroy(string $id)
     {
-        $meal=Meal::findOrfail($id);
+        $meal = Meal::findOrFail($id);
         $meal->delete();
 
-        return redirect('/adminpanel/manage_meals')->with('success','Refeição excluida do menu com sucesso');
+        return redirect('adminpanel/manage_meals')->with('success', 'Refeição excluída do menu com sucesso');
     }
 }

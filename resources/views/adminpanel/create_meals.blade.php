@@ -19,7 +19,6 @@
     <form class="was-validated" action="{{ route('meals.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
 
-
         <!-- Step Indicators -->
         <div class="d-flex justify-content-center align-items-center mb-4">
             <ul class="steps d-flex list-unstyled justify-content-center gap-2 align-items-center">
@@ -49,11 +48,8 @@
                         class="rounded-circle"
                         style="width: 120px; height: 120px;">
                 </div>
-
-
                 <input type="file" name="photo" class="form-control mt-3" accept="image/*">
             </div>
-
 
             <div class="mb-4">
                 <label for="name" class="form-label">Nome do prato</label>
@@ -73,11 +69,9 @@
                 <label for="price" class="form-label">Preço</label>
                 <input type="number" name="price" id="price" value="{{ old('price') }}"
                     class="form-control" step="0.01" required>
-
                 <div class="invalid-feedback">
                     Por favor, insira um preço válido.
                 </div>
-
             </div>
 
             <div class="mb-4">
@@ -85,40 +79,33 @@
                 <select name="category_id" id="category_id" class="form-select" required>
                     <option value="" selected disabled>Selecione um tipo de refeição</option>
                     @foreach ($categories as $categoryId => $categoryName)
-                    <option value="{{ $categoryId }}" {{ old('category_id') == $categoryId ? 'selected' : '' }}>
-                        {{ $categoryName }}
-                    </option>
+                        <option value="{{ $categoryId }}" {{ old('category_id') == $categoryId ? 'selected' : '' }}>
+                            {{ $categoryName }}
+                        </option>
                     @endforeach
                 </select>
-
                 <div class="invalid-feedback">
                     Por favor, selecione uma categoria de refeição.
                 </div>
-
             </div>
-            <div class="mb-3">
-    <label for="day_week_start" class="form-label">Data de venda:</label>
-    <div class="input-group">
-        <input type="text" class="form-control" name="day_week_start" id="day_week_start" required>
-        <span class="input-group-text">
-            <i class="bi bi-calendar3"></i>
-        </span>
 
-
-        <input type="hidden" name="day_of_week" id="day_of_week"> <!-- Campo oculto -->
-    <div class="mt-2">
-        <p id="dayOfWeek" class="text-muted"></p>
-    </div>
-
-
-    </div>
-    <div class="mt-2">
-        <p id="dayOfWeek" class="text-muted"></p>
-    </div>
-    <div class="invalid-feedback">
-        Por favor, selecione uma data de venda! 
-    </div>
-</div>
+            <!-- Container do Datepicker com id para facilitar a manipulação -->
+            <div class="mb-3" id="sale-date-container">
+                <label for="day_week_start" class="form-label">Data de venda:</label>
+                <div class="input-group">
+                    <input type="text" class="form-control" name="day_week_start" id="day_week_start" required>
+                    <span class="input-group-text">
+                        <i class="bi bi-calendar3"></i>
+                    </span>
+                    <input type="hidden" name="day_of_week" id="day_of_week"> <!-- Campo oculto -->
+                </div>
+                <div class="mt-2">
+                    <p id="dayOfWeek" class="text-muted"></p>
+                </div>
+                <div class="invalid-feedback">
+                    Por favor, selecione uma data de venda! 
+                </div>
+            </div>
 
             <div class="d-flex justify-content-between">
                 <button type="button" class="btn btn-outline-secondary" id="prevBtn">Voltar</button>
@@ -131,11 +118,9 @@
             <div class="mb-4">
                 <label for="validationTextarea" class="form-label">Descrição</label>
                 <textarea name="description" id="description" class="form-control" rows="4" required>{{ old('description') }}</textarea>
-
                 <div class="invalid-feedback">
-                    Descreva um pouco do prato a ser oferecido .
+                    Descreva um pouco do prato a ser oferecido.
                 </div>
-
             </div>
 
             <div class="d-flex justify-content-between">
@@ -144,20 +129,17 @@
             </div>
         </div>
     </form>
-
-
 </div>
 
 @if ($errors->any())
 <div class="alert alert-danger mt-3">
     <ul>
         @foreach ($errors->all() as $error)
-        <li>{{ $error }}</li>
+            <li>{{ $error }}</li>
         @endforeach
     </ul>
 </div>
 @endif
-
 
 @if (session('success'))
 <div class="alert alert-success">
@@ -169,22 +151,18 @@
 
 @section('css')
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-
 <style>
     .steps-container {
         display: flex;
         justify-content: center;
     }
-
     .steps {
         display: flex;
         align-items: center;
     }
-
     .step-circle {
         width: 40px;
         height: 40px;
@@ -196,12 +174,10 @@
         font-weight: bold;
         color: #6c757d;
     }
-
     .active .step-circle {
         background-color: #198754;
         color: #fff;
     }
-
     .form-step {
         padding: 10px 20px;
     }
@@ -212,9 +188,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 <script>
+    // Controle dos passos do formulário
     const steps = document.querySelectorAll('.form-step');
     const stepCircles = document.querySelectorAll('.step-circle');
     let currentStep = 0;
@@ -230,7 +205,7 @@
         });
     }
 
-    // Função de validação
+    // Função de validação do step atual
     function validateStep(step) {
         const inputs = steps[step].querySelectorAll('input, select, textarea');
         let isValid = true;
@@ -270,21 +245,37 @@
     document.getElementById('prevBtn').addEventListener('click', prevStep);
     document.getElementById('prevBtnStep3').addEventListener('click', prevStep);
 
+    // Inicialização do datepicker
     $(function () {
-    $("#day_week_start").datepicker({
-        dateFormat: "yy-mm-dd",
-        onSelect: function (dateText) {
-            const date = new Date(dateText);
-            const dayOfWeek = date.toLocaleDateString('pt-PT', { weekday: 'long' });
-            $('#dayOfWeek').text(`Dia da semana: ${dayOfWeek}`);
-            $('#day_of_week').val(dayOfWeek); // Atualiza o campo oculto
-        }
+        $("#day_week_start").datepicker({
+            dateFormat: "yy-mm-dd",
+            onSelect: function (dateText) {
+                const date = new Date(dateText);
+                const dayOfWeek = date.toLocaleDateString('pt-PT', { weekday: 'long' });
+                $('#dayOfWeek').text(`Dia da semana: ${dayOfWeek}`);
+                $('#day_of_week').val(dayOfWeek); // Atualiza o campo oculto
+            }
+        });
     });
-});
 
-
-
-
-
+    // Função para exibir ou ocultar o campo de data conforme a categoria selecionada
+    $(document).ready(function() {
+        function toggleSaleDate() {
+            // Recupera o texto da opção selecionada
+            var selectedOption = $('#category_id option:selected').text().trim();
+            // Se for "Almoço", mostra o campo; caso contrário, oculta e remove o required
+            if (selectedOption === "Almoço") {
+                $('#sale-date-container').show();
+                $('#day_week_start').attr('required', true);
+            } else {
+                $('#sale-date-container').hide();
+                $('#day_week_start').removeAttr('required');
+            }
+        }
+        
+        // Executa ao mudar a categoria e também na inicialização, caso já haja um valor selecionado
+        $('#category_id').on('change', toggleSaleDate);
+        toggleSaleDate();
+    });
 </script>
 @endsection
