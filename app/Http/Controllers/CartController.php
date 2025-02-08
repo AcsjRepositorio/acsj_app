@@ -17,23 +17,65 @@ class CartController extends Controller
     // Adiciona item ao carrinho
     public function store(Request $request)
     {
-        $meal = Meal::findOrFail($request->meal_id);
+        // Valida o ID da refeição
+        $request->validate([
+            'meal_id' => 'required|integer|exists:meals,id'
+        ]);
+
+        $mealId = $request->meal_id;
+        $meal = Meal::findOrFail($mealId);
+
+        // Recupera o carrinho atual da sessão ou cria um array vazio
         $cart = session()->get('cart', []);
 
-        if (isset($cart[$meal->id])) {
-            $cart[$meal->id]['quantity'] += 1; 
+        // Se o item já estiver no carrinho, incrementa a quantidade (se não ultrapassar o estoque)
+        if (isset($cart[$mealId])) {
+            // Verifica se a quantidade atual é menor que o estoque disponível
+            if ($cart[$mealId]['quantity'] < $meal->stock) {
+                $cart[$mealId]['quantity']++;
+            } else {
+                // Se a quantidade já é igual ao estoque, retorna com uma mensagem de erro
+                return redirect()->back()->with('error', 'Quantidade máxima em estoque já adicionada.');
+            }
         } else {
-            $cart[$meal->id] = [
-                'name'        => $meal->name,
-                'price'       => $meal->price,
-                'quantity'    => 1,
-                'photo'       => $meal->photo,
-                'day_of_week' => $meal->day_of_week
+            // Se o item ainda não estiver no carrinho, adiciona com quantidade 1 e registra o estoque
+            $cart[$mealId] = [
+                'name'     => $meal->name,
+                'price'    => $meal->price,
+                'photo'    => $meal->photo,
+                'quantity' => 1,
+                'stock'    => $meal->stock, // Armazena o estoque disponível
             ];
         }
 
+        // Salva o carrinho atualizado na sessão
         session()->put('cart', $cart);
-        return redirect()->back()->with('success', 'Item adicionado ao carrinho!');
+
+        return redirect()->back()->with('success', 'Item adicionado ao carrinho.');
+    }
+
+    // Você deve ter também um método para atualizar a quantidade, por exemplo:
+    public function updateQuantity(Request $request)
+    {
+        $data = $request->validate([
+            'meal_id'  => 'required|integer|exists:meals,id',
+            'quantity' => 'required|integer|min:1'
+        ]);
+
+        $cart = session()->get('cart', []);
+        $mealId = $data['meal_id'];
+        $quantity = $data['quantity'];
+
+        // Obtenha o estoque atual do produto (pode ser obtido do banco ou do próprio carrinho)
+        if (isset($cart[$mealId])) {
+            // Se a quantidade enviada ultrapassar o estoque armazenado, corrige para o valor máximo
+            $maxStock = $cart[$mealId]['stock'] ?? 0;
+            $cart[$mealId]['quantity'] = ($quantity > $maxStock) ? $maxStock : $quantity;
+        }
+
+        session()->put('cart', $cart);
+
+        return response()->json(['success' => true]);
     }
 
     // Remove item do carrinho
@@ -44,31 +86,14 @@ class CartController extends Controller
             unset($cart[$id]);
             session()->put('cart', $cart);
         }
-        return redirect()->back()->with('success', 'Item removido do carrinho!');
+        return redirect()->back()->with('success', 'Item removido do carrinho.');
     }
 
-    // Limpa o carrinho inteiro
+    // Limpa todo o carrinho
     public function clear()
     {
         session()->forget('cart');
-        return redirect()->back()->with('success', 'Carrinho limpo com sucesso!');
-    }
-
-    // NOVO: Atualiza as quantidades do carrinho
-    public function updateQuantity(Request $request)
-    {
-        $mealId = $request->input('meal_id');
-        $newQty = (int) $request->input('quantity');
-    
-        $cart = session()->get('cart', []);
-    
-        if (isset($cart[$mealId])) {
-            // Quantidade mínima = 1
-            $cart[$mealId]['quantity'] = max(1, $newQty);
-            session()->put('cart', $cart);
-        }
-    
-        // Retorna algo simples em JSON
-        return response()->json(['success' => true]);
+        return redirect()->back()->with('success', 'Carrinho limpo.');
     }
 }
+

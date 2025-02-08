@@ -5,14 +5,25 @@
     $hoje = Carbon::today();
 
     // Se a refeição for do tipo Almoço (category_id == 2) e possuir data definida,
+    // verifica se a data de venda já passou.
     if ($meal->category_id == 2 && $meal->day_week_start) {
         $menuExpirado = Carbon::parse($meal->day_week_start)->lt($hoje);
     } else {
         $menuExpirado = false;
     }
+
+    // Recupera o carrinho da sessão e obtém a quantidade já adicionada para este produto.
+    $cart = session('cart', []);
+    $inCart = isset($cart[$meal->id]) ? $cart[$meal->id]['quantity'] : 0;
+
+    // Define a condição para desabilitar o botão:
+    // - Se for Almoço e o menu estiver expirado,
+    // - Ou se o estoque for 0 ou menor,
+    // - Ou se a quantidade já no carrinho for igual ou superior ao estoque disponível.
+    $disableButton = (($meal->category_id == 2 && $menuExpirado) || $meal->stock <= 0 || ($inCart >= $meal->stock));
 @endphp
 
-<div class="card {{ (($meal->category_id == 2 && $menuExpirado) || $meal->stock <= 0) ? 'expired' : '' }}">
+<div class="card {{ $disableButton ? 'expired' : '' }}">
     <div class="price-badge">€{{ $meal->price }}</div>
     <div class="image-wrapper">
         <img src="{{ $meal->photo && file_exists(public_path('storage/' . $meal->photo)) 
@@ -20,12 +31,8 @@
                 : asset('images/default-meal.jpg') }}"
              alt="Foto de {{ $meal->name }}">
 
-        @if($meal->category_id == 2 && $menuExpirado)
+        @if((($meal->category_id == 2 && $menuExpirado) || $meal->stock <= 0))
             <div class="sold-out-badge">Menu esgotado</div>
-        @endif
-
-        @if($meal->stock <= 0)
-            <div class="sold-out-badge">Esgotado</div>
         @endif
 
         @if($meal->category_id == 2 && $meal->day_week_start)
@@ -47,7 +54,7 @@
         <form method="POST" action="{{ route('cart.store') }}">
             @csrf
             <input type="hidden" name="meal_id" value="{{ $meal->id }}">
-            <button type="submit" class="button add-to-cart" {{ (($meal->category_id == 2 && $menuExpirado) || $meal->stock <= 0) ? 'disabled' : '' }}>
+            <button type="submit" class="button add-to-cart" {{ $disableButton ? 'disabled' : '' }}>
                 Adicionar ao carrinho
             </button>
         </form>
@@ -86,7 +93,7 @@
     border-radius: 15px;
   }
 
-  /* Badge de data agora sempre fica fixada na parte inferior da imagem */
+  /* Badge de data */
   .day-badge {
     position: absolute;
     bottom: -15px;
@@ -103,7 +110,7 @@
     z-index: 10;
   }
 
-  /* Badge "Menu Esgotado" e "Esgotado" */
+  /* Badge "Menu Esgotado" */
   .sold-out-badge {
     position: absolute;
     top: 5px;
@@ -142,7 +149,7 @@
     z-index: 1;
   }
 
-  /* Garante que a descrição ocupe o espaço adequado sem sobreposição */
+  /* Conteúdo do card */
   .card-content {
     flex-grow: 1;
     display: flex;
@@ -156,7 +163,7 @@
     margin: 8px 0;
   }
 
-  /* Truncamento da descrição */
+  /* Descrição truncada */
   .card-description {
     font-size: 14px;
     color: #6c757d;
@@ -169,9 +176,9 @@
     margin-bottom: 10px;
   }
 
-  /* Mantém o botão fixo no final do card */
+  /* Rodapé do card */
   .card-footer {
-    margin-top: auto; /* Empurra o botão para o final */
+    margin-top: auto;
     padding-top: 10px;
   }
 
@@ -197,4 +204,3 @@
     cursor: not-allowed;
   }
 </style>
-

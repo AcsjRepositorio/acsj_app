@@ -28,7 +28,7 @@
 
             <!-- Botão CTA aprimorado e centralizado -->
             <div class="d-flex justify-content-center my-4">
-                <a href="{{ url('/') }}" class="mt-3 btn btn-custom">Continuar Comprando</a>
+                <a href="{{ url('/') }}" class="mt-3 btn btn-custom">Continuar a comprar </a>
             </div>
 
             <!-- Mensagem de agradecimento -->
