@@ -36,24 +36,32 @@ Route::middleware('auth')->group(function () {
         Route::get('/adminpanel/manage_meals', [MealController::class, 'index'])->name('adminpanel.manage.meals');
 
         // Tela de consulta e filtro de pedidos (agrupados)
-        Route::get('/adminpanel/manage_order', [DashboardController::class, 'dashboardView'])->name('adminpanel.manage.order');
+        Route::get('/adminpanel/manage_order', [DashboardController::class, 'dashboardView'])
+            ->name('adminpanel.manage.order');
 
         // Busca server‑side por Order ID ou nome do cliente
         Route::get('/adminpanel/manage_order/search', [DashboardController::class, 'search'])
             ->name('adminpanel.manage.order.search');
 
-        // Atualização dos pedidos
-        Route::put('/adminpanel/manage_order/update', [DashboardController::class, 'update'])->name('adminpanel.manage.order.update');
+        // Atualização dos pedidos via form (modo tradicional)
+        Route::put('/adminpanel/manage_order/update', [DashboardController::class, 'update'])
+            ->name('adminpanel.manage.order.update');
+
+        // **Nova rota** para atualizar 1 campo via AJAX:
+        Route::patch('/adminpanel/manage_order/update-field', [DashboardController::class, 'updateField'])
+            ->name('adminpanel.manage.order.updateField');
 
         // Overview simples dos pedidos (sem agrupamento)
-        Route::get('/adminpanel/order_overview', [DashboardController::class, 'index'])->name('adminpanel.order.overview');
+        Route::get('/adminpanel/order_overview', [DashboardController::class, 'index'])
+            ->name('adminpanel.order.overview');
 
         // Recursos
         Route::resource('users', UserController::class);
         Route::resource('meals', MealController::class);
 
         // Rotas de atualização de estoque
-        Route::post('adminpanel/manage_meals/{meal}/stock', [MealController::class, 'updateStock'])->name('meals.stock.update');
+        Route::post('adminpanel/manage_meals/{meal}/stock', [MealController::class, 'updateStock'])
+            ->name('meals.stock.update');
     });
 
     // Rotas com prefixo "adminpanel"

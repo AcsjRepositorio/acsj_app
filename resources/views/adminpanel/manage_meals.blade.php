@@ -21,12 +21,13 @@
     <table class="table table-bordered table-hover">
         <thead class="table-light text-center">
             <tr>
-                <th scope="col"></th>
-                <th style="width: 10%;">Foto</th>
-                <th style="width: 20%;">Nome</th>
+                <th scope="col" style="width: 5%"></th>
+                <th style="width: 5%;">Foto</th>
+                <th style="width: 5%;">Nome</th>    
                 <th style="width: 35%;">Descrição</th>
                 <th style="width: 10%;">Preço</th>
-                <th style="width: 15%;">Categoria</th>
+                <th style="width: 5%;">Estoque</th>
+                <th style="width: 10%;">Categoria</th>
                 <th style="width: 10%;">Ações</th>
             </tr>
         </thead>
@@ -69,6 +70,7 @@
 
                 <!-- Stock -->
                 
+                <td class="align-middle text-center">{{ $meal->stock }}</td>
                 
                
                 <!-- Categoria -->

@@ -89,11 +89,8 @@
         </div>
     </div>
 
+    <!-- Cada botão atualiza via AJAX -->
     @if(!empty($groupedData))
-    <form action="{{ route('adminpanel.manage.order.update') }}" method="POST">
-        @csrf
-        @method('PUT')
-
         @forelse($groupedData as $rawDate => $horarios)
             @php
                 try {
@@ -120,13 +117,13 @@
                             <th>Qtd</th>
                             <th>Obs</th>
                             <th>Pickup Time</th>
-                            <th>Disp. Preparo</th>
-                            <th>Entregue</th>
+                            <th style="width: 120px;">ENTREGUE</th>
+                            <th style="width: 130px;">DISP.Preparo</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($items as $item)
-                            <tr class="{{ $item['entregue'] ? 'entregue-sim' : '' }}">
+                            <tr>
                                 <td>{{ $item['order_id'] }}</td>
                                 <td>{{ $item['customer_name'] }}</td>
                                 <td>{{ $item['customer_email'] }}</td>
@@ -134,17 +131,25 @@
                                 <td>{{ $item['quantity'] }}</td>
                                 <td>{{ $item['note'] }}</td>
                                 <td>{{ $item['pickup_time'] }}</td>
+                                <!-- ENTREGUE (AJAX com botão) -->
                                 <td>
-                                    <select name="disponivel_preparo[{{ $item['order_meal_id'] }}]" class="form-control">
-                                        <option value="sim" {{ $item['disponivel_preparo'] ? 'selected' : '' }}>Sim</option>
-                                        <option value="nao" {{ !$item['disponivel_preparo'] ? 'selected' : '' }}>Não</option>
-                                    </select>
+                                    <button type="button"
+                                        class="btn btn-sm ajax-toggle entregue-btn {{ $item['entregue'] ? 'btn-success' : 'btn-outline-dark' }}"
+                                        data-pivot-id="{{ $item['order_meal_id'] }}"
+                                        data-field="entregue"
+                                        data-value="{{ $item['entregue'] ? 'sim' : 'nao' }}">
+                                        {{ $item['entregue'] ? 'Sim' : 'Não' }}
+                                    </button>
                                 </td>
-                                <td>
-                                    <select name="entregue[{{ $item['order_meal_id'] }}]" class="form-control entregue-select">
-                                        <option value="sim" {{ $item['entregue'] ? 'selected' : '' }}>Sim</option>
-                                        <option value="nao" {{ !$item['entregue'] ? 'selected' : '' }}>Não</option>
-                                    </select>
+                                <!-- DISP. PREPARO (AJAX com botão) -->
+                                <td class="disp-prep">
+                                    <button type="button"
+                                        class="btn btn-sm ajax-toggle preparo-btn {{ $item['disponivel_preparo'] ? 'btn-warning' : 'btn-outline-dark' }}"
+                                        data-pivot-id="{{ $item['order_meal_id'] }}"
+                                        data-field="disponivel_preparo"
+                                        data-value="{{ $item['disponivel_preparo'] ? 'sim' : 'nao' }}">
+                                        {{ $item['disponivel_preparo'] ? 'Sim' : 'Não' }}
+                                    </button>
                                 </td>
                             </tr>
                         @endforeach
@@ -154,9 +159,6 @@
         @empty
             <p>Nenhum pedido encontrado.</p>
         @endforelse
-
-        <button type="submit" class="btn btn-primary mt-3">Salvar Alterações</button>
-    </form>
     @else
         <div class="shadow p-4 mt-5 bg-body rounded text-center mx-auto" style="max-width: 300px; width: 100%;">
             <img src="/images/icons/emptyfolder.png" alt="Empty Folder" class="img-fluid" style="max-height: 120px; object-fit: contain;">
@@ -175,24 +177,50 @@
           crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/css/bootstrap-datepicker.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
-        /* Classe para o fundo verde com transparência */
+        /* Disponível Preparo: âmbar (gradient) */
+        .preparo-sim {
+            background: linear-gradient(135deg, #fff3cd, #ffe8a1) !important;
+        }
+        /* Entregue: verde (gradient) */
         .entregue-sim {
-            background-color: rgba(212, 237, 218, 0.5) !important;
+            background: linear-gradient(135deg,rgb(63, 200, 95), #c3e6cb) !important;
         }
     </style>
 @stop
 
 @section('js')
-    <!-- Carregue o jQuery PRIMEIRO para que os scripts dependentes funcionem -->
+    <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- Outros scripts -->
+    <!-- Bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
             crossorigin="anonymous"></script>
+    <!-- Datepicker -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/js/bootstrap-datepicker.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.pt-BR.min.js"></script>
+
     <script>
+        // Função para atualizar as cores visuais da linha/célula
+        function updateRowColor($row) {
+            var entregueVal = $row.find('[data-field="entregue"]').data('value');
+            // Remove classes de cores anteriores
+            $row.removeClass('entregue-sim');
+            $row.find('td.disp-prep').removeClass('preparo-sim');
+
+            if (entregueVal === 'sim') {
+                // Se entregue for sim, pinta a linha inteira de verde
+                $row.addClass('entregue-sim');
+            } else {
+                // Se não entregue e disponível para preparo for sim, pinta somente a célula de âmbar
+                var prepVal = $row.find('[data-field="disponivel_preparo"]').data('value');
+                if (prepVal === 'sim') {
+                    $row.find('[data-field="disponivel_preparo"]').closest('td').addClass('preparo-sim');
+                }
+            }
+        }
+
         $(document).ready(function() {
             // Inicializa o Datepicker
             $('#selectedDate').datepicker({
@@ -201,8 +229,8 @@
                 autoclose: true,
                 todayHighlight: true
             });
-    
-            // Exibe/oculta o container de horário conforme o filtro adicional
+
+            // Filtro de horário
             $('#additionalFilter').on('change', function() {
                 var selectedVal = $(this).val();
                 var dateVal = $('#selectedDate').val();
@@ -218,30 +246,61 @@
                     $('#pickupWindowContainer').hide();
                 }
             });
-    
+
             if ($('#additionalFilter').val() === 'horario') {
                 $('#pickupWindowContainer').show();
             }
-    
-            // --- Alteração mínima para atualizar o background da linha conforme o valor do select "Entregue" ---
-            // Ao carregar a página, verifica cada select e, se o valor for "sim", adiciona a classe para fundo verde
-            $('.entregue-select').each(function() {
-                var $select = $(this);
-                var $row = $select.closest('tr');
-                if ($select.val() === 'sim') {
-                    $row.addClass('entregue-sim');
-                }
+
+            // Ao carregar a página, atualiza as cores de cada linha
+            $('table tbody tr').each(function() {
+                updateRowColor($(this));
             });
-    
-            // Ao mudar o valor do select, atualiza a classe da linha
-            $('.entregue-select').on('change', function() {
-                var $select = $(this);
-                var $row = $select.closest('tr');
-                if ($select.val() === 'sim') {
-                    $row.addClass('entregue-sim');
-                } else {
-                    $row.removeClass('entregue-sim');
-                }
+
+            // Ao clicar nos botões (ENTREGUE e DISP. PREPARO)
+            $('.ajax-toggle').on('click', function() {
+                var $btn = $(this);
+                var pivotId = $btn.data('pivot-id');
+                var field = $btn.data('field'); // 'entregue' ou 'disponivel_preparo'
+                var currentValue = $btn.data('value'); // 'sim' ou 'nao'
+                var newValue = (currentValue === 'sim') ? 'nao' : 'sim';
+
+                // Chama a rota de updateField via AJAX (PATCH)
+                $.ajax({
+                    url: '{{ route("adminpanel.manage.order.updateField") }}',
+                    method: 'PATCH',
+                    data: {
+                        pivot_id: pivotId,
+                        field: field,
+                        value: newValue,
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function(response) {
+                        // Atualiza o valor e o texto do botão
+                        $btn.data('value', newValue);
+                        $btn.text(newValue === 'sim' ? 'Sim' : 'Não');
+
+                        // Atualiza a classe do botão conforme o campo
+                        if(field === 'entregue') {
+                            if(newValue === 'sim') {
+                                $btn.removeClass('btn-outline-success').addClass('btn-success');
+                            } else {
+                                $btn.removeClass('btn-success').addClass('btn-outline-success');
+                            }
+                        } else if(field === 'disponivel_preparo') {
+                            if(newValue === 'sim') {
+                                $btn.removeClass('btn-outline-warning').addClass('btn-warning');
+                            } else {
+                                $btn.removeClass('btn-warning').addClass('btn-outline-warning');
+                            }
+                        }
+
+                        // Atualiza a cor visual da linha ou célula
+                        updateRowColor($btn.closest('tr'));
+                    },
+                    error: function(xhr) {
+                        alert('Erro ao atualizar: ' + (xhr.responseJSON?.error || xhr.statusText));
+                    }
+                });
             });
         });
     </script>

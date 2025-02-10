@@ -22,8 +22,8 @@ class DashboardController extends Controller
         // Captura os parâmetros do formulário de filtro
         $selectedDate      = $request->input('selectedDate');      // Data no formato dd/mm/yyyy
         $queryParam        = $request->input('query');             // Termo de busca (Order ID ou Nome)
-        $additionalFilter  = $request->input('additional_filter');   // 'horario', 'disponivel' ou 'entregue'
-        $pickupWindow      = $request->input('pickup_window');       // Caso additional_filter == 'horario'
+        $additionalFilter  = $request->input('additional_filter'); // 'horario', 'disponivel' ou 'entregue'
+        $pickupWindow      = $request->input('pickup_window');     // Caso additional_filter == 'horario'
 
         // Se houver termo de busca, filtra a consulta no banco; caso contrário, pega todos os pedidos
         if ($queryParam) {
@@ -43,7 +43,10 @@ class DashboardController extends Controller
         foreach ($orders as $order) {
             foreach ($order->meals as $meal) {
                 // Formata a data para dd/mm/yyyy
+                // (Caso você não queira mais usar day_week_start,
+                //  basta trocar para algo como pivot->day_of_week ou remover o Carbon.)
                 $date = Carbon::parse($meal->day_week_start)->format('d/m/Y');
+
                 // Define o pickup time (ou "Não definido")
                 $pickupTime = $meal->pivot->pickup_time ?? 'Não definido';
                 $note       = $meal->pivot->note ?? '';
@@ -82,7 +85,6 @@ class DashboardController extends Controller
                     $filteredItems = [];
                     foreach ($items as $item) {
                         if ($additionalFilter == 'horario') {
-                            // Compara de forma exata (aplicando trim para evitar espaços extras)
                             if ($pickupWindow && trim($item['pickup_time']) === trim($pickupWindow)) {
                                 $filteredItems[] = $item;
                             }
@@ -161,7 +163,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * Exibe uma overview simples dos pedidos.
+     * Exibe uma overview simples dos pedidos (se quiser).
      */
     public function index()
     {
@@ -170,42 +172,54 @@ class DashboardController extends Controller
     }
 
     /**
-     * Atualiza os campos "Disponível para Preparo" e "Entregue" dos pedidos.
-     *
-     * Alteramos aqui o update para combinar as atualizações em um único loop, garantindo que
-     * o campo 'entregue' seja atualizado corretamente.
+     * Atualiza os campos "Disponível para Preparo" e "Entregue" dos pedidos (com form tradicional).
+     * (Mantido caso você use ainda um form e um botão "Salvar alterações".)
      */
     public function update(Request $request)
     {
-        // Valida os valores recebidos do formulário
+        // Valida se todos os selects recebidos são 'sim' ou 'nao'
         $request->validate([
             'disponivel_preparo.*' => 'required|in:sim,nao',
             'entregue.*'           => 'required|in:sim,nao',
         ]);
 
+        // Arrays do form: ex.: ['123' => 'sim', '456' => 'nao']
         $disponivelPreparo = $request->input('disponivel_preparo', []);
-        $entregue = $request->input('entregue', []);
+        $entregue          = $request->input('entregue', []);
 
-        // Obtém todos os IDs enviados (pode ser que alguma linha exista em apenas um dos arrays)
-        $orderMealIds = array_unique(array_merge(array_keys($disponivelPreparo), array_keys($entregue)));
+        // JUNTA todas as chaves (IDs) para atualizar
+        $allPivotIds = array_unique(array_merge(
+            array_keys($disponivelPreparo),
+            array_keys($entregue)
+        ));
 
         DB::beginTransaction();
         try {
-            foreach ($orderMealIds as $orderMealId) {
-                $dpValue = isset($disponivelPreparo[$orderMealId]) ? $disponivelPreparo[$orderMealId] : 'nao';
-                $entValue = isset($entregue[$orderMealId]) ? $entregue[$orderMealId] : 'nao';
+            // Percorre cada ID da pivot
+            foreach ($allPivotIds as $pivotId) {
+                // Se não estiver setado em algum array, default = 'nao'
+                $prepVal = $disponivelPreparo[$pivotId] ?? 'nao';
+                $entVal  = $entregue[$pivotId]          ?? 'nao';
 
-                OrderMeal::where('id', $orderMealId)->update([
-                    'disponivel_preparo' => ($dpValue === 'sim'),
-                    'entregue'           => ($entValue === 'sim'),
-                ]);
+                // Localiza o registro do pivot
+                $orderMeal = OrderMeal::find($pivotId);
+                if ($orderMeal) {
+                    // Se no BD for boolean/tinyint, convertemos 'sim'->true / 'nao'->false
+                    $orderMeal->disponivel_preparo = ($prepVal === 'sim');
+                    $orderMeal->entregue           = ($entVal === 'sim');
+                    $orderMeal->save();
+                }
             }
 
             DB::commit();
-            return redirect()->back()->with('success', 'Pedidos atualizados com sucesso!');
+            return redirect()
+                ->route('adminpanel.manage.order')
+                ->with('success', 'Pedidos atualizados com sucesso.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('error', 'Erro ao atualizar pedidos: ' . $e->getMessage());
+            return redirect()
+                ->route('adminpanel.manage.order')
+                ->with('error', 'Erro ao atualizar os pedidos: ' . $e->getMessage());
         }
     }
 
@@ -213,18 +227,12 @@ class DashboardController extends Controller
     // Métodos para Overview
     //////////////////////////
 
-    /**
-     * Exibe a página de overview dos pedidos sem filtros.
-     */
     public function overview(Request $request)
     {
         $orders = Order::with('meals')->get();
         return view('adminpanel.order_overview', compact('orders'));
     }
 
-    /**
-     * Realiza a busca por pedido ou nome do cliente na visão de overview.
-     */
     public function overviewSearch(Request $request)
     {
         $query = $request->input('query', '');
@@ -239,10 +247,6 @@ class DashboardController extends Controller
         return view('adminpanel.order_overview', compact('orders'));
     }
 
-    /**
-     * Aplica os filtros na visão de overview.
-     * Filtra por data do pedido, status do pagamento e método de pagamento.
-     */
     public function overviewFilter(Request $request)
     {
         $selectedDate   = $request->input('selectedDate', '');
@@ -251,23 +255,48 @@ class DashboardController extends Controller
 
         $ordersQuery = Order::with('meals');
 
-        // Filtra por data do pedido (campo created_at; formato esperado: yyyy-mm-dd)
         if (!empty($selectedDate)) {
             $ordersQuery->whereDate('created_at', $selectedDate);
         }
-
-        // Filtra por status do pagamento (ex.: pending ou paid)
         if (!empty($paymentStatus)) {
             $ordersQuery->where('payment_status', $paymentStatus);
         }
-
-        // Filtra por método de pagamento (ex.: card, mbway, multibanco)
         if (!empty($paymentMethod)) {
             $ordersQuery->where('payment_method', $paymentMethod);
         }
 
         $orders = $ordersQuery->get();
-
         return view('adminpanel.order_overview', compact('orders'));
+    }
+
+    /**
+     * NOVO MÉTODO: Atualiza UM campo via AJAX quando o usuário muda o <select>.
+     * Recebe: pivot_id, field (entregue/disponivel_preparo), value (sim/nao).
+     */
+    public function updateField(Request $request)
+    {
+        // Validação dos parâmetros do AJAX
+        $request->validate([
+            'pivot_id' => 'required|integer',
+            'field'    => 'required|in:entregue,disponivel_preparo',
+            'value'    => 'required|in:sim,nao',
+        ]);
+
+        $pivot = OrderMeal::find($request->pivot_id);
+        if (!$pivot) {
+            return response()->json(['error' => 'Pivot não encontrado'], 404);
+        }
+
+        // Se colunas forem boolean, convertemos 'sim'->true e 'nao'->false
+        $boolValue = ($request->value === 'sim');
+
+        if ($request->field === 'entregue') {
+            $pivot->entregue = $boolValue;
+        } else {
+            $pivot->disponivel_preparo = $boolValue;
+        }
+        $pivot->save();
+
+        return response()->json(['success' => true]);
     }
 }
