@@ -111,14 +111,14 @@
                     <thead>
                         <tr>
                             <th>Order ID</th>
-                            <th>Nome do Cliente</th>
+                            <th>Cliente</th>
                             <th>Email</th>
                             <th>Prato</th>
-                            <th>Qtd</th>
-                            <th>Obs</th>
-                            <th>Pickup Time</th>
-                            <th style="width: 120px;">ENTREGUE</th>
-                            <th style="width: 130px;">DISP.Preparo</th>
+                            <th>Quantidade</th>
+                            <th>Observações</th>
+                            <th>Horário de levantamento</th>
+                            <th style="width: 130px;">Disp.preparo</th>
+                            <th style="width: 120px;">Entregue</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -131,6 +131,16 @@
                                 <td>{{ $item['quantity'] }}</td>
                                 <td>{{ $item['note'] }}</td>
                                 <td>{{ $item['pickup_time'] }}</td>
+                                <!-- DISP.Preparo (AJAX com botão) -->
+                                <td class="disp-prep">
+                                    <button type="button"
+                                        class="btn btn-sm ajax-toggle preparo-btn {{ $item['disponivel_preparo'] ? 'btn-warning' : 'btn-outline-dark' }}"
+                                        data-pivot-id="{{ $item['order_meal_id'] }}"
+                                        data-field="disponivel_preparo"
+                                        data-value="{{ $item['disponivel_preparo'] ? 'sim' : 'nao' }}">
+                                        {{ $item['disponivel_preparo'] ? 'Sim' : 'Não' }}
+                                    </button>
+                                </td>
                                 <!-- ENTREGUE (AJAX com botão) -->
                                 <td>
                                     <button type="button"
@@ -139,16 +149,6 @@
                                         data-field="entregue"
                                         data-value="{{ $item['entregue'] ? 'sim' : 'nao' }}">
                                         {{ $item['entregue'] ? 'Sim' : 'Não' }}
-                                    </button>
-                                </td>
-                                <!-- DISP. PREPARO (AJAX com botão) -->
-                                <td class="disp-prep">
-                                    <button type="button"
-                                        class="btn btn-sm ajax-toggle preparo-btn {{ $item['disponivel_preparo'] ? 'btn-warning' : 'btn-outline-dark' }}"
-                                        data-pivot-id="{{ $item['order_meal_id'] }}"
-                                        data-field="disponivel_preparo"
-                                        data-value="{{ $item['disponivel_preparo'] ? 'sim' : 'nao' }}">
-                                        {{ $item['disponivel_preparo'] ? 'Sim' : 'Não' }}
                                     </button>
                                 </td>
                             </tr>
@@ -185,7 +185,7 @@
         }
         /* Entregue: verde (gradient) */
         .entregue-sim {
-            background: linear-gradient(135deg,rgb(63, 200, 95), #c3e6cb) !important;
+            background: linear-gradient(135deg, rgb(63, 200, 95), #c3e6cb) !important;
         }
     </style>
 @stop
@@ -256,7 +256,7 @@
                 updateRowColor($(this));
             });
 
-            // Ao clicar nos botões (ENTREGUE e DISP. PREPARO)
+            // Ao clicar nos botões (ENTREGUE e DISP.Preparo)
             $('.ajax-toggle').on('click', function() {
                 var $btn = $(this);
                 var pivotId = $btn.data('pivot-id');

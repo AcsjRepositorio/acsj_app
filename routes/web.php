@@ -62,6 +62,8 @@ Route::middleware('auth')->group(function () {
         // Rotas de atualização de estoque
         Route::post('adminpanel/manage_meals/{meal}/stock', [MealController::class, 'updateStock'])
             ->name('meals.stock.update');
+
+        
     });
 
     // Rotas com prefixo "adminpanel"

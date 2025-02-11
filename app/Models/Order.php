@@ -39,4 +39,10 @@ class Order extends Model
                     ])
                     ->withTimestamps();
     }
+
+
+    public function scopepaid($query){
+
+        return $query->where('payment_status', 'paid');
+    }
 }

@@ -29,15 +29,14 @@
                 </li>
 
                 <!-- Botão para acionar o sidebar do carrinho -->
-                <li class="nav-item position-relative">
+                <li class="nav-item position-relative cart-container">
                     <a class="nav-link" href="/carrinho"
                         data-bs-toggle="offcanvas" 
                         data-bs-target="#offcanvasCart" 
                         aria-controls="offcanvasCart">
-                        <i class="bi bi-cart"></i>
+                        <i  class="bi bi-cart"></i>
                         @if(session('cart') && count(session('cart')) > 0)
                             <span class="cart-badge">{{ count(session('cart')) }}</span>
-                            
                         @endif
                     </a>
                 </li>
@@ -59,60 +58,61 @@
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" ></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <style>
     .navbar-brand img {
         max-height: 60px;
     }
-    
+
     .nav-link {
         font-size: 18px;
         margin-right: 15px;
         text-decoration: none;
     }
-    
+
     .nav-link:hover {
         color: #F25F29;
     }
-    
+
     .nav-link.active {
         color: #F25F29 !important;
         font-weight: bold;
     }
-    
+
     .bi {
         font-size: 24px;
+        position: relative;
     }
 
     /* Estilo para o badge do carrinho */
-    .nav-item.position-relative {
+    .cart-container {
         position: relative;
     }
 
     .cart-badge {
         position: absolute;
-        top: -5px; /* Ajuste a posição vertical */
-        right: -10px; /* Ajuste a posição horizontal */
+        top: 0;
+        right: 25;
+        transform: translate(50%, -50%);
         background-color: #F25F29;
         color: white;
         border-radius: 50%;
-        padding: 2px 6px;
+        padding: 4px 7px;
         font-size: 12px;
+        font-weight: bold;
         display: flex;
         align-items: center;
         justify-content: center;
         min-width: 20px;
         height: 20px;
-        /* Remove o transform ou ajuste conforme necessário */
-        transform: none; 
     }
 
-    /* Opcional: Ajuste para telas menores */
+    /* Ajuste para telas menores */
     @media (max-width: 576px) {
         .cart-badge {
-            top: -8px;
-            right: -12px;
+            top: -5px;
+            right: -5px;
             font-size: 10px;
             min-width: 18px;
             height: 18px;

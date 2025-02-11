@@ -16,38 +16,45 @@ class DashboardController extends Controller
      * - Filtro adicional (horario, disponivel ou entregue)
      * - Janela de horário (para filtro adicional "horario")
      * - Termo de busca (Order ID ou Nome) se informado
+     * 
+     * 
+     * 
      */
+
+       //////////////////////////
+    // Métodos para manage_order
+    //////////////////////////
+
+
     public function dashboardView(Request $request)
     {
-        // Captura os parâmetros do formulário de filtro
-        $selectedDate      = $request->input('selectedDate');      // Data no formato dd/mm/yyyy
-        $queryParam        = $request->input('query');             // Termo de busca (Order ID ou Nome)
-        $additionalFilter  = $request->input('additional_filter'); // 'horario', 'disponivel' ou 'entregue'
-        $pickupWindow      = $request->input('pickup_window');     // Caso additional_filter == 'horario'
+        $selectedDate     = $request->input('selectedDate');      // Data no formato dd/mm/yyyy
+        $queryParam       = $request->input('query');             // Termo de busca (Order ID ou Nome)
+        $additionalFilter = $request->input('additional_filter'); // 'horario', 'disponivel' ou 'entregue'
+        $pickupWindow     = $request->input('pickup_window');     // Caso additional_filter == 'horario'
 
-        // Se houver termo de busca, filtra a consulta no banco; caso contrário, pega todos os pedidos
+        // Utiliza o scope "paid" para filtrar apenas pedidos pagos
+        // No model Order inseri uma query scope para isso
+        // A ideia é que o scope seja aplicado em todos os pedidos, mas aqui o despachante só se importará com pedidos pagos 
+        //para não haver confusão
         if ($queryParam) {
-            $orders = Order::with('meals')
+            $orders = Order::paid()
+                ->with('meals')
                 ->where(function($q) use ($queryParam) {
-                    // Filtra por order_id ou nome do cliente (usando LIKE)
                     $q->where('order_id', 'like', "%{$queryParam}%")
                       ->orWhere('customer_name', 'like', "%{$queryParam}%");
                 })
                 ->get();
         } else {
-            $orders = Order::with('meals')->get();
+            $orders = Order::paid()->with('meals')->get();
         }
 
         // Monta o array agrupado por data (dd/mm/yyyy) e pickup_time
         $groupedData = [];
         foreach ($orders as $order) {
             foreach ($order->meals as $meal) {
-                // Formata a data para dd/mm/yyyy
-                // (Caso você não queira mais usar day_week_start,
-                //  basta trocar para algo como pivot->day_of_week ou remover o Carbon.)
+                // Formata a data (supondo que day_week_start exista no meal)
                 $date = Carbon::parse($meal->day_week_start)->format('d/m/Y');
-
-                // Define o pickup time (ou "Não definido")
                 $pickupTime = $meal->pivot->pickup_time ?? 'Não definido';
                 $note       = $meal->pivot->note ?? '';
                 $quantity   = $meal->pivot->quantity ?? 1;
@@ -78,7 +85,7 @@ class DashboardController extends Controller
             $groupedData = $filteredData;
         }
 
-        // Se houver filtro adicional E data selecionada, filtra os itens dentro de cada grupo
+        // Se houver filtro adicional e data selecionada, filtra os itens dentro de cada grupo
         if ($selectedDate && $additionalFilter) {
             foreach ($groupedData as $date => $horarios) {
                 foreach ($horarios as $pickupTime => $items) {
@@ -128,9 +135,12 @@ class DashboardController extends Controller
         }
 
         // Busca os pedidos cujo order_id ou customer_name contenha o termo
-        $orders = Order::with('meals')
-            ->where('order_id', 'like', "%{$query}%")
-            ->orWhere('customer_name', 'like', "%{$query}%")
+        $orders = Order::paid()
+            ->with('meals')
+            ->where(function ($q) use ($query) {
+                $q->where('order_id', 'like', "%{$query}%")
+                  ->orWhere('customer_name', 'like', "%{$query}%");
+            })
             ->get();
 
         // Agrupa os resultados por data (dd/mm/yyyy) e pickup_time
@@ -249,9 +259,9 @@ class DashboardController extends Controller
 
     public function overviewFilter(Request $request)
     {
-        $selectedDate   = $request->input('selectedDate', '');
-        $paymentStatus  = $request->input('payment_status', '');
-        $paymentMethod  = $request->input('payment_method', '');
+        $selectedDate  = $request->input('selectedDate', '');
+        $paymentStatus = $request->input('payment_status', '');
+        $paymentMethod = $request->input('payment_method', '');
 
         $ordersQuery = Order::with('meals');
 
@@ -287,7 +297,7 @@ class DashboardController extends Controller
             return response()->json(['error' => 'Pivot não encontrado'], 404);
         }
 
-        // Se colunas forem boolean, convertemos 'sim'->true e 'nao'->false
+        // Converte 'sim' para true e 'nao' para false (considerando colunas booleanas)
         $boolValue = ($request->value === 'sim');
 
         if ($request->field === 'entregue') {
