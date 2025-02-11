@@ -89,11 +89,21 @@ Route::middleware('auth')->group(function () {
     });
 });
 
+// Rota opcional para "dashboard" (para evitar o erro de rota não definida)
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
 // Rotas para pagamento (ifthenpay) – não precisam de autenticação
 Route::post('/payment/process', [PaymentController::class, 'process'])->name('payment.process');
 Route::get('/payment/success', [PaymentController::class, 'success'])->name('payment.success');
 Route::get('/payment/error', [PaymentController::class, 'error'])->name('payment.error');
 Route::get('/payment/cancel', [PaymentController::class, 'cancel'])->name('payment.cancel');
+
+// Callback para MB WAY (se necessário)
+Route::post('/payment/mbway/callback', [PaymentController::class, 'mbwayCallback'])->name('payment.mbway.callback');
+
+// Verificar status mbway 
+Route::get('/payment/mbway/status', [PaymentController::class, 'checkMbWayStatus'])->name('payment.mbway.status');
+
 
 // Rota para atualizar quantidades dos itens do carrinho
 Route::post('/cart/update-quantity', [CartController::class, 'updateQuantity'])->name('cart.updateQuantity');
@@ -102,3 +112,4 @@ Route::post('/cart/update-quantity', [CartController::class, 'updateQuantity'])-
 Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
 
 require __DIR__ . '/auth.php';
+

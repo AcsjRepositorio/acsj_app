@@ -81,7 +81,6 @@
 
         <!-- Limpar Carrinho e total -->
         <div class="d-flex justify-content-center align-items-center mt-4">
-          
             <div>
                 <label><b>Total do carrinho:</b></label>
                 <span id="carrinho-total"><b>€ 0.00</b></span>
@@ -168,8 +167,8 @@
 <style>
     /* Tamanho fixo e uniforme para as imagens dos métodos de pagamento */
     .payment-icon {
-        width: 120px;      /* ajuste conforme necessário */
-        height: 40px;      /* ajuste conforme necessário */
+        width: 120px;
+        height: 40px;
         object-fit: contain;
         transition: transform 0.2s;
     }
@@ -252,25 +251,20 @@
 
     // Função para seleção do método de pagamento
     function selecionarMetodoPagamento(metodo, elementoClicado) {
-        // Remove a classe 'selected' de todos os containers
         document.querySelectorAll('.metodo-pg').forEach(el => {
             el.classList.remove('selected');
         });
-        // Adiciona a classe 'selected' ao container clicado (mesmo que o clique seja na imagem interna)
         if (elementoClicado.classList.contains('metodo-pg')) {
             elementoClicado.classList.add('selected');
         } else {
             elementoClicado.closest('.metodo-pg').classList.add('selected');
         }
-        // Define o método selecionado no campo hidden
         document.getElementById('payment_method').value = metodo;
-        // Se o método for MBWay, exibe o campo do telefone; caso contrário, esconde
         if (metodo === 'mbway') {
             document.getElementById('mbway-phone-field').style.display = 'block';
         } else {
             document.getElementById('mbway-phone-field').style.display = 'none';
         }
-        // Ativa o botão "Finalizar Compra"
         const btn = document.getElementById('finalizar-btn');
         btn.disabled = false;
         btn.style.opacity = 1;
@@ -316,7 +310,6 @@
 
     document.addEventListener('DOMContentLoaded', function () {
         recalcularTotalCarrinho();
-        // Caso haja um valor antigo para payment_method, reativa o botão (opcional)
         @if (old('payment_method') === 'mbway')
             document.getElementById('payment_method').value = 'mbway';
             document.getElementById('mbway-phone-field').style.display = 'block';
