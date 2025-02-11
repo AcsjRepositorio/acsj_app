@@ -50,14 +50,32 @@
     </div>
 
     <!-- Rodapé fixo para o botão -->
-    <div class="card-footer">
+    <div class="card-footer d-flex flex-column gap-2">
+        <!-- Botão Adicionar ao Carrinho -->
         <form method="POST" action="{{ route('cart.store') }}">
             @csrf
             <input type="hidden" name="meal_id" value="{{ $meal->id }}">
-            <button type="submit" class="button add-to-cart" {{ $disableButton ? 'disabled' : '' }}>
+            <button type="submit" class="button add-to-cart w-100" {{ $disableButton ? 'disabled' : '' }}>
                 Adicionar ao carrinho
             </button>
         </form>
+
+        <!-- Botão "Mais detalhes" que abre o modal -->
+        <button 
+            type="button" 
+            class="button w-100" 
+            {{ $disableButton ? 'disabled' : '' }}
+            data-bs-toggle="modal"
+            data-bs-target="#mealModal"
+            data-meal-name="{{ $meal->name }}"
+            data-meal-description="{{ $meal->description }}"
+            data-meal-photo="{{ $meal->photo && file_exists(public_path('storage/' . $meal->photo)) 
+                                ? asset('storage/' . $meal->photo) 
+                                : asset('images/default-meal.jpg') }}"
+            data-meal-price="{{ $meal->price }}"
+        >
+            Mais detalhes
+        </button>
     </div>
 </div>
 
@@ -182,9 +200,8 @@
     padding-top: 10px;
   }
 
-  /* Botão "Adicionar ao carrinho" */
+  /* Botão */
   .button {
-    width: 100%;
     border-radius: 8px;
     padding: 10px;
     background-color: #517AF0;
@@ -193,6 +210,8 @@
     font-size: 16px;
     font-weight: bold;
     cursor: pointer;
+    text-decoration: none;
+    text-align: center;
   }
 
   .button:hover {
@@ -204,3 +223,4 @@
     cursor: not-allowed;
   }
 </style>
+
