@@ -2,6 +2,8 @@
 
 @section('title', 'Dashboard - Refeições da semana')
 
+
+
 @section('content')
 <div class="container mt-5">
     <div class="d-flex justify-content-between align-items-center mb-5">
@@ -23,7 +25,7 @@
             <tr>
                 <th scope="col" style="width: 5%"></th>
                 <th style="width: 5%;">Foto</th>
-                <th style="width: 5%;">Nome</th>    
+                <th style="width: 5%;">Nome</th>
                 <th style="width: 35%;">Descrição</th>
                 <th style="width: 10%;">Preço</th>
                 <th style="width: 5%;">Estoque</th>
@@ -35,11 +37,12 @@
             @foreach($meals as $meal)
 
             <tr>
-            <td class="bg-black text-white justify-content-center p-1" style="height: 50px; margin-right: 5px;">
-    <p class="text-center m-0" style="writing-mode: vertical-rl; font-size: 12px;">
-    {{ ucfirst($meal->day_of_week) }}
-    </p>
-</td>
+                <td class="bg-black text-white justify-content-center p-1" style="height: 50px; margin-right: 5px;">
+                    <div class="text-center m-0 d-flex justify-content-center align-items-center" style="writing-mode: vertical-rl; font-size: 12px;">
+                    {{ \Carbon\Carbon::parse($meal->day_week_start)->format('d-m-Y') }} - {{ ucfirst($meal->day_of_week) }}
+
+                    </div>
+                </td>
 
 
 
@@ -69,10 +72,10 @@
 
 
                 <!-- Stock -->
-                
+
                 <td class="align-middle text-center">{{ $meal->stock }}</td>
-                
-               
+
+
                 <!-- Categoria -->
                 <td>{{ $meal->category->meal_category ?? 'Categoria não definida' }}</td>
 

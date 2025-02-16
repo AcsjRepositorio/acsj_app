@@ -4,62 +4,49 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\OrderMeal;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
     /**
-     * Exibe os pedidos agrupados por data e pickup_time com base nos filtros:
-     * - Data
-     * - Filtro adicional (horario, disponivel ou entregue)
-     * - Janela de horário (para filtro adicional "horario")
-     * - Termo de busca (Order ID ou Nome) se informado
-     * 
-     * 
-     * 
+     * 1) Exibe os pedidos agrupados (manage_order.blade.php).
+     *    - Filtros: selectedDate (dd/mm/yyyy), query (nome ou order_id), additional_filter (horario/disponivel/entregue).
+     *    - Pagina 10 pedidos por vez.
      */
-
-       //////////////////////////
-    // Métodos para manage_order
-    //////////////////////////
-
-
     public function dashboardView(Request $request)
     {
         $selectedDate     = $request->input('selectedDate');      // Data no formato dd/mm/yyyy
-        $queryParam       = $request->input('query');             // Termo de busca (Order ID ou Nome)
-        $additionalFilter = $request->input('additional_filter'); // 'horario', 'disponivel' ou 'entregue'
-        $pickupWindow     = $request->input('pickup_window');     // Caso additional_filter == 'horario'
+        $queryParam       = $request->input('query');             // Termo de busca
+        $additionalFilter = $request->input('additional_filter'); // 'horario', 'disponivel', 'entregue'
+        $pickupWindow     = $request->input('pickup_window');     // Ex: "12h15 - 12h30"
 
-        // Utiliza o scope "paid" para filtrar apenas pedidos pagos
-        // No model Order inseri uma query scope para isso
-        // A ideia é que o scope seja aplicado em todos os pedidos, mas aqui o despachante só se importará com pedidos pagos 
-        //para não haver confusão
+        // 1) Monta query de pedidos (somente pagos, se existir scope 'paid')
+        $baseQuery = Order::paid()->with('meals');
+
+        // 2) Se tiver busca (nome ou order_id)
         if ($queryParam) {
-            $orders = Order::paid()
-                ->with('meals')
-                ->where(function($q) use ($queryParam) {
-                    $q->where('order_id', 'like', "%{$queryParam}%")
-                      ->orWhere('customer_name', 'like', "%{$queryParam}%");
-                })
-                ->get();
-        } else {
-            $orders = Order::paid()->with('meals')->get();
+            $baseQuery->where(function($q) use ($queryParam) {
+                $q->where('order_id', 'like', "%{$queryParam}%")
+                  ->orWhere('customer_name', 'like', "%{$queryParam}%");
+            });
         }
 
-        // Monta o array agrupado por data (dd/mm/yyyy) e pickup_time
+        // 3) Pagina 10 pedidos
+        $orders = $baseQuery->paginate(10);
+
+        // 4) Agrupa os pedidos da página atual
         $groupedData = [];
         foreach ($orders as $order) {
             foreach ($order->meals as $meal) {
-                // Formata a data (supondo que day_week_start exista no meal)
-                $date = Carbon::parse($meal->day_week_start)->format('d/m/Y');
+                // day_week_start => assumindo que está em meals (outra tabela)
+                $rawDate = Carbon::parse($meal->day_week_start)->format('d/m/Y');
                 $pickupTime = $meal->pivot->pickup_time ?? 'Não definido';
                 $note       = $meal->pivot->note ?? '';
                 $quantity   = $meal->pivot->quantity ?? 1;
 
-                $groupedData[$date][$pickupTime][] = [
+                $groupedData[$rawDate][$pickupTime][] = [
                     'order_meal_id'      => $meal->pivot->id,
                     'order_id'           => $order->order_id,
                     'customer_name'      => $order->customer_name,
@@ -74,7 +61,7 @@ class DashboardController extends Controller
             }
         }
 
-        // Se houver data selecionada, filtra os grupos pela data
+        // 5) Se houver data selecionada, filtra em memória
         if ($selectedDate) {
             $filteredData = [];
             foreach ($groupedData as $rawDate => $horarios) {
@@ -85,21 +72,21 @@ class DashboardController extends Controller
             $groupedData = $filteredData;
         }
 
-        // Se houver filtro adicional e data selecionada, filtra os itens dentro de cada grupo
+        // 6) Se houver additionalFilter e selectedDate, filtra mais em memória
         if ($selectedDate && $additionalFilter) {
             foreach ($groupedData as $date => $horarios) {
                 foreach ($horarios as $pickupTime => $items) {
                     $filteredItems = [];
                     foreach ($items as $item) {
-                        if ($additionalFilter == 'horario') {
+                        if ($additionalFilter === 'horario') {
                             if ($pickupWindow && trim($item['pickup_time']) === trim($pickupWindow)) {
                                 $filteredItems[] = $item;
                             }
-                        } elseif ($additionalFilter == 'disponivel') {
+                        } elseif ($additionalFilter === 'disponivel') {
                             if ($item['disponivel_preparo'] === true) {
                                 $filteredItems[] = $item;
                             }
-                        } elseif ($additionalFilter == 'entregue') {
+                        } elseif ($additionalFilter === 'entregue') {
                             if ($item['entregue'] === true) {
                                 $filteredItems[] = $item;
                             }
@@ -117,49 +104,48 @@ class DashboardController extends Controller
             }
         }
 
-        return view('adminpanel.manage_order', compact('groupedData'));
+        // 7) Retorna para a view
+        return view('adminpanel.manage_order', [
+            'groupedData' => $groupedData, // dados agrupados
+            'orders'      => $orders,      // objeto paginado ({{ $orders->links() }})
+        ]);
     }
 
     /**
-     * Método search para busca server-side usando o campo de pesquisa independente.
-     * Este método filtra os pedidos com base no termo (Order ID ou Nome do Cliente)
-     * e agrupa os resultados da mesma forma que dashboardView().
+     * 2) Método de busca específico (query) para manage_order.
+     *    Filtra (order_id ou customer_name), pagina e agrupa.
      */
     public function search(Request $request)
     {
-        $query = $request->input('query');
-        
-        // Se não for informado nenhum termo, redireciona para a tela principal de gestão
-        if (!$query) {
+        $queryParam = $request->input('query', '');
+        if (!$queryParam) {
             return redirect()->route('adminpanel.manage.order');
         }
 
-        // Busca os pedidos cujo order_id ou customer_name contenha o termo
+        // 1) Busca + pagina
         $orders = Order::paid()
             ->with('meals')
-            ->where(function ($q) use ($query) {
-                $q->where('order_id', 'like', "%{$query}%")
-                  ->orWhere('customer_name', 'like', "%{$query}%");
+            ->where(function($q) use ($queryParam) {
+                $q->where('order_id', 'like', "%{$queryParam}%")
+                  ->orWhere('customer_name', 'like', "%{$queryParam}%");
             })
-            ->get();
+            ->paginate(10);
 
-        // Agrupa os resultados por data (dd/mm/yyyy) e pickup_time
+        // 2) Agrupa resultados da página
         $groupedData = [];
         foreach ($orders as $order) {
             foreach ($order->meals as $meal) {
-                $date = Carbon::parse($meal->day_week_start)->format('d/m/Y');
+                $rawDate = Carbon::parse($meal->day_week_start)->format('d/m/Y');
                 $pickupTime = $meal->pivot->pickup_time ?? 'Não definido';
-                $note = $meal->pivot->note ?? '';
-                $quantity = $meal->pivot->quantity ?? 1;
 
-                $groupedData[$date][$pickupTime][] = [
+                $groupedData[$rawDate][$pickupTime][] = [
                     'order_meal_id'      => $meal->pivot->id,
                     'order_id'           => $order->order_id,
                     'customer_name'      => $order->customer_name,
                     'customer_email'     => $order->customer_email,
                     'meal_name'          => $meal->name,
-                    'quantity'           => $quantity,
-                    'note'               => $note,
+                    'quantity'           => $meal->pivot->quantity ?? 1,
+                    'note'               => $meal->pivot->note ?? '',
                     'pickup_time'        => $pickupTime,
                     'disponivel_preparo' => $meal->pivot->disponivel_preparo,
                     'entregue'           => $meal->pivot->entregue,
@@ -167,23 +153,16 @@ class DashboardController extends Controller
             }
         }
 
-        // Retorna a view com os dados agrupados e passa o termo pesquisado para referência (opcional)
-        return view('adminpanel.manage_order', compact('groupedData'))
-            ->with('search_query', $query);
+        return view('adminpanel.manage_order', [
+            'groupedData' => $groupedData,
+            'orders'      => $orders,
+            'search_query'=> $queryParam
+        ]);
     }
 
     /**
-     * Exibe uma overview simples dos pedidos (se quiser).
-     */
-    public function index()
-    {
-        $orders = Order::with('meals')->get();
-        return view('adminpanel.order_overview', compact('orders'));
-    }
-
-    /**
-     * Atualiza os campos "Disponível para Preparo" e "Entregue" dos pedidos (com form tradicional).
-     * (Mantido caso você use ainda um form e um botão "Salvar alterações".)
+     * 3) Atualiza pedidos via form (modo tradicional).
+     *    (Caso você ainda use esse método.)
      */
     public function update(Request $request)
     {
@@ -193,11 +172,9 @@ class DashboardController extends Controller
             'entregue.*'           => 'required|in:sim,nao',
         ]);
 
-        // Arrays do form: ex.: ['123' => 'sim', '456' => 'nao']
         $disponivelPreparo = $request->input('disponivel_preparo', []);
         $entregue          = $request->input('entregue', []);
 
-        // JUNTA todas as chaves (IDs) para atualizar
         $allPivotIds = array_unique(array_merge(
             array_keys($disponivelPreparo),
             array_keys($entregue)
@@ -205,16 +182,12 @@ class DashboardController extends Controller
 
         DB::beginTransaction();
         try {
-            // Percorre cada ID da pivot
             foreach ($allPivotIds as $pivotId) {
-                // Se não estiver setado em algum array, default = 'nao'
                 $prepVal = $disponivelPreparo[$pivotId] ?? 'nao';
                 $entVal  = $entregue[$pivotId]          ?? 'nao';
 
-                // Localiza o registro do pivot
                 $orderMeal = OrderMeal::find($pivotId);
                 if ($orderMeal) {
-                    // Se no BD for boolean/tinyint, convertemos 'sim'->true / 'nao'->false
                     $orderMeal->disponivel_preparo = ($prepVal === 'sim');
                     $orderMeal->entregue           = ($entVal === 'sim');
                     $orderMeal->save();
@@ -229,63 +202,15 @@ class DashboardController extends Controller
             DB::rollBack();
             return redirect()
                 ->route('adminpanel.manage.order')
-                ->with('error', 'Erro ao atualizar os pedidos: ' . $e->getMessage());
+                ->with('error', 'Erro ao atualizar: ' . $e->getMessage());
         }
-    }
-
-    //////////////////////////
-    // Métodos para Overview
-    //////////////////////////
-
-    public function overview(Request $request)
-    {
-        $orders = Order::with('meals')->get();
-        return view('adminpanel.order_overview', compact('orders'));
-    }
-
-    public function overviewSearch(Request $request)
-    {
-        $query = $request->input('query', '');
-
-        $orders = Order::with('meals')
-            ->where(function ($q) use ($query) {
-                $q->where('order_id', 'like', "%{$query}%")
-                  ->orWhere('customer_name', 'like', "%{$query}%");
-            })
-            ->get();
-
-        return view('adminpanel.order_overview', compact('orders'));
-    }
-
-    public function overviewFilter(Request $request)
-    {
-        $selectedDate  = $request->input('selectedDate', '');
-        $paymentStatus = $request->input('payment_status', '');
-        $paymentMethod = $request->input('payment_method', '');
-
-        $ordersQuery = Order::with('meals');
-
-        if (!empty($selectedDate)) {
-            $ordersQuery->whereDate('created_at', $selectedDate);
-        }
-        if (!empty($paymentStatus)) {
-            $ordersQuery->where('payment_status', $paymentStatus);
-        }
-        if (!empty($paymentMethod)) {
-            $ordersQuery->where('payment_method', $paymentMethod);
-        }
-
-        $orders = $ordersQuery->get();
-        return view('adminpanel.order_overview', compact('orders'));
     }
 
     /**
-     * NOVO MÉTODO: Atualiza UM campo via AJAX quando o usuário muda o <select>.
-     * Recebe: pivot_id, field (entregue/disponivel_preparo), value (sim/nao).
+     * 4) Atualiza UM campo via AJAX (disponivel_preparo ou entregue).
      */
     public function updateField(Request $request)
     {
-        // Validação dos parâmetros do AJAX
         $request->validate([
             'pivot_id' => 'required|integer',
             'field'    => 'required|in:entregue,disponivel_preparo',
@@ -297,9 +222,7 @@ class DashboardController extends Controller
             return response()->json(['error' => 'Pivot não encontrado'], 404);
         }
 
-        // Converte 'sim' para true e 'nao' para false (considerando colunas booleanas)
         $boolValue = ($request->value === 'sim');
-
         if ($request->field === 'entregue') {
             $pivot->entregue = $boolValue;
         } else {
@@ -308,5 +231,70 @@ class DashboardController extends Controller
         $pivot->save();
 
         return response()->json(['success' => true]);
+    }
+
+    /**
+     * 5) VISÃO GERAL: Exibe pedidos numa lista simples (order_overview).
+     *    Pagina 10, sem agrupamento.
+     */
+    public function overview(Request $request)
+    {
+        $orders = Order::with('meals')->paginate(10);
+
+        return view('adminpanel.order_overview', compact('orders'));
+    }
+
+    /**
+     * 6) Busca na visão geral (por order_id ou customer_name).
+     */
+    public function overviewSearch(Request $request)
+    {
+        $query = $request->input('query', '');
+
+        $orders = Order::with('meals')
+            ->where(function ($q2) use ($query) {
+                $q2->where('order_id', 'like', "%{$query}%")
+                   ->orWhere('customer_name', 'like', "%{$query}%");
+            })
+            ->paginate(10);
+
+        return view('adminpanel.order_overview', compact('orders'));
+    }
+
+    /**
+     * 7) Filtro (data, status, método) na visão geral.
+     */
+    public function overviewFilter(Request $request)
+    {
+        $selectedDate  = $request->input('selectedDate', '');
+        $paymentStatus = $request->input('payment_status', '');
+        $paymentMethod = $request->input('payment_method', '');
+
+        $ordersQuery = Order::with('meals');
+
+        if (!empty($selectedDate)) {
+            // Filtra pela data do pedido (created_at)
+            $ordersQuery->whereDate('created_at', $selectedDate);
+        }
+        if (!empty($paymentStatus)) {
+            $ordersQuery->where('payment_status', $paymentStatus);
+        }
+        if (!empty($paymentMethod)) {
+            $ordersQuery->where('payment_method', $paymentMethod);
+        }
+
+        $orders = $ordersQuery->paginate(10);
+
+        return view('adminpanel.order_overview', compact('orders'));
+    }
+
+    /**
+     * 8) Exemplo de index (se precisar).
+     */
+    public function index()
+    {
+        // Poderia ser outra listagem simples
+        $orders = Order::with('meals')->paginate(10);
+        return view('adminpanel.order_overview', compact('orders'));
     }
 }

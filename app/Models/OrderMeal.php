@@ -11,7 +11,6 @@ class OrderMeal extends Pivot
 
     protected $table = 'order_meal';
 
-    // Chave primária 'id' e autoincrement
     protected $primaryKey = 'id';
     public $incrementing = true;
 
@@ -26,13 +25,24 @@ class OrderMeal extends Pivot
         'meal_id',
     ];
 
-    /**
-     * Se as colunas 'disponivel_preparo' e 'entregue' forem TINYINT(1) ou booleans,
-     * você pode declarar o cast para boolean:
-     */
     protected $casts = [
         'disponivel_preparo' => 'boolean',
         'entregue'           => 'boolean',
     ];
-}
 
+    /**
+     * Relacionamento com o Model Order
+     */
+    public function order()
+    {
+        return $this->belongsTo(Order::class, 'order_id');
+    }
+
+    /**
+     * Relacionamento com o Model Meal
+     */
+    public function meal()
+    {
+        return $this->belongsTo(Meal::class, 'meal_id');
+    }
+}

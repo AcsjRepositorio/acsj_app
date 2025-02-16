@@ -3,7 +3,7 @@
 @section('title', 'Consultar Pedidos')
 
 @section('content_header')
-    <h1>Dashboard - Consulta de Pedidos</h1>
+    <h1 class="mb-5">Dashboard - Consulta de Pedidos</h1>
 @stop
 
 @section('content')
@@ -17,7 +17,7 @@
     @endif
 
     <!-- Bloco sombreado centralizado -->
-    <div class="d-flex justify-content-center">
+    <div class="d-flex justify-content-center mt-5 mb-3">
         <div class="shadow p-3 bg-body rounded" style="max-width: 800px; width: 100%;">
             <div class="d-flex justify-content-center">
                 <form action="{{ route('adminpanel.manage.order.search') }}" method="GET" id="searchForm" class="mb-3 w-100">
@@ -80,6 +80,7 @@
                     </div>
                 </form>
             </div>
+
             <!-- Botão de Limpar Filtros -->
             <div class="col-md-12 text-start mt-2">
                 <a href="{{ route('adminpanel.manage.order') }}" class="btn btn-danger">
@@ -89,7 +90,7 @@
         </div>
     </div>
 
-    <!-- Cada botão atualiza via AJAX -->
+    <!-- Lista de pedidos agrupados -->
     @if(!empty($groupedData))
         @forelse($groupedData as $rawDate => $horarios)
             @php
@@ -117,7 +118,7 @@
                             <th>Quantidade</th>
                             <th>Observações</th>
                             <th>Horário de levantamento</th>
-                            <th style="width: 130px;">Disp.preparo</th>
+                            <th style="width: 130px;">Disp.Entrega</th>
                             <th style="width: 120px;">Entregue</th>
                         </tr>
                     </thead>
@@ -165,6 +166,14 @@
             <p class="mt-2">A busca não retornou resultados</p>
         </div>
     @endif
+
+    <!-- Se existir $orders e ele estiver paginado, exibe links de paginação -->
+    @if(isset($orders) && $orders->count() > 0)
+        <div class="d-flex justify-content-center mt-4">
+            {{ $orders->links('pagination::bootstrap-5') }}
+        </div>
+    @endif
+
 </div>
 @stop
 
@@ -202,7 +211,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.pt-BR.min.js"></script>
 
     <script>
-        // Função para atualizar as cores visuais da linha/célula
+        // Função para atualizar as cores da linha/célula
         function updateRowColor($row) {
             var entregueVal = $row.find('[data-field="entregue"]').data('value');
             // Remove classes de cores anteriores
@@ -222,7 +231,7 @@
         }
 
         $(document).ready(function() {
-            // Inicializa o Datepicker
+            // Inicializa o Datepicker (Bootstrap Datepicker)
             $('#selectedDate').datepicker({
                 format: 'dd/mm/yyyy',
                 language: 'pt-BR',
@@ -247,6 +256,7 @@
                 }
             });
 
+            // Exibe o container do horário se a URL já tiver esse filtro
             if ($('#additionalFilter').val() === 'horario') {
                 $('#pickupWindowContainer').show();
             }
@@ -264,7 +274,7 @@
                 var currentValue = $btn.data('value'); // 'sim' ou 'nao'
                 var newValue = (currentValue === 'sim') ? 'nao' : 'sim';
 
-                // Chama a rota de updateField via AJAX (PATCH)
+                // Requisição AJAX para a rota de atualização
                 $.ajax({
                     url: '{{ route("adminpanel.manage.order.updateField") }}',
                     method: 'PATCH',
@@ -279,22 +289,22 @@
                         $btn.data('value', newValue);
                         $btn.text(newValue === 'sim' ? 'Sim' : 'Não');
 
-                        // Atualiza a classe do botão conforme o campo
+                        // Ajusta a classe do botão conforme o campo
                         if(field === 'entregue') {
                             if(newValue === 'sim') {
-                                $btn.removeClass('btn-outline-success').addClass('btn-success');
+                                $btn.removeClass('btn-outline-dark').addClass('btn-success');
                             } else {
-                                $btn.removeClass('btn-success').addClass('btn-outline-success');
+                                $btn.removeClass('btn-success').addClass('btn-outline-dark');
                             }
                         } else if(field === 'disponivel_preparo') {
                             if(newValue === 'sim') {
-                                $btn.removeClass('btn-outline-warning').addClass('btn-warning');
+                                $btn.removeClass('btn-outline-dark').addClass('btn-warning');
                             } else {
-                                $btn.removeClass('btn-warning').addClass('btn-outline-warning');
+                                $btn.removeClass('btn-warning').addClass('btn-outline-dark');
                             }
                         }
 
-                        // Atualiza a cor visual da linha ou célula
+                        // Atualiza a cor da linha/célula
                         updateRowColor($btn.closest('tr'));
                     },
                     error: function(xhr) {

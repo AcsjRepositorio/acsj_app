@@ -10,6 +10,9 @@
 <h1>Pedidos - Visão Geral </h1>
 
 <!-- Search Bar -->
+<div class="d-flex justify-content-center mt-5 mb-3">
+<div class="shadow p-3 bg-body rounded" style="max-width: 800px; width: 100%;">
+
 <div class=" d-flex justify-content-center">
     <form action="{{ route('adminpanel.manage.order.overview.search') }}" method="GET" class="mb-3 mt-3" style="max-width: 800px; width: 100%;">
         <div class="input-group">
@@ -57,6 +60,9 @@
             </div>
         </div>
     </form>
+</div>
+
+</div>
 </div>
 
 <!-- Orders Table -->
@@ -119,6 +125,11 @@
                 @endforeach
             </tbody>
         </table>
+
+        <!-- Aqui adicionamos a paginação -->
+        <div class="d-flex justify-content-center mt-3">
+        {{ $orders->links('pagination::bootstrap-5') }}
+        </div>
     @else
         <!-- Bloco para quando não houver resultados -->
         <div class="shadow p-4 mt-5 bg-body rounded text-center mx-auto" style="max-width: 300px; width: 100%;">

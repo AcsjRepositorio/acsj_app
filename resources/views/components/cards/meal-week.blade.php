@@ -25,11 +25,14 @@
 
 <div class="card {{ $disableButton ? 'expired' : '' }}">
     <div class="price-badge">€{{ $meal->price }}</div>
+
     <div class="image-wrapper">
-        <img src="{{ $meal->photo && file_exists(public_path('storage/' . $meal->photo)) 
+        <img 
+            src="{{ $meal->photo && file_exists(public_path('storage/' . $meal->photo)) 
                 ? asset('storage/' . $meal->photo) 
                 : asset('images/default-meal.jpg') }}"
-             alt="Foto de {{ $meal->name }}">
+            alt="Foto de {{ $meal->name }}"
+        >
 
         @if((($meal->category_id == 2 && $menuExpirado) || $meal->stock <= 0))
             <div class="sold-out-badge">Menu esgotado</div>
@@ -49,43 +52,49 @@
         <p class="card-description">{{ $meal->description }}</p>
     </div>
 
-    <!-- Rodapé fixo para o botão -->
-    <div class="card-footer d-flex flex-column gap-2">
-        <!-- Botão Adicionar ao Carrinho -->
+    <!-- Rodapé fixo para os botões -->
+    <div class="card-footer">
+        <!-- Botão "Adicionar" -->
+         <div>
         <form method="POST" action="{{ route('cart.store') }}">
             @csrf
             <input type="hidden" name="meal_id" value="{{ $meal->id }}">
-            <button type="submit" class="button add-to-cart w-100" {{ $disableButton ? 'disabled' : '' }}>
-                Adicionar ao carrinho
+            <button type="submit" class="button btn-add" {{ $disableButton ? 'disabled' : '' }}>
+                Adicionar
             </button>
         </form>
+      </div>
 
-        <!-- Botão "Mais detalhes" que abre o modal -->
-        <button 
-            type="button" 
-            class="button w-100" 
-            {{ $disableButton ? 'disabled' : '' }}
-            data-bs-toggle="modal"
-            data-bs-target="#mealModal"
-            data-meal-name="{{ $meal->name }}"
-            data-meal-description="{{ $meal->description }}"
-            data-meal-photo="{{ $meal->photo && file_exists(public_path('storage/' . $meal->photo)) 
-                                ? asset('storage/' . $meal->photo) 
-                                : asset('images/default-meal.jpg') }}"
-            data-meal-price="{{ $meal->price }}"
-        >
-            Mais detalhes
-        </button>
+        <!-- Botão "+" (abre modal de detalhes) -->
+
+        <form >
+          <button
+              type="button"
+              class="button btn-plus"
+              {{ $disableButton ? 'disabled' : '' }}
+              data-bs-toggle="modal"
+              data-bs-target="#mealModal"
+              data-meal-name="{{ $meal->name }}"
+              data-meal-description="{{ $meal->description }}"
+              data-meal-photo="{{ $meal->photo && file_exists(public_path('storage/' . $meal->photo))
+                                  ? asset('storage/' . $meal->photo)
+                                  : asset('images/default-meal.jpg') }}"
+              data-meal-price="{{ $meal->price }}"
+          >
+           <i class="bi bi-plus"> </i>
+          
+          </button>
+        </form>
     </div>
 </div>
 
 <style>
-  /* Define o card com layout flexível e divide em três seções */
+  /* Card principal */
   .card {
     display: flex;
     flex-direction: column;
     width: 300px;
-    height: 450px; /* Tamanho fixo para todos os cards */
+    height: 450px; 
     border-radius: 15px;
     background-color: #fff;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -96,10 +105,15 @@
     transition: 0.3s;
   }
 
+  .card.expired {
+    opacity:  .4  ;
+  }
+
+ 
   .image-wrapper {
     position: relative;
     width: 100%;
-    height: 180px; /* Define altura fixa para garantir consistência */
+    height: 180px;
     border-radius: 15px;
     overflow: hidden;
   }
@@ -107,49 +121,26 @@
   .image-wrapper img {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Garante que a imagem preencha a área corretamente */
+    object-fit: cover;
     border-radius: 15px;
   }
 
-  /* Badge de data */
-  .day-badge {
-    position: absolute;
-    bottom: -15px;
-    left: 0;
-    width: 100%;
-    background: rgba(0, 0, 0, 0.6);
-    color: #fff;
-    padding: 8px 0;
-    font-size: 14px;
-    text-align: center;
-    font-weight: bold;
-    border-bottom-left-radius: 15px;
-    border-bottom-right-radius: 15px;
-    z-index: 10;
-  }
-
-  /* Badge "Menu Esgotado" */
+  
   .sold-out-badge {
     position: absolute;
     top: 5px;
-    right: 5px;
-    background: #F2D338;
-    color: #000;
+    right: -5px;
+    background:  #f00;
+    color: #fff;
     padding: 8px 14px;
     font-size: 14px;
     font-weight: bold;
     border-radius: 5px;
-    transform: rotate(15deg);
+    
     z-index: 1000;
   }
 
-  /* Card com aparência alterada quando expirado ou sem estoque */
-  .card.expired {
-    background-color: rgba(187, 201, 59, 0.65);
-    opacity: 0.6;
-  }
-
-  /* Badge de preço */
+  
   .price-badge {
     position: absolute;
     top: 4.5px;
@@ -167,7 +158,24 @@
     z-index: 1;
   }
 
-  /* Conteúdo do card */
+  
+  .day-badge {
+    position: absolute;
+    bottom: -15px;
+    left: 0;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    padding: 8px 0;
+    font-size: 14px;
+    text-align: center;
+    font-weight: bold;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    z-index: 10;
+  }
+
+
   .card-content {
     flex-grow: 1;
     display: flex;
@@ -181,7 +189,6 @@
     margin: 8px 0;
   }
 
-  /* Descrição truncada */
   .card-description {
     font-size: 14px;
     color: #6c757d;
@@ -192,35 +199,57 @@
     -webkit-box-orient: vertical;
     white-space: normal;
     margin-bottom: 10px;
+   
   }
 
-  /* Rodapé do card */
+ 
   .card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-top: auto;
     padding-top: 10px;
+    background-color: transparent;
+    border-top: 1px solid transparent;
   }
 
-  /* Botão */
+  
   .button {
     border-radius: 8px;
     padding: 10px;
-    background-color: #517AF0;
-    color: #fff;
     border: none;
     font-size: 16px;
     font-weight: bold;
     cursor: pointer;
     text-decoration: none;
-    text-align: center;
-  }
-
-  .button:hover {
-    background-color: #415bb5;
+    outline: none;
   }
 
   .button[disabled] {
-    background-color: #ccc;
+    background-color: #ccc !important;
+    color: #666;
     cursor: not-allowed;
   }
-</style>
 
+  
+  .btn-add {
+    background-color: #FF452B; 
+    color: #fff;
+  }
+  .btn-add:hover:not([disabled]) {
+    background-color: #F25F29;
+  }
+
+  
+  .btn-plus {
+    background-color: transparent;
+    color:rgb(50, 49, 49); 
+   
+    width: 48px;
+    text-align: center;
+  }
+  .btn-plus:hover:not([disabled]) {
+    background-color:rgb(26, 28, 27);
+    color: #fff;
+  }
+</style>
