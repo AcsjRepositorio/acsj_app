@@ -1,94 +1,59 @@
-<div class="container my-5">
-  <!-- Início da linha -->
-  <div class="row d-flex align-items-center">
-    
-    <!-- Coluna Imagem -->
-    <div class="col-12 col-md-6 mb-3    ">
-      <div class="d-flex justify-content-center align-items-center p-3">
-        <div class="position-relative w-100 h-100">
-          <div class="days-meal-image" style="background-image: url('{{ asset('images/retangleyellow.png') }}')">
-            <span class="menu-label text-center fw-bold text-white fs-4">Menu do dia</span>
-            <img
-              src="{{ asset('images/pratodefault.png') }}"
-              alt="imagem de prato padrão"
-              class="meal-photo img-fluid rounded"
-            >
-          </div>
+
+    <!-- Título principal acima da imagem -->
+    <div class="container text-center my-4">
+        <h1>Bar da associação das crianças do São João</h1>
+    </div>
+
+    <!-- Hero Section -->
+    <div class="container mb-5">
+        <div class="row justify-content-center">
+            <!-- Coluna centralizada em desktop (8 colunas) -->
+            <div class="col-12 col-md-11 position-relative">
+                <!-- Imagem que será o "fundo" do texto -->
+                <img 
+                    src="{{ asset('images/hero-image.png') }}" 
+                    alt="Imagem de refeições" 
+                    class="img-fluid w-100"
+                >
+
+                <!-- Texto e botão em posição absoluta sobre a imagem -->
+                <div 
+                    class=" background-text position-absolute top-50 translate-middle text-center p-3 col-12 col-md-4" 
+                    
+                >
+                    <h2 class="mb-3">Planei sua semana sem filas</h2>
+                    <p class="mb-4">
+                        Faça seu pedido online, garanta sua senha e aproveite 
+                        as suas refeições sem espera!
+                    </p>
+                    <a href="#" class="btn btn-primary btn-lg">
+                        Iniciar pedido
+                    </a>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-    
-    <!-- Coluna Texto -->
-    <div class="col-12 col-md-6 mb-3 d-flex flex-column justify-content-center">
-      <h1 class="text-center">Bar da Asociação das Crianças do São João</h1>
-      <h5>Planeie sua semana sem filas</h5>
-      <p>
-      Faça seu pedido online, garanta sua senha e aproveite suas refeições sem espera. Escolhar
-      seus pratos favoritos para semana e aproveite mais do dia
-      </p>
-      <p class="lead mt-5">
-      <button type="submit" class="button add-to-cart">Iniciar pedido</button>
-      </p>
-    </div>
-    
-  </div>
-  
-</div>
 
-
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script
-        src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 
     <style>
-        h1, h3, h3 {
-            font-family: 'Nunito', sans-serif;
-        }
 
-        .menu-label {
-            position: absolute;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 20px;
-            padding: 8px 16px;
-            border-radius: 8px;
-        }
+.background-text{
+  top: 50%;
+  left: 65%;
+  height: 50%;
+  color: #fff;
+  width:40%;
 
-        .meal-photo {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 100%;
-            max-width: 250px;
-            transform: translate(-50%, -50%);
-            border-radius: 8px;
-        }
+  .h2{
 
-        .days-meal-image {
-            width: 100%;
-            height: 100%;
-            /* Atualizado para ocupar 100% da altura do elemento pai */
-            min-height: 400px;
-            /* Altura mínima para manter consistência */
-            background-repeat: no-repeat;
-            background-size: contain;
-            /* Ajusta para caber completamente na vertical */
-            background-position: center;
-            border-radius: 12px;
-            position: relative;
-        }
+    width: 100%;
+    font-size: large;
+    
 
+  }
 
-        .button {
-            border-radius: 8px;
-            padding: 8px 16px;
-            background-color: #517AF0;
-            color: #fff;
-            border: none;
-            text-decoration: none;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-        }
+} 
     </style>
+   
+
+      
