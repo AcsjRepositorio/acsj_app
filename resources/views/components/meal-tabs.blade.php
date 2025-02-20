@@ -5,8 +5,8 @@
 @endphp
 
 <div class="meal-tabs-background shadow p-3 mb-5 bg-body rounded"> <!-- Novo wrapper com background e border radius -->
-    <div class=" mt-3 mb-5">
-        <h1>Menu completo da semana</h1>
+    <div class=" text-center mt-3 mb-5">
+        <h1 style="color:rgba(11, 11, 11, 0.6)">Menu da semana</h1>
     </div>
     <div class="meal-tabs-container">
         <div class="tabs-header">
@@ -114,7 +114,7 @@
 
 .tab-button.active,
 .tab-button:hover {
-    background-color: #FF452B;
+    background-color: #00C49A;
 }
 
 /* Conteúdo de cada tab (escondido por padrão) */

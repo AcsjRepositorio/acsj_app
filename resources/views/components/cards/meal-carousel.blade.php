@@ -3,14 +3,22 @@
 
 
 
-<div class="container mt-5">
+
+<div class="container mt-5 shadow p-3 mb-5 rounded"   >
+    
     <!-- Swiper container -->
-    <div class="swiper mySwiper">
-        <div class="swiper-wrapper">
+    <div class="swiper mySwiper" >
+
+      <div class="text-center text">
+        <h1  style="color:rgba(11, 11, 11, 0.6);"> Snacks</h1>
+      </div>
+
+        <div class="swiper-wrapper" >
+
         
             @foreach($meals as $meal)
             @if($meal->category_id===4)
-                <div class="swiper-slide">
+                <div class="swiper-slide" >
                     <x-cards.meal-week :meal="$meal" />
                 </div>
             @endif
@@ -75,6 +83,7 @@ document.addEventListener("DOMContentLoaded", function() {
 <!-- Estilos extras (opcional) -->
 <style>
     /* Ajuste de layout do card */
+    
     .swiper-slide {
         /* Se quiser controlar a altura, ou padding, etc. */
         display: flex;

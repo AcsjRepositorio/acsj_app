@@ -1,5 +1,7 @@
 @props(['meal'])
 
+
+
 @php
     use Carbon\Carbon;
     $hoje = Carbon::today();
@@ -22,6 +24,9 @@
     // - Ou se a quantidade já no carrinho for igual ou superior ao estoque disponível.
     $disableButton = (($meal->category_id == 2 && $menuExpirado) || $meal->stock <= 0 || ($inCart >= $meal->stock));
 @endphp
+
+
+
 
 <div class="card {{ $disableButton ? 'expired' : '' }}">
     <div class="price-badge">€{{ $meal->price }}</div>

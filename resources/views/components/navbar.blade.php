@@ -1,8 +1,14 @@
+
+@include('components.modal.aboutUs')
+@include('components.modal.ourValues')
+@include('components.modal.contact')
+
+
 <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
     <div class="container-fluid">
         <!-- Logo -->
         <a class="navbar-brand" href="/">
-            <img src="{{ asset('images/acsj_logo.png') }}" alt="Logo" style="height: 60px;">
+            <img src="{{ asset('images/acsj_logo.png') }}" alt="Logo" style="height: 200px;">
         </a>
 
         <!-- Botão para colapso no mobile -->
@@ -13,18 +19,21 @@
 
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
-                <!-- Links de menu -->
+                
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->is('/') ? 'active' : '' }}" href="/">Sobre Nós</a>
+
+                    <a href="#" class="text-dark text-decoration-none nav-link {{ request()->is('/') ? 'active' : '' }}" data-bs-toggle="modal" data-bs-target="#sobreNosModal" >Sobre nós</a>
                 </li>
+
+
+
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->is('valores') ? 'active' : '' }}" href="/valores">Nossos Valores</a>
+                    
+                    <a href="#" class="text-dark text-decoration-none nav-link {{ request()->is('valores') ? 'active' : '' }}"data-bs-toggle="modal" data-bs-target="#nossosValoresModal" >Nossos valores</a>
                 </li>
+               
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->is('comprar-refeicao') ? 'active' : '' }}" href="/comprar-refeicao">Comprar Refeição</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->is('contato') ? 'active' : '' }}" href="/contato">Contacto</a>
+                <a href="#" class="text-dark text-decoration-none nav-link {{ request()->is('valores') ? 'active' : '' }}"data-bs-toggle="modal" data-bs-target="#contact" > Contactos</a>
                 </li>
 
                 <!-- Botão para acionar o sidebar do carrinho -->
@@ -84,6 +93,17 @@
         </div>
     </div>
 </nav>
+
+
+
+<!-- Bootstrap e Bootstrap Icons -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous" ></script> 
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+
 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"/>

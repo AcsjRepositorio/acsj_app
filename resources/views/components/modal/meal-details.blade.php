@@ -1,15 +1,18 @@
+
 <div class="modal fade" id="mealModal" tabindex="-1" aria-labelledby="mealModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header d-flex justify-content-between align-items-center">
                 <h5 class="modal-title" id="mealModalLabel"></h5>
+                <h3 id="mealModalTitle" style="color: #00C49A"></h3>
                 <div class="d-flex gap-2">
                     <a class="button" role="button" id="openSideBarButton">
-                       
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                     </a>
-                    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                    
                 </div>
             </div>
+            
 
             <div class="modal-body d-flex flex-wrap">
                 <div class="col-md-4">
@@ -20,7 +23,7 @@
                 </div>
 
                 <div class="col-md-8 ps-4">
-                    <h3 id="mealModalTitle"></h3>
+                    
                     <h4 id="mealModalPrice" class="price text-success mb-2"></h4>
                     <p id="mealModalDescription" class="text-muted"></p>
 
@@ -72,13 +75,10 @@ document.addEventListener('DOMContentLoaded', () => {
     .button {
         border-radius: 8px;
         padding: 6px;
-        background-color: #517AF0;
         color: #fff;
         border: none;
         text-decoration: none;
     }
 
-    .button:hover {
-        background-color: #6C757D;
-    }
+ 
 </style>

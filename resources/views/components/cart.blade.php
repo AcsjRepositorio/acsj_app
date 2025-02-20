@@ -70,7 +70,7 @@
             <div class="d-flex justify-content-between mt-3">
                 <form method="POST" action="{{ route('cart.clear') }}">
                     @csrf
-                    <button type="submit" class="btn btn-link">Limpar Carrinho</button>
+                    <a type="submit" class=" btn-link">Limpar Carrinho</a>
                 </form>
 
                 <div>
@@ -80,7 +80,7 @@
             </div>
 
             <!-- Botão para Checkout -->
-            <a type="button" class="btn btn-primary btn-lg btn-block" href="{{ route('checkout') }}">Checkout</a>
+            <a type="button" class="btn   btn-lg btn-block" href="{{ route('checkout') }}">Checkout</a>
         @else
             <div class="shadow-lg p-4 mt-5 bg-body rounded text-center mx-auto" style="max-width: 350px; width: 100%;">
                 <img src="/images/icons/emptydish.png" alt="prato Vazio" class="img-fluid empty-cart-img" style="max-height: 140px; object-fit: contain;">
