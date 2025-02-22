@@ -5,7 +5,7 @@
       </a>
     
     <ul class="dropdown-menu dropdown-menu-end">
-        <li><a class="dropdown-item" href="{{ route('login') }}">Entrar</a></li>
+        <li><a class="dropdown-item d-flex align-items-center justify-content-between" href="{{ route('login') }}">Entrar <i class="bi bi-box-arrow-in-right"></i></a> </li>
         <li><a class="dropdown-item " href="{{ route('register') }}">Registar-se</a></li>
     </ul>
 </div>

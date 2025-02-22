@@ -75,14 +75,20 @@
                 </button>
             </form>
         </li>
-        <li>
-            <a class="dropdown-item d-flex align-items-center" href="/dashboard">
-                <i class="bi bi-speedometer2 me-2"></i>
-                Dashboard
-            </a>
-        </li>
-    </ul>
-</li>
+
+
+        @if(auth()->user()->user_type === \App\Models\User::TYPE_ADMIN)
+    <li>
+        <a class="dropdown-item d-flex align-items-center" href="/adminpanel/manage_order">
+            <i class="bi bi-speedometer2 me-2"></i>
+            Dashboard
+        </a>
+    </li>
+@endif
+   
+        
+        
+      
 
                 @else
                     <li class="nav-item">

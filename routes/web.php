@@ -90,53 +90,47 @@ Route::middleware('auth')->group(function () {
         // Rota que exibe a lista simples de pedidos
         Route::get('/adminpanel/order_overview', [DashboardController::class, 'index'])
             ->name('adminpanel.order.overview');
+
+
+
+            Route::group(['prefix' => 'adminpanel'], function () {
+
+                // manage-orders
+                Route::get('/manage-orders', [DashboardController::class, 'dashboardView'])
+                    ->name('adminpanel.manage.order');
+        
+                // Busca
+                Route::get('/search-orders', [DashboardController::class, 'search'])
+                    ->name('adminpanel.search.order');
+        
+                // Visão Geral (index)
+                Route::get('/orders-overview', [DashboardController::class, 'index'])
+                    ->name('adminpanel.order.overview');
+        
+                // Atualização via form
+                Route::post('/orders/update', [DashboardController::class, 'update'])
+                    ->name('adminpanel.orders.update');
+        
+                // Manage Order Overview
+                Route::get('/manage_order_overview', [DashboardController::class, 'overview'])
+                    ->name('adminpanel.manage.order.overview');
+        
+                // Busca na Overview
+                Route::get('/manage_order_overview/search', [DashboardController::class, 'overviewSearch'])
+                    ->name('adminpanel.manage.order.overview.search');
+        
+                // Filtro na Overview
+                Route::get('/manage_order_overview/filter', [DashboardController::class, 'overviewFilter'])
+                    ->name('adminpanel.manage.order.overview.filter');
+            });
     });
 
-    /*
-    |--------------------------------------------------------------------------
-    | Rotas com prefixo "adminpanel"
-    |--------------------------------------------------------------------------
-    | (Algumas parecem duplicar a lógica, mas você as definiu assim. Mantenha
-    | se quiser ter URLs alternativas ou consolidar no mesmo controller.)
-    */
-    Route::group(['prefix' => 'adminpanel'], function () {
-
-        // manage-orders
-        Route::get('/manage-orders', [DashboardController::class, 'dashboardView'])
-            ->name('adminpanel.manage.order');
-
-        // Busca
-        Route::get('/search-orders', [DashboardController::class, 'search'])
-            ->name('adminpanel.search.order');
-
-        // Visão Geral (index)
-        Route::get('/orders-overview', [DashboardController::class, 'index'])
-            ->name('adminpanel.order.overview');
-
-        // Atualização via form
-        Route::post('/orders/update', [DashboardController::class, 'update'])
-            ->name('adminpanel.orders.update');
-
-        // Manage Order Overview
-        Route::get('/manage_order_overview', [DashboardController::class, 'overview'])
-            ->name('adminpanel.manage.order.overview');
-
-        // Busca na Overview
-        Route::get('/manage_order_overview/search', [DashboardController::class, 'overviewSearch'])
-            ->name('adminpanel.manage.order.overview.search');
-
-        // Filtro na Overview
-        Route::get('/manage_order_overview/filter', [DashboardController::class, 'overviewFilter'])
-            ->name('adminpanel.manage.order.overview.filter');
-    });
+    
+    
 });
 
-/*
-|--------------------------------------------------------------------------
-| Rota opcional "dashboard"
-|--------------------------------------------------------------------------
-*/
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+
 
 /*
 |--------------------------------------------------------------------------

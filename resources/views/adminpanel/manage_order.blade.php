@@ -16,6 +16,10 @@
         <div class="alert alert-danger">{{ session('error') }}</div>
     @endif
 
+
+<!-- OSERVAÇÃO: O CAMPO DÍSPONÍVEL PARA ENTREGA ATES ERA CHAMADO "DISPONÍVEL PARA PREPARO" FOI ALTERADO APENAS PARA ADEQUAR-SE
+AO MODELO DE NEGÓCIO. MAS A LÓGICA SEGUE INTERNAMENTE COMO DISPOIVEL_PREPARO -->
+
     <!-- Bloco sombreado centralizado -->
     <div class="d-flex justify-content-center mt-5 mb-3">
         <div class="shadow p-3 bg-body rounded" style="max-width: 800px; width: 100%;">
@@ -55,7 +59,7 @@
                         <select name="additional_filter" id="additionalFilter" class="form-control form-control-sm w-100">
                             <option value="">Escolha uma categoria</option>
                             <option value="horario" {{ request('additional_filter') == 'horario' ? 'selected' : '' }}>Horário de Pickup</option>
-                            <option value="disponivel" {{ request('additional_filter') == 'disponivel' ? 'selected' : '' }}>Disponível para Preparo</option>
+                            <option value="disponivel" {{ request('additional_filter') == 'disponivel' ? 'selected' : '' }}>Disponível para Entrega</option>
                             <option value="entregue" {{ request('additional_filter') == 'entregue' ? 'selected' : '' }}>Entregue</option>
                         </select>
                     </div>
