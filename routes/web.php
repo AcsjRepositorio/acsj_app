@@ -1,6 +1,9 @@
 <?php
 
+use Illuminate\Http\Request;
+use App\Http\Middleware\AdminAcess;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Cookie;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\MealController;
 use App\Http\Controllers\UserController;
@@ -9,7 +12,6 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
-use App\Http\Middleware\AdminAcess;
 
 /*
 |--------------------------------------------------------------------------
@@ -164,7 +166,17 @@ Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
 
 /*
 |--------------------------------------------------------------------------
-| Autenticação
+| Cookies
 |--------------------------------------------------------------------------
 */
+
+
+Route::post('/accept-cookie', function (Request $request) {
+    // Tempo em minutos para expirar (ex: 365 dias = 525600 minutos)
+    $minutes = 525600; 
+    Cookie::queue('cookie_consent', 'aceito', $minutes);
+    return response()->json(['status' => 'ok']);
+})->name('accept-cookie');
+
+
 require __DIR__ . '/auth.php';
