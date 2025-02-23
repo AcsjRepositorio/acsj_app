@@ -5,6 +5,22 @@
         <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
 
+        <!-- //~Trouxe este estilo para cá para se sobrepor ao OFF-canvas,  -->
+    <style>
+
+.btn-checkout{
+                    background-color: #FF452B;
+                }
+
+                  .btn-checkout:hover{
+                    background-color: #F25F29 !important;
+                }
+
+
+
+    </style>
+
+  
     <div class="offcanvas-body">
         <!-- Mensagens de sucesso/erro -->
         @if (session('success'))
@@ -67,7 +83,7 @@
             @endforeach
 
             <!-- Botão Limpar vae Total -->
-            <div class="d-flex justify-content-between mt-3">
+            <div class="d-flex justify-content-between mt-3 mb-5">
                 <form method="POST" action="{{ route('cart.clear') }}">
                     @csrf
                     <a type="submit" class=" btn-link">Limpar Carrinho</a>
@@ -80,7 +96,8 @@
             </div>
 
             <!-- Botão para Checkout -->
-            <a type="button" class="btn   btn-lg btn-block" href="{{ route('checkout') }}">Checkout</a>
+            <a type="button" class="btn btn-lg w-100 btn-checkout"  href="{{ route('checkout') }}" >Checkout</a>
+          
         @else
             <div class="shadow-lg p-4 mt-5 bg-body rounded text-center mx-auto" style="max-width: 350px; width: 100%;">
                 <img src="/images/icons/emptydish.png" alt="prato Vazio" class="img-fluid empty-cart-img" style="max-height: 140px; object-fit: contain;">
@@ -89,6 +106,9 @@
             </div>
 
             <style>
+
+
+
                 .empty-cart-img {
                     filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.2));
                     transition: transform 0.3s ease-in-out;

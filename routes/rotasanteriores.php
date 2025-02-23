@@ -14,9 +14,9 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 
 /*
-|---------------------------------------------------------------------------
+|--------------------------------------------------------------------------
 | Rotas Públicas
-|---------------------------------------------------------------------------
+|--------------------------------------------------------------------------
 */
 Route::get('/', function () {
     return view('home');
@@ -27,9 +27,9 @@ Route::resource('cart', CartController::class)->only(['index', 'store', 'destroy
 Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
 
 /*
-|---------------------------------------------------------------------------
+|--------------------------------------------------------------------------
 | Rotas Protegidas por Autenticação
-|---------------------------------------------------------------------------
+|--------------------------------------------------------------------------
 */
 Route::middleware('auth')->group(function () {
 
@@ -42,9 +42,9 @@ Route::middleware('auth')->group(function () {
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
     /*
-    |---------------------------------------------------------------------------
+    |--------------------------------------------------------------------------
     | Rotas de Administrador (middleware AdminAcess)
-    |---------------------------------------------------------------------------
+    |--------------------------------------------------------------------------
     */
     Route::middleware([AdminAcess::class])->group(function () {
 
@@ -64,9 +64,9 @@ Route::middleware('auth')->group(function () {
         Route::resource('users', UserController::class);
 
         /*
-        |---------------------------------------------------------------------------
+        |--------------------------------------------------------------------------
         | Pedidos Agrupados (manage_order)
-        |---------------------------------------------------------------------------
+        |--------------------------------------------------------------------------
         */
         // Tela principal de consulta/filtro de pedidos agrupados
         Route::get('/adminpanel/manage_order', [DashboardController::class, 'dashboardView'])
@@ -85,50 +85,59 @@ Route::middleware('auth')->group(function () {
             ->name('adminpanel.manage.order.updateField');
 
         /*
-        |---------------------------------------------------------------------------
+        |--------------------------------------------------------------------------
         | Overview Simples (sem agrupamento)
-        |---------------------------------------------------------------------------
+        |--------------------------------------------------------------------------
         */
         // Rota que exibe a lista simples de pedidos
         Route::get('/adminpanel/order_overview', [DashboardController::class, 'index'])
             ->name('adminpanel.order.overview');
 
-        Route::group(['prefix' => 'adminpanel'], function () {
-            // manage-orders
-            Route::get('/manage-orders', [DashboardController::class, 'dashboardView'])
-                ->name('adminpanel.manage.order');
 
-            // Busca
-            Route::get('/search-orders', [DashboardController::class, 'search'])
-                ->name('adminpanel.search.order');
 
-            // Visão Geral (index)
-            Route::get('/orders-overview', [DashboardController::class, 'index'])
-                ->name('adminpanel.order.overview');
+            Route::group(['prefix' => 'adminpanel'], function () {
 
-            // Atualização via form
-            Route::post('/orders/update', [DashboardController::class, 'update'])
-                ->name('adminpanel.orders.update');
-
-            // Manage Order Overview
-            Route::get('/manage_order_overview', [DashboardController::class, 'overview'])
-                ->name('adminpanel.manage.order.overview');
-
-            // Busca na Overview
-            Route::get('/manage_order_overview/search', [DashboardController::class, 'overviewSearch'])
-                ->name('adminpanel.manage.order.overview.search');
-
-            // Filtro na Overview
-            Route::get('/manage_order_overview/filter', [DashboardController::class, 'overviewFilter'])
-                ->name('adminpanel.manage.order.overview.filter');
-        });
+                // manage-orders
+                Route::get('/manage-orders', [DashboardController::class, 'dashboardView'])
+                    ->name('adminpanel.manage.order');
+        
+                // Busca
+                Route::get('/search-orders', [DashboardController::class, 'search'])
+                    ->name('adminpanel.search.order');
+        
+                // Visão Geral (index)
+                Route::get('/orders-overview', [DashboardController::class, 'index'])
+                    ->name('adminpanel.order.overview');
+        
+                // Atualização via form
+                Route::post('/orders/update', [DashboardController::class, 'update'])
+                    ->name('adminpanel.orders.update');
+        
+                // Manage Order Overview
+                Route::get('/manage_order_overview', [DashboardController::class, 'overview'])
+                    ->name('adminpanel.manage.order.overview');
+        
+                // Busca na Overview
+                Route::get('/manage_order_overview/search', [DashboardController::class, 'overviewSearch'])
+                    ->name('adminpanel.manage.order.overview.search');
+        
+                // Filtro na Overview
+                Route::get('/manage_order_overview/filter', [DashboardController::class, 'overviewFilter'])
+                    ->name('adminpanel.manage.order.overview.filter');
+            });
     });
+
+    
+    
 });
 
+
+
+
 /*
-|---------------------------------------------------------------------------
+|--------------------------------------------------------------------------
 | Rotas para Pagamento (IfThenPay, etc.)
-|---------------------------------------------------------------------------
+|--------------------------------------------------------------------------
 */
 Route::post('/payment/process', [PaymentController::class, 'process'])->name('payment.process');
 Route::get('/payment/success', [PaymentController::class, 'success'])->name('payment.success');
@@ -139,14 +148,14 @@ Route::get('/payment/cancel', [PaymentController::class, 'cancel'])->name('payme
 Route::post('/payment/mbway/callback', [PaymentController::class, 'mbwayCallback'])
     ->name('payment.mbway.callback');
 
-// Rota para verificar status MB WAY
+// Verificar status MB WAY
 Route::get('/payment/mbway/status', [PaymentController::class, 'checkMbWayStatus'])
     ->name('payment.mbway.status');
 
 /*
-|---------------------------------------------------------------------------
+|--------------------------------------------------------------------------
 | Outras Rotas
-|---------------------------------------------------------------------------
+|--------------------------------------------------------------------------
 */
 // Atualizar quantidade dos itens do carrinho
 Route::post('/cart/update-quantity', [CartController::class, 'updateQuantity'])
@@ -156,14 +165,18 @@ Route::post('/cart/update-quantity', [CartController::class, 'updateQuantity'])
 Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
 
 /*
-|---------------------------------------------------------------------------
+|--------------------------------------------------------------------------
 | Cookies
-|---------------------------------------------------------------------------
+|--------------------------------------------------------------------------
 */
+
+
 Route::post('/accept-cookie', function (Request $request) {
+    // Tempo em minutos para expirar (ex: 365 dias = 525600 minutos)
     $minutes = 525600; 
     Cookie::queue('cookie_consent', 'aceito', $minutes);
     return response()->json(['status' => 'ok']);
 })->name('accept-cookie');
+
 
 require __DIR__ . '/auth.php';

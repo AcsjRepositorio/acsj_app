@@ -279,6 +279,35 @@ class PaymentController extends Controller
     /**
      * Callback (simulado) para MB WAY.
      */
+    public function checkMbWayStatus(Request $request)
+{
+    // Recupera o orderId da query string
+    $orderId = $request->query('orderId');
+
+    // Busca o pedido pelo orderId
+    $order = Order::where('order_id', $orderId)->first();
+
+    if (!$order) {
+        return redirect()->route('home')->with('error', 'Pedido não encontrado.');
+    }
+
+    // Exemplo de verificação do status do pagamento:
+    // Se o pagamento já foi confirmado, exibe a view de sucesso;
+    // caso contrário, exibe a view de pendência.
+    if ($order->payment_status === 'paid') {
+        return view('payments.success', [
+            'orderId' => $orderId,
+            'amount'  => $order->amount
+        ]);
+    } else {
+        return view('payments.mbway_pending', [
+            'orderId' => $orderId
+        ]);
+    }
+}
+
+
+
     public function mbwayCallback(Request $request)
     {
         return response('OK', 200);

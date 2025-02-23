@@ -50,9 +50,15 @@
   <style>
     .btn {
       background-color: #FF452B;
-      color: #fff;
+      color: #fff !important;
       font-weight: bold;
     }
+
+    .btn:hover{
+      background-color: #F25F29;
+      
+    }
+
 
     /* Modo responsivo */
     .btn {
