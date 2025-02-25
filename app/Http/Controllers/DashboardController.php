@@ -22,14 +22,21 @@ class DashboardController extends Controller
         $additionalFilter = $request->input('additional_filter'); // 'horario', 'disponivel', 'entregue'
         $pickupWindow     = $request->input('pickup_window');     // Ex: "12h15 - 12h30"
 
-        // 1) Monta query de pedidos (somente pagos, se existir scope 'paid')
-        $baseQuery = Order::paid()->with('meals');
+        // 1) Monta query de pedidos (somente pagos, se existir scope 'paid') com ordenação dos mais recentes
+        $baseQuery = Order::paid()->with('meals')->orderBy('created_at', 'desc');
 
         // 2) Se tiver busca (nome ou order_id)
         if ($queryParam) {
             $baseQuery->where(function($q) use ($queryParam) {
                 $q->where('order_id', 'like', "%{$queryParam}%")
                   ->orWhere('customer_name', 'like', "%{$queryParam}%");
+            });
+        }
+
+        if ($selectedDate) {
+            $date = \Carbon\Carbon::createFromFormat('d/m/Y', $selectedDate)->toDateString();
+            $baseQuery->whereHas('meals', function($q) use ($date) {
+                $q->whereDate('day_week_start', $date);
             });
         }
 
@@ -122,13 +129,14 @@ class DashboardController extends Controller
             return redirect()->route('adminpanel.manage.order');
         }
 
-        // 1) Busca + pagina
+        // 1) Busca + pagina com ordenação dos mais recentes
         $orders = Order::paid()
             ->with('meals')
             ->where(function($q) use ($queryParam) {
                 $q->where('order_id', 'like', "%{$queryParam}%")
                   ->orWhere('customer_name', 'like', "%{$queryParam}%");
             })
+            ->orderBy('created_at', 'desc')
             ->paginate(10);
 
         // 2) Agrupa resultados da página
@@ -239,7 +247,9 @@ class DashboardController extends Controller
      */
     public function overview(Request $request)
     {
-        $orders = Order::with('meals')->paginate(10);
+        $orders = Order::with('meals')
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
 
         return view('adminpanel.order_overview', compact('orders'));
     }
@@ -256,6 +266,7 @@ class DashboardController extends Controller
                 $q2->where('order_id', 'like', "%{$query}%")
                    ->orWhere('customer_name', 'like', "%{$query}%");
             })
+            ->orderBy('created_at', 'desc')
             ->paginate(10);
 
         return view('adminpanel.order_overview', compact('orders'));
@@ -283,7 +294,9 @@ class DashboardController extends Controller
             $ordersQuery->where('payment_method', $paymentMethod);
         }
 
-        $orders = $ordersQuery->paginate(10);
+        $orders = $ordersQuery
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
 
         return view('adminpanel.order_overview', compact('orders'));
     }
@@ -294,7 +307,28 @@ class DashboardController extends Controller
     public function index()
     {
         // Poderia ser outra listagem simples
-        $orders = Order::with('meals')->paginate(10);
+        $orders = Order::with('meals')
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
         return view('adminpanel.order_overview', compact('orders'));
+    }
+    
+    /**
+     * 9) Deleta os pedidos selecionados da base de dados.
+     */
+    public function deleteOrders(Request $request)
+    {
+        $orderIds = $request->input('order_ids', []);
+        if (empty($orderIds)) {
+            return redirect()->route('adminpanel.order.overview')->with('error', 'Nenhum pedido selecionado para exclusão.');
+        }
+        
+        try {
+            // Deleta os pedidos cujos ids estão na lista
+            Order::whereIn('id', $orderIds)->delete();
+            return redirect()->route('adminpanel.order.overview')->with('success', 'Pedidos apagados com sucesso.');
+        } catch (\Exception $e) {
+            return redirect()->route('adminpanel.order.overview')->with('error', 'Erro ao apagar pedidos: ' . $e->getMessage());
+        }
     }
 }

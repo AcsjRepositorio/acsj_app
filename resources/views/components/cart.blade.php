@@ -86,7 +86,9 @@
             <div class="d-flex justify-content-between mt-3 mb-5">
                 <form method="POST" action="{{ route('cart.clear') }}">
                     @csrf
-                    <a type="submit" class=" btn-link">Limpar Carrinho</a>
+                    <button type="submit" style="background: none; border: none; color: blue; text-decoration: underline; cursor: pointer;">
+        Limpar Carrinho
+    </button>
                 </form>
 
                 <div>

@@ -22,6 +22,7 @@ Route::get('/', function () {
     return view('home');
 })->name('home');
 
+
 // Carrinho (Cart)
 Route::resource('cart', CartController::class)->only(['index', 'store', 'destroy']);
 Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
@@ -37,6 +38,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+
+    // SROTA PARA EXIBIR A TELA DA TROCA DE SENHA
+    Route::get('/password/change', [\App\Http\Controllers\Auth\PasswordController::class, 'show'])
+        ->name('password.change');
+
+    // Processa a atualização da senha
+    Route::patch('/password/change', [\App\Http\Controllers\Auth\PasswordController::class, 'update'])
+        ->name('password.update');
 
     // Logout
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
@@ -121,6 +131,10 @@ Route::middleware('auth')->group(function () {
             // Filtro na Overview
             Route::get('/manage_order_overview/filter', [DashboardController::class, 'overviewFilter'])
                 ->name('adminpanel.manage.order.overview.filter');
+
+
+                Route::delete('/adminpanel/order/delete', [\App\Http\Controllers\DashboardController::class, 'deleteOrders'])->name('adminpanel.order.delete');
+
         });
     });
 });
@@ -154,6 +168,13 @@ Route::post('/cart/update-quantity', [CartController::class, 'updateQuantity'])
 
 // Checkout
 Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
+
+
+Route::get('/', function () {
+    // Lógica para definir o "prato do dia". Se não houver, pode ser null.
+    $mealOfTheDay = /* sua lógica aqui */ null;
+    return view('home', ['mealOfTheDay' => $mealOfTheDay]);
+});
 
 /*
 |---------------------------------------------------------------------------

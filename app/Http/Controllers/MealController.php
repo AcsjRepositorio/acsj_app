@@ -139,6 +139,7 @@ class MealController extends Controller
             'category_id'    => 'required|integer|in:1,2,3,4',
             'day_week_start' => 'required_if:category_id,2|nullable|date',
             'day_of_week'    => 'required_if:category_id,2|nullable|string|max:50',
+            'stock'          => 'required|integer|min:0', // Nova regra para estoque
         ], [
             'name.required'              => 'O nome do prato é obrigatório.',
             'price.required'             => 'O preço é obrigatório.',
@@ -146,6 +147,7 @@ class MealController extends Controller
             'day_week_start.required_if' => 'A data de venda é obrigatória para refeições do tipo Almoço.',
             'description.required'       => 'A descrição é obrigatória.',
             'photo.image'                => 'O arquivo enviado deve ser uma imagem.',
+            'stock.required'             => 'Defina a quantidade a ser vendida.',
         ]);
 
         $meal = Meal::findOrFail($id);

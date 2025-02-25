@@ -36,7 +36,7 @@
               
               <div class="position-absolute w-100 text-end mt-3" style="top: 65%; left: 23%; transform: translate(-50%, -50%);">
               
-                  <a href="#" class="btn btn-lg btn-responsive">Iniciar pedido</a>
+              <a href="#scroll-day-meal" class="btn btn-lg btn-responsive">Iniciar pedido</a>
               </div>
 
 

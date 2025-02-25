@@ -60,12 +60,12 @@
         {{ auth()->user()->name }}
     </a>
     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-        <li>
-            <a class="dropdown-item d-flex align-items-center" href="{{ route('profile.edit') }}">
-            <i class="bi bi-person"></i>
-                Editar Perfil
-            </a>
-        </li>
+    <li>
+    <a class="dropdown-item d-flex align-items-center" href="{{ route('password.change') }}">
+        <i class="bi bi-person"></i>
+        Atualizar senha
+    </a>
+</li>
         <li>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf

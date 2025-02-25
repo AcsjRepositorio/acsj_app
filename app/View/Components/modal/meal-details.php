@@ -1,12 +1,12 @@
 <?php
 
-namespace App\View\Components\modal;
+namespace App\View\Components\Modal;
 
 use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 
-class meal-details extends Component
+class MealDetails extends Component
 {
     /**
      * Create a new component instance.

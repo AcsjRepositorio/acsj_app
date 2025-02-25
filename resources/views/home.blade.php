@@ -11,7 +11,8 @@
 <x-banner-hero/>
 
 <!-- componente com o banner do prato do dia -->
-{{--<x-day-meal-component />--}}
+
+
 
 <!-- componente Carrossel com cards dos pratos -->
 
@@ -36,7 +37,9 @@
 
 
 <!-- Componente "ficheiro" com os dias da semana -->
+<div id="scroll-day-meal">
 <x-meal-tabs :mealsByDay="$mealsByDay" />
+</div>
 
 <x-cards.meal-carousel :meals="$meals" /> 
     

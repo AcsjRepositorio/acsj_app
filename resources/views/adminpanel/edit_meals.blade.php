@@ -56,7 +56,6 @@
                 <input type="text" name="name" id="name"
                     value="{{ old('name', $meal->name) }}"
                     class="form-control" required>
-
                 <div class="invalid-feedback">
                     Adicione o nome do prato.
                 </div>
@@ -73,9 +72,16 @@
                 <label for="price" class="form-label">Preço</label>
                 <input type="number" name="price" id="price" value="{{ old('price', $meal->price) }}"
                     class="form-control" step="0.01" required>
-
                 <div class="invalid-feedback">
                     Por favor, insira um preço válido.
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label for="stock" class="form-label">Estoque</label>
+                <input type="number" name="stock" id="stock" value="{{ old('stock', $meal->stock) }}" class="form-control" min="0" required>
+                <div class="invalid-feedback">
+                    Por favor, insira a quantidade disponível.
                 </div>
             </div>
 
@@ -89,33 +95,31 @@
                     </option>
                     @endforeach
                 </select>
-
                 <div class="invalid-feedback">
                     Por favor, selecione uma categoria de refeição.
                 </div>
             </div>
 
             <div class="mb-3">
-    <label for="day_week_start" class="form-label">Data de venda:</label>
-    <div class="input-group">
-        <input type="text"
-               class="form-control"
-               name="day_week_start"
-               id="day_week_start"
-               value="{{ old('day_week_start', $meal->day_week_start ? \Carbon\Carbon::parse($meal->day_week_start)->format('Y-m-d') : '') }}">
-        <span class="input-group-text">
-            <i class="bi bi-calendar3"></i>
-        </span>
-
-        <input type="hidden" name="day_of_week" id="day_of_week"> <!-- Campo oculto -->
-        <div class="mt-2">
-            <p id="dayOfWeek" class="text-muted"></p>
-        </div>
-    </div>
-    <div class="invalid-feedback">
-        Por favor, selecione uma data de venda!
-    </div>
-</div>
+                <label for="day_week_start" class="form-label">Data de venda:</label>
+                <div class="input-group">
+                    <input type="text"
+                           class="form-control"
+                           name="day_week_start"
+                           id="day_week_start"
+                           value="{{ old('day_week_start', $meal->day_week_start ? \Carbon\Carbon::parse($meal->day_week_start)->format('Y-m-d') : '') }}">
+                    <span class="input-group-text">
+                        <i class="bi bi-calendar3"></i>
+                    </span>
+                    <input type="hidden" name="day_of_week" id="day_of_week" value="{{ old('day_of_week', $meal->day_of_week) }}">
+                    <div class="mt-2">
+                        <p id="dayOfWeek" class="text-muted">{{ old('day_of_week', $meal->day_of_week) ? 'Dia da semana: ' . old('day_of_week', $meal->day_of_week) : '' }}</p>
+                    </div>
+                </div>
+                <div class="invalid-feedback">
+                    Por favor, selecione uma data de venda!
+                </div>
+            </div>
 
             <div class="d-flex justify-content-between">
                 <button type="button" class="btn btn-outline-secondary" id="prevBtn">Voltar</button>
@@ -128,7 +132,6 @@
             <div class="mb-4">
                 <label for="description" class="form-label">Descrição</label>
                 <textarea name="description" id="description" class="form-control" rows="4" required>{{ old('description', $meal->description) }}</textarea>
-
                 <div class="invalid-feedback">
                     Por favor, descreva o prato.
                 </div>
@@ -138,8 +141,6 @@
                 <button type="button" class="btn btn-outline-secondary" id="prevBtnStep3">Voltar</button>
                 <button type="submit" class="btn btn-success">Salvar Alterações</button>
             </div>
-
-            
         </div>
     </form>
 </div>
@@ -159,7 +160,6 @@
 @section('css')
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
@@ -205,7 +205,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 <script>
-
 
     const steps = document.querySelectorAll('.form-step');
     const stepCircles = document.querySelectorAll('.step-circle');
@@ -276,18 +275,17 @@
         }
     }
 
-
     $(function () {
-    $("#day_week_start").datepicker({
-        dateFormat: "yy-mm-dd",
-        onSelect: function (dateText) {
-            const date = new Date(dateText);
-            const dayOfWeek = date.toLocaleDateString('pt-PT', { weekday: 'long' });
-            $('#dayOfWeek').text(`Dia da semana: ${dayOfWeek}`);
-            $('#day_of_week').val(dayOfWeek); // Atualiza o campo oculto
-        }
+        $("#day_week_start").datepicker({
+            dateFormat: "yy-mm-dd",
+            onSelect: function (dateText) {
+                const date = new Date(dateText);
+                const dayOfWeek = date.toLocaleDateString('pt-PT', { weekday: 'long' });
+                $('#dayOfWeek').text(`Dia da semana: ${dayOfWeek}`);
+                $('#day_of_week').val(dayOfWeek); // Atualiza o campo oculto
+            }
+        });
     });
-});
-
+    
 </script>
 @endsection

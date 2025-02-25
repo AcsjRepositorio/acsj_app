@@ -23,6 +23,7 @@ class OrderMeal extends Pivot
         'entregue',
         'order_id',
         'meal_id',
+        'nif'
     ];
 
     protected $casts = [

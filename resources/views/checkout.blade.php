@@ -199,6 +199,8 @@
                         </div>
                     @endif
 
+              
+
                     <!-- Campo MBWay (exibido apenas quando selecionado) -->
                     <div id="mbway-phone-field" class="shadow-sm p-3 mb-4 bg-body rounded" style="display: none;">
                         <label for="mbway_phone" class="form-label">Telefone MBWay</label>
@@ -209,6 +211,8 @@
                                placeholder="ex: 912345678"
                                value="{{ old('mbway_phone') }}">
                     </div>
+
+                    
 
                     <!-- Resumo do pedido -->
                     <div class="shadow-sm p-3 mb-4 bg-body rounded">
@@ -226,6 +230,22 @@
                             <span>€ 0,50</span>
                         </div>
                     </div>
+
+
+                          <!-- Início: Campo para Fatura -->
+        <div class="mb-3">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="check-fatura" name="fatura" onclick="toggleNifField()">
+                <label class="form-check-label" for="check-fatura">
+                    <strong>Deseja fatura?</strong>
+                </label>
+            </div>
+        </div>
+        <div class="mb-3" id="nif_field" style="display: none;">
+            <label for="nif" class="form-label">NIF</label>
+            <input type="text" id="nif" name="nif" class="form-control" placeholder="Digite o contribuinte" maxlength="10">
+        </div>
+        <!-- Fim: Campo para Fatura -->
 
                     <!-- Inputs hidden para note, pickup_time e quantity de cada item -->
                     <div id="hidden-fields-container"></div>
@@ -257,7 +277,7 @@
     @else
         <!-- Caso o carrinho esteja vazio -->
         <div class="shadow-lg p-4 mt-5 bg-body rounded text-center mx-auto" style="max-width: 350px; width: 100%;">
-            <img src="/images/icons/emptydish.png" alt="prato vazio" class="img-fluid empty-cart-img" style="max-height: 140px; object-fit: contain;">
+            <img src="/images/icons/emptycart.png" alt="prato vazio" class="img-fluid empty-cart-img" style="max-height: 140px; object-fit: contain;">
             <h5 class="mb-3 text-secondary">Por hora, o seu prato está vazio!</h5>
             <a href="{{ route('home') }}" class="btn btn-primary mt-3" role="button" aria-label="Ver Refeições">Ver Refeições</a>
         </div>
@@ -298,6 +318,20 @@
 
 <!-- JS Customizado -->
 <script>
+    //Lógica para inserir nif 
+
+
+    function toggleNifField() {
+        var checkbox = document.getElementById('check-fatura');
+        var nifField = document.getElementById('nif_field');
+        if (checkbox.checked) {
+            nifField.style.display = 'block';
+        } else {
+            nifField.style.display = 'none';
+        }
+    }
+
+
     // Variável global para armazenar a taxa de serviço
     let serviceFee = 0;
 
