@@ -68,7 +68,7 @@
             </li>
             @else
             <li class="nav-item">
-                <x-profile-icon />
+                <x-profile-icon/>
             </li>
             @endauth 
         </ul>
@@ -124,7 +124,7 @@
                 </li>
                 @endauth
 
-x\
+
                 <li class="nav-item position-relative cart-container ">
                     <a class="nav-link" href="/carrinho" data-bs-toggle="offcanvas" data-bs-target="#offcanvasCart" aria-controls="offcanvasCart">
                         <i class="bi bi-cart"></i>
