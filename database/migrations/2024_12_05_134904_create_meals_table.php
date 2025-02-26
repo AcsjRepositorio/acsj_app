@@ -17,8 +17,7 @@ return new class extends Migration
            $table->longText('description');
            $table->string('photo')->nullable();
            $table->decimal('price',8,2);
-           $table->unsignedBigInteger('menu_id');
-           $table->foreign('menu_id')->references('id')->on('menus')->onDelete('cascade');
+          
             
            
 
