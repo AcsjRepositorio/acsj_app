@@ -37,7 +37,7 @@
                     </div>
                 @else
                 <div class="shadow-lg p-4 mt-5 bg-body rounded text-center mx-auto" style="max-width: 350px; width: 100%;">
-            <img src="/images/chef.png" alt="prato vazio" class="img-fluid empty-cart-img" style="max-height: 140px; object-fit: contain;">
+            <img src="/images/cheff.png" alt="sem menu disponível" class="img-fluid empty-cart-img" style="max-height: 140px; object-fit: contain;">
             <h5 class=" mt-3 text-secondary"> Para já, não temos pratos para este dia.  </h5>
             <h5 class="mb-3 text-secondary"> Os nossos chefs estão a preparar uma ementa deliciosa.  </h5>
             
