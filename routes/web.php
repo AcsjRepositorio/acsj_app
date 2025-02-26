@@ -170,12 +170,11 @@ Route::post('/cart/update-quantity', [CartController::class, 'updateQuantity'])
 Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
 
 
+// Lógica para definir o "prato do dia". Se não houver, pode ser null.
 Route::get('/', function () {
-    // Lógica para definir o "prato do dia". Se não houver, pode ser null.
-    $mealOfTheDay = /* sua lógica aqui */ null;
+    $mealOfTheDay =  null;
     return view('home', ['mealOfTheDay' => $mealOfTheDay]);
-});
-
+})->name('home');
 /*
 |---------------------------------------------------------------------------
 | Cookies

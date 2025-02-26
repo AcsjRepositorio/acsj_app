@@ -84,17 +84,17 @@
             Dashboard
         </a>
     </li>
-@endif
+    @endif
    
         
         
       
 
-                <!-- @else
+                 @else
                     <li class="nav-item">
                         <x-profile-icon />
                     </li>
-                @endauth -->
+                @endauth 
             </ul>
         </div>
     </div>
