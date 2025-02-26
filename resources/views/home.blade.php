@@ -5,7 +5,7 @@
 @section('content')
 
 <!-- componente navbar -->
-<x-navbar />
+<x-navbar/>
 
 
 <x-banner-hero/>
