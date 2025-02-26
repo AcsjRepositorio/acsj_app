@@ -22,6 +22,6 @@ class ProfileIcon extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.profileicon');
+        return view('components.profile-icon');
     }
 }
