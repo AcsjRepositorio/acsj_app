@@ -57,10 +57,17 @@
                                         </form>
                                     </div>
                                     <!-- Imagem do item -->
-                                    <img src="{{ $item['photo'] ? asset('storage/' . $item['photo']) : asset('images/default-meal.jpg') }}"
-                                         alt="{{ $item['name'] }}"
-                                         class="img-fluid mb-3"
-                                         style="max-height: 200px; object-fit: contain;">
+                                    @if(str_contains($item['photo'], 'images/'))
+                                        <img src="{{ asset($item['photo']) }}"
+                                             alt="{{ $item['name'] }}"
+                                             class="img-fluid mb-3"
+                                             style="max-height: 200px; object-fit: contain;">
+                                    @else
+                                        <img src="{{ asset('storage/' . $item['photo']) }}"
+                                             alt="{{ $item['name'] }}"
+                                             class="img-fluid mb-3"
+                                             style="max-height: 200px; object-fit: contain;">
+                                    @endif
 
                                     <div class="mt-auto">
                                         <div class="d-flex justify-content-between align-items-center">
@@ -199,8 +206,6 @@
                         </div>
                     @endif
 
-              
-
                     <!-- Campo MBWay (exibido apenas quando selecionado) -->
                     <div id="mbway-phone-field" class="shadow-sm p-3 mb-4 bg-body rounded" style="display: none;">
                         <label for="mbway_phone" class="form-label">Telefone MBWay</label>
@@ -211,8 +216,6 @@
                                placeholder="ex: 912345678"
                                value="{{ old('mbway_phone') }}">
                     </div>
-
-                    
 
                     <!-- Resumo do pedido -->
                     <div class="shadow-sm p-3 mb-4 bg-body rounded">
@@ -231,21 +234,20 @@
                         </div>
                     </div>
 
-
-                          <!-- Início: Campo para Fatura -->
-        <div class="mb-3">
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="check-fatura" name="fatura" onclick="toggleNifField()">
-                <label class="form-check-label" for="check-fatura">
-                    <strong>Deseja fatura?</strong>
-                </label>
-            </div>
-        </div>
-        <div class="mb-3" id="nif_field" style="display: none;">
-            <label for="nif" class="form-label">NIF</label>
-            <input type="text" id="nif" name="nif" class="form-control" placeholder="Digite o contribuinte" maxlength="10">
-        </div>
-        <!-- Fim: Campo para Fatura -->
+                    <!-- Início: Campo para Fatura -->
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="check-fatura" name="fatura" onclick="toggleNifField()">
+                            <label class="form-check-label" for="check-fatura">
+                                <strong>Deseja fatura?</strong>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mb-3" id="nif_field" style="display: none;">
+                        <label for="nif" class="form-label">NIF</label>
+                        <input type="text" id="nif" name="nif" class="form-control" placeholder="Digite o contribuinte" maxlength="10">
+                    </div>
+                    <!-- Fim: Campo para Fatura -->
 
                     <!-- Inputs hidden para note, pickup_time e quantity de cada item -->
                     <div id="hidden-fields-container"></div>
@@ -319,18 +321,11 @@
 <!-- JS Customizado -->
 <script>
     //Lógica para inserir nif 
-
-
     function toggleNifField() {
         var checkbox = document.getElementById('check-fatura');
         var nifField = document.getElementById('nif_field');
-        if (checkbox.checked) {
-            nifField.style.display = 'block';
-        } else {
-            nifField.style.display = 'none';
-        }
+        nifField.style.display = checkbox.checked ? 'block' : 'none';
     }
-
 
     // Variável global para armazenar a taxa de serviço
     let serviceFee = 0;

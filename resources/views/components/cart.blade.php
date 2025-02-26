@@ -5,22 +5,17 @@
         <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
 
-        <!-- //~Trouxe este estilo para cá para se sobrepor ao OFF-canvas,  -->
+    <!-- //~Trouxe este estilo para cá para se sobrepor ao OFF-canvas,  -->
     <style>
+        .btn-checkout, button {
+            background-color: #FF452B;
+        }
 
-.btn-checkout{
-                    background-color: #FF452B;
-                }
-
-                  .btn-checkout:hover{
-                    background-color: #F25F29 !important;
-                }
-
-
-
+        .btn-checkout:hover {
+            background-color: #F25F29 !important;
+        }
     </style>
 
-  
     <div class="offcanvas-body">
         <!-- Mensagens de sucesso/erro -->
         @if (session('success'))
@@ -51,9 +46,11 @@
                     </div>
 
                     <!-- Imagem -->
-                    <img src="{{ $item['photo'] ? asset('storage/' . $item['photo']) : asset('images/default-meal.jpg') }}"
-                         alt="{{ $item['name'] }}"
-                         width="80">
+                    @if(str_contains($item['photo'], 'images/'))
+                        <img src="{{ asset($item['photo']) }}" alt="{{ $item['name'] }}" width="80">
+                    @else
+                        <img src="{{ asset('storage/' . $item['photo']) }}" alt="{{ $item['name'] }}" width="80">
+                    @endif
 
                     <div class="d-flex justify-content-between mt-3">
                         <!-- Botões +/- -->
@@ -82,13 +79,13 @@
                 </div>
             @endforeach
 
-            <!-- Botão Limpar vae Total -->
+            <!-- Botão Limpar e Total -->
             <div class="d-flex justify-content-between mt-3 mb-5">
                 <form method="POST" action="{{ route('cart.clear') }}">
                     @csrf
                     <button type="submit" style="background: none; border: none; color: blue; text-decoration: underline; cursor: pointer;">
-        Limpar Carrinho
-    </button>
+                        Limpar Carrinho
+                    </button>
                 </form>
 
                 <div>
@@ -98,19 +95,16 @@
             </div>
 
             <!-- Botão para Checkout -->
-            <a type="button" class="btn btn-lg w-100 btn-checkout"  href="{{ route('checkout') }}" >Checkout</a>
+            <a type="button" class="btn btn-lg w-100 btn-checkout" href="{{ route('checkout') }}">Checkout</a>
           
         @else
             <div class="shadow-lg p-4 mt-5 bg-body rounded text-center mx-auto" style="max-width: 350px; width: 100%;">
-                <img src="/images/icons/emptydish.png" alt="prato Vazio" class="img-fluid empty-cart-img" style="max-height: 140px; object-fit: contain;">
-                <h5 class="mb-3 text-secondary">Por hora, o seu prato está vazio!</h5>
-                <button type="button"  class="button mt-3 " data-bs-dismiss="offcanvas" aria-label="Close">Ver Refeições</button>
+                <img src="/images/icons/emptycart.png" alt="Carrinho vazio" class="img-fluid empty-cart-img" style="max-height: 140px; object-fit: contain;">
+                <h5 class="mb-3 text-secondary">Por hora, o seu carrinho está vazio!</h5>
+                <button type="button" class="button mt-3" data-bs-dismiss="offcanvas" aria-label="Close">Ver Refeições</button>
             </div>
 
             <style>
-
-
-
                 .empty-cart-img {
                     filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.2));
                     transition: transform 0.3s ease-in-out;
