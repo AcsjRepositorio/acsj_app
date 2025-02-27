@@ -1,3 +1,6 @@
+@extends('layouts.masterlayout') 
+
+@section('content')
 <x-navbar />
 <x-cart />
 
@@ -12,8 +15,12 @@
                 @if($order->status == 'completed')
                     <div class="col-12 col-md-6 col-lg-4">
                         <div class="card mb-4 shadow-sm">
-                            <div class="card-header bg-primary text-white">
+                            <div class="card-header  text-white d-flex justify-content-between align-items-center" style="background-color: #156064;">
                                 <h5 class="card-title mb-0">Ordem: {{ $order->order_id }}</h5>
+                                <!-- Botão de Exclusão -->
+                                <button class="btn  btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal{{ $order->order_id }}" style="background-color:rgba(201, 201, 201, 0.17);">
+                                    <i class="bi bi-trash"></i>
+                                </button>
                             </div>
                             <div class="card-body">
                                 <!-- Informações básicas do pedido -->
@@ -22,10 +29,15 @@
                                 <p><strong>Método de Pagamento:</strong> {{ $order->payment_method }}</p>
                                 <p><strong>Data:</strong> {{ $order->created_at->format('d/m/Y H:i') }}</p>
 
-                                <!-- Botão para expandir detalhes -->
-                                <button class="btn btn-outline-primary btn-sm toggle-btn" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ $order->order_id }}" aria-expanded="false" aria-controls="collapse{{ $order->order_id }}">
-                                    <i class="bi bi-plus"></i>
-                                </button>
+                                <!-- Botões para alternar detalhes -->
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-outline-primary btn-sm open-btn" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ $order->order_id }}" aria-expanded="false" aria-controls="collapse{{ $order->order_id }}">
+                                        <i class="bi bi-plus"></i> 
+                                    </button>
+                                    <button class="btn btn-outline-secondary btn-sm close-btn" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ $order->order_id }}" aria-expanded="true" aria-controls="collapse{{ $order->order_id }}" style="display: none;">
+                                        <i class="bi bi-dash"></i> Fechar
+                                    </button>
+                                </div>
 
                                 <!-- Área de detalhes ocultos -->
                                 <div class="collapse mt-3" id="collapse{{ $order->order_id }}">
@@ -54,6 +66,29 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Modal de Confirmação para Exclusão -->
+                    <div class="modal fade" id="deleteModal{{ $order->order_id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ $order->order_id }}" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="deleteModalLabel{{ $order->order_id }}">Confirmar Exclusão</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                                </div>
+                                <div class="modal-body">
+                                    Tem certeza de que deseja excluir a ordem {{ $order->order_id }}?
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <form action="{{ route('orders.destroy', $order->id) }}" method="POST">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-danger">Sim, excluir</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 @endif
             @endforeach
         </div>
@@ -63,34 +98,58 @@
 <x-footer />
 
 @push('scripts')
-    
-    
+
+
+
+
+
  
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
-    
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-    
-
     <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        var toggles = document.querySelectorAll('.toggle-btn');
-        toggles.forEach(function (btn) {
-            var targetSelector = btn.getAttribute('data-bs-target');
-            var collapseElement = document.querySelector(targetSelector);
-            
-            // Verifica se o elemento de collapse existe
-            if (!collapseElement) return;
+        document.addEventListener('DOMContentLoaded', function () {
+            // Seleciona todos os botões de abrir e fechar
+            var openButtons = document.querySelectorAll('.open-btn');
+            var closeButtons = document.querySelectorAll('.close-btn');
 
-            collapseElement.addEventListener('show.bs.collapse', function () {
-                btn.innerHTML = '<i class="bi bi-dash"></i>';
+            openButtons.forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    // Quando abrir, esconde o botão de abrir e mostra o de fechar
+                    var target = btn.getAttribute('data-bs-target');
+                    var closeBtn = document.querySelector(target).parentElement.querySelector('.close-btn');
+                    btn.style.display = 'none';
+                    closeBtn.style.display = 'inline-block';
+                });
             });
 
-            collapseElement.addEventListener('hide.bs.collapse', function () {
-                btn.innerHTML = '<i class="bi bi-plus"></i>';
+            closeButtons.forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    // Quando fechar, esconde o botão de fechar e mostra o de abrir
+                    var target = btn.getAttribute('data-bs-target');
+                    var openBtn = document.querySelector(target).parentElement.querySelector('.open-btn');
+                    btn.style.display = 'none';
+                    openBtn.style.display = 'inline-block';
+                });
+            });
+
+            // Também é possível usar os eventos do collapse do Bootstrap para sincronizar:
+            var collapses = document.querySelectorAll('.collapse');
+            collapses.forEach(function (collapseEl) {
+                collapseEl.addEventListener('hidden.bs.collapse', function () {
+                    var parent = collapseEl.parentElement;
+                    var openBtn = parent.querySelector('.open-btn');
+                    var closeBtn = parent.querySelector('.close-btn');
+                    openBtn.style.display = 'inline-block';
+                    closeBtn.style.display = 'none';
+                });
+                collapseEl.addEventListener('shown.bs.collapse', function () {
+                    var parent = collapseEl.parentElement;
+                    var openBtn = parent.querySelector('.open-btn');
+                    var closeBtn = parent.querySelector('.close-btn');
+                    openBtn.style.display = 'none';
+                    closeBtn.style.display = 'inline-block';
+                });
             });
         });
-    });
     </script>
 @endpush
+@endsection
+

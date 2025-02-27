@@ -42,8 +42,8 @@ Route::middleware('auth')->group(function () {
 
     // Perfil do usuário autenticado para gerenciar suas encomendas
     Route::get('/minhas-encomendas', [OrderController::class, 'minhasEncomendas'])->name('minhas.encomendas');
-
-
+   
+    Route::delete('/orders/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
     // SROTA PARA EXIBIR A TELA DA TROCA DE SENHA
     Route::get('/password/change', [\App\Http\Controllers\Auth\PasswordController::class, 'show'])
         ->name('password.change');

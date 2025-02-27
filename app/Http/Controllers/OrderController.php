@@ -29,4 +29,18 @@ class OrderController extends Controller
         // Retorna a view com os dados
         return view('minhas_encomendas', compact('orders'));
     }
+
+
+
+    public function destroy(Order $order)
+    {
+        // Verifica se o usuário autenticado pode excluir este pedido
+        if ($order->user_id !== Auth::id()) {
+            return redirect()->back()->with('error', 'Você não tem permissão para excluir este pedido.');
+        }
+
+        $order->delete();
+
+        return redirect()->route('minhas.encomendas')->with('success', 'Pedido excluído com sucesso!');
+    }
 }

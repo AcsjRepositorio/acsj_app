@@ -8,6 +8,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
+    @include('profile.partials.favicons')
+
 </head>
 <body>
     
@@ -17,6 +19,7 @@
     @yield('content')
 
     @include('cookie-consent')
+   
   
 
 
