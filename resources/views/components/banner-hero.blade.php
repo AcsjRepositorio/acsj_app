@@ -19,7 +19,7 @@
 
               <div style="color: #fff;">
 
-              <h1 class=" position-absolute w-100 text-end main-text " style="top: 36%; left: 38%; transform: translate(-50%, -50%);">Planei sua semana sem filas</h1>
+              <h1 class=" position-absolute w-100 text-end main-text " style="top: 36%; left: 38%; transform: translate(-50%, -50%);">Planeie sua semana sem filas</h1>
 
               <h3 class=" position-absolute w-100 text-end mb-3 sub-text" style="top: 47%; left: 30%; transform: translate(-50%, -50%);"> 
                 Faça seu pedido online e 
