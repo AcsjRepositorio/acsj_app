@@ -279,8 +279,8 @@
     @else
         <!-- Caso o carrinho esteja vazio -->
         <div class="shadow-lg p-4 mt-5 bg-body rounded text-center mx-auto" style="max-width: 350px; width: 100%;">
-            <img src="/images/icons/emptycart.png" alt="prato vazio" class="img-fluid empty-cart-img" style="max-height: 140px; object-fit: contain;">
-            <h5 class="mb-3 text-secondary">Por hora, o seu prato está vazio!</h5>
+            <img src="/images/icons/emptycart.png" alt="carrinho vazio" class="img-fluid empty-cart-img" style="max-height: 140px; object-fit: contain;">
+            <h5 class="mb-3 text-secondary">Por hora, o seu carrinho está vazio!</h5>
             <a href="{{ route('home') }}" class="btn btn-primary mt-3" role="button" aria-label="Ver Refeições">Ver Refeições</a>
         </div>
     @endif
