@@ -47,6 +47,13 @@
                             Atualizar senha
                         </a>
                     </li>
+
+                    <li>
+                        <a class="dropdown-item d-flex align-items-center" href="{{ route('minhas.encomendas') }}">
+                            <i class="bi bi-person"></i>
+                            Minhas encomendas
+                        </a>
+                    </li>
                     <li>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf

@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Cookie;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\MealController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CheckoutController;
@@ -34,10 +35,13 @@ Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear')
 */
 Route::middleware('auth')->group(function () {
 
-    // Perfil do usuário
+    // Edição do usuário pelo administrador autenticado 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Perfil do usuário autenticado para gerenciar suas encomendas
+    Route::get('/minhas-encomendas', [OrderController::class, 'minhasEncomendas'])->name('minhas.encomendas');
 
 
     // SROTA PARA EXIBIR A TELA DA TROCA DE SENHA
