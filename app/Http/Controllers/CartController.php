@@ -66,7 +66,7 @@ class CartController extends Controller
         $mealId = $data['meal_id'];
         $quantity = $data['quantity'];
 
-        // Obtenha o estoque atual do produto (pode ser obtido do banco ou do próprio carrinho)
+        //  estoque atual do produto 
         if (isset($cart[$mealId])) {
             // Se a quantidade enviada ultrapassar o estoque armazenado, corrige para o valor máximo
             $maxStock = $cart[$mealId]['stock'] ?? 0;
@@ -94,6 +94,45 @@ class CartController extends Controller
     {
         session()->forget('cart');
         return redirect()->back()->with('success', 'Carrinho limpo.');
+    }
+
+
+    public function bulkStore(Request $request)
+    {
+        // Decodifica os IDs dos produtos selecionados (espera receber um JSON)
+        $selectedIds = json_decode($request->input('selected_ids'), true);
+        
+        // Recupera o carrinho atual da sessão ou cria um array vazio
+        $cart = session()->get('cart', []);
+        
+        // Para cada ID selecionado, adiciona o produto ao carrinho com quantidade 1
+        foreach ($selectedIds as $id) {
+            // Busca o produto
+            $meal = Meal::find($id);
+            if ($meal) {
+                // Se o item já existir no carrinho, incrementa a quantidade se houver estoque disponível
+                if (isset($cart[$id])) {
+                    if ($cart[$id]['quantity'] < $meal->stock) {
+                        $cart[$id]['quantity']++;
+                    }
+                    // Se já atingiu o estoque, podemos ignorar ou enviar mensagem de aviso (opcional)
+                } else {
+                    // Adiciona o item ao carrinho com quantidade 1
+                    $cart[$id] = [
+                        'name'     => $meal->name,
+                        'price'    => $meal->price,
+                        'photo'    => $meal->photo,
+                        'quantity' => 1,
+                        'stock'    => $meal->stock, // Armazena o estoque disponível
+                    ];
+                }
+            }
+        }
+        
+        // Atualiza o carrinho na sessão
+        session()->put('cart', $cart);
+        
+        return redirect()->back()->with('success', 'Produtos adicionados ao carrinho!');
     }
 }
 

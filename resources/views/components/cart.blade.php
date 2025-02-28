@@ -1,16 +1,19 @@
 <!-- resources/views/cart.blade.php -->
+@php
+    $cart = session('cart', []);
+@endphp
+
 <div class="offcanvas offcanvas-end" data-bs-backdrop="false" tabindex="-1" id="offcanvasCart" aria-labelledby="offcanvasCartLabel">
     <div class="offcanvas-header">
         <h5 class="offcanvas-title" id="offcanvasCartLabel">Seu Carrinho</h5>
         <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
 
-    <!-- //~Trouxe este estilo para cá para se sobrepor ao OFF-canvas,  -->
+    <!-- Estilos para sobrepor ao offcanvas -->
     <style>
         .btn-checkout, button {
             background-color: #FF452B;
         }
-
         .btn-checkout:hover {
             background-color: #F25F29 !important;
         }
@@ -26,58 +29,60 @@
         @endif
 
         @if (is_array($cart) && count($cart) > 0)
-            <!-- LISTA DE ITENS -->
-            @foreach ($cart as $id => $item)
-                <div class="shadow p-3 mb-5 bg-body rounded"
-                     id="produto-{{ $id }}"
-                     data-preco="{{ $item['price'] }}"
-                     data-stock="{{ $item['stock'] ?? 0 }}">
-                    
-                    <div class="d-flex justify-content-between">
-                        <b>{{ $item['name'] }}</b>
-                        <!-- Form de excluir item -->
-                        <form method="POST" action="{{ route('cart.destroy', $id) }}">
-                            @csrf
-                            @method('DELETE')
-                            <a href="javascript:void(0);" style="color: gray; text-decoration: none;" onclick="this.closest('form').submit();">
-                                <i class="bi bi-trash"></i>
-                            </a>
-                        </form>
-                    </div>
-
-                    <!-- Imagem -->
-                    @if(str_contains($item['photo'], 'images/'))
-                        <img src="{{ asset($item['photo']) }}" alt="{{ $item['name'] }}" width="80">
-                    @else
-                        <img src="{{ asset('storage/' . $item['photo']) }}" alt="{{ $item['name'] }}" width="80">
-                    @endif
-
-                    <div class="d-flex justify-content-between mt-3">
-                        <!-- Botões +/- -->
-                        <div data-app="product.quantity" id="quantidade-{{ $id }}">
-                            <input type="button" id="btn-minus-{{ $id }}" value="-" onclick="processarQuantidade({{ $id }}, -1)" />
-                            <input id="campo-quant-{{ $id }}"
-                                   class="text"
-                                   size="1"
-                                   type="text"
-                                   value="{{ $item['quantity'] }}"
-                                   maxlength="5"
-                                   onblur="atualizarQuantidade({{ $id }})" />
-                            <input type="button" id="btn-plus-{{ $id }}" value="+" onclick="processarQuantidade({{ $id }}, 1)" />
+            <!-- Lista de Itens do Carrinho - itens envoltos em #cart-items -->
+            <div id="cart-items">
+                @foreach ($cart as $id => $item)
+                    <div class="shadow p-3 mb-5 bg-body rounded"
+                         id="produto-{{ $id }}"
+                         data-preco="{{ $item['price'] }}"
+                         data-stock="{{ $item['stock'] ?? 0 }}">
+                        
+                        <div class="d-flex justify-content-between">
+                            <b>{{ $item['name'] }}</b>
+                            <!-- Form de excluir item -->
+                            <form method="POST" action="{{ route('cart.destroy', $id) }}">
+                                @csrf
+                                @method('DELETE')
+                                <a href="javascript:void(0);" style="color: gray; text-decoration: none;" onclick="this.closest('form').submit();">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </form>
                         </div>
 
-                        <!-- Subtotal -->
-                        <div class="gap-3">
-                            <span><b>Subtotal:</b></span>
-                            <span>
-                                <b id="total-{{ $id }}">
-                                    €{{ number_format($item['price'] * $item['quantity'], 2) }}
-                                </b>
-                            </span>
+                        <!-- Imagem -->
+                        @if(str_contains($item['photo'], 'images/'))
+                            <img src="{{ asset($item['photo']) }}" alt="{{ $item['name'] }}" width="80">
+                        @else
+                            <img src="{{ asset('storage/' . $item['photo']) }}" alt="{{ $item['name'] }}" width="80">
+                        @endif
+
+                        <div class="d-flex justify-content-between mt-3">
+                            <!-- Botões +/- -->
+                            <div data-app="product.quantity" id="quantidade-{{ $id }}">
+                                <input type="button" id="btn-minus-{{ $id }}" value="-" onclick="processarQuantidade({{ $id }}, -1)" />
+                                <input id="campo-quant-{{ $id }}"
+                                       class="text"
+                                       size="1"
+                                       type="text"
+                                       value="{{ $item['quantity'] }}"
+                                       maxlength="5"
+                                       onblur="atualizarQuantidade({{ $id }})" />
+                                <input type="button" id="btn-plus-{{ $id }}" value="+" onclick="processarQuantidade({{ $id }}, 1)" />
+                            </div>
+
+                            <!-- Subtotal -->
+                            <div class="gap-3">
+                                <span><b>Subtotal:</b></span>
+                                <span>
+                                    <b id="total-{{ $id }}">
+                                        €{{ number_format($item['price'] * $item['quantity'], 2) }}
+                                    </b>
+                                </span>
+                            </div>
                         </div>
                     </div>
-                </div>
-            @endforeach
+                @endforeach
+            </div>
 
             <!-- Botão Limpar e Total -->
             <div class="d-flex justify-content-between mt-3 mb-5">
@@ -121,7 +126,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    // Função para aumentar ou diminuir a quantidade
+    // Função para aumentar ou diminuir a quantidade (para itens dentro do carrinho)
     function processarQuantidade(id, delta) {
         const campoQuant = document.getElementById('campo-quant-' + id);
         let quantidadeAtual = parseInt(campoQuant.value) || 1;
@@ -144,18 +149,16 @@
         atualizarQuantidade(id, quantidadeAtual);
     }
 
-    // Habilita ou desabilita os botões conforme a quantidade atual
+    // Atualiza os botões +/- para o item, operando apenas em #cart-items
     function atualizarBotao(id, quantidadeAtual, maxStock) {
         const btnPlus = document.getElementById('btn-plus-' + id);
         const btnMinus = document.getElementById('btn-minus-' + id);
         
-        // Desabilita o botão de incremento se a quantidade for igual ou superior ao estoque
         if (quantidadeAtual >= maxStock) {
             btnPlus.disabled = true;
         } else {
             btnPlus.disabled = false;
         }
-        // Desabilita o botão de decremento se a quantidade for 1
         if (quantidadeAtual <= 1) {
             btnMinus.disabled = true;
         } else {
@@ -163,20 +166,19 @@
         }
     }
 
-    // Função para atualizar a quantidade ao sair do campo de texto
+    // Atualiza a quantidade do item e o subtotal, operando apenas em #cart-items
     function atualizarQuantidade(id, quantidade) {
         const campoQuant = document.getElementById('campo-quant-' + id);
         const produtoDiv = document.getElementById('produto-' + id);
         const preco = parseFloat(produtoDiv.getAttribute('data-preco'));
         const maxStock = parseInt(produtoDiv.getAttribute('data-stock')) || 0;
         
-        // Se o usuário digitar uma quantidade maior que o estoque, corrige para o máximo
         if (quantidade > maxStock) {
             quantidade = maxStock;
             campoQuant.value = maxStock;
         }
         
-        // Calcula e atualiza o subtotal do item
+        // Atualiza o subtotal
         const subtotal = preco * quantidade;
         const totalElement = document.getElementById('total-' + id);
         totalElement.textContent = '€' + subtotal.toFixed(2);
@@ -186,10 +188,10 @@
         atualizarBotao(id, quantidade, maxStock);
     }
 
-    // Recalcula o total do carrinho
+    // Recalcula o total do carrinho apenas para itens dentro de #cart-items
     function recalcularTotalCarrinho() {
         let totalCarrinho = 0;
-        document.querySelectorAll('[id^="produto-"]').forEach((produto) => {
+        document.querySelectorAll('#cart-items [id^="produto-"]').forEach((produto) => {
             const preco = parseFloat(produto.getAttribute('data-preco'));
             const campoQuant = produto.querySelector('[id^="campo-quant-"]');
             const quantidade = parseInt(campoQuant.value) || 1;
@@ -199,7 +201,7 @@
         carrinhoTotal.textContent = '€ ' + totalCarrinho.toFixed(2);
     }
 
-    // Envia a nova quantidade ao servidor
+    // Envia a nova quantidade para o servidor
     function atualizarQuantidadeServidor(id, quantidade) {
         fetch("{{ route('cart.updateQuantity') }}", {
             method: 'POST',
@@ -225,9 +227,9 @@
         });
     }
 
-    // Ao carregar a página, verifica e atualiza o estado dos botões para cada item
+    // Ao carregar a página, atualiza os botões de cada item do carrinho (dentro de #cart-items)
     document.addEventListener('DOMContentLoaded', function () {
-        document.querySelectorAll('[id^="produto-"]').forEach((produto) => {
+        document.querySelectorAll('#cart-items [id^="produto-"]').forEach((produto) => {
             const id = produto.id.split('-')[1];
             const campoQuant = document.getElementById('campo-quant-' + id);
             const quantidade = parseInt(campoQuant.value) || 1;
@@ -237,7 +239,7 @@
         recalcularTotalCarrinho();
     });
 
-    // Funções auxiliares (para nota ou horário, se necessário)
+    // Funções auxiliares (se necessário)
     function toggleNoteField(button, id) {
         const noteField = document.getElementById('noteField-' + id);
         if (noteField.style.display === 'none') {

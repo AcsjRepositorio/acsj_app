@@ -316,13 +316,9 @@ return [
       
        
      
-        [
-            'text' => 'Alterar senha',
-            'url' => 'auth/forgot-password',
-            'icon' => 'fas fa-fw fa-lock',
-        ],
+      
        
-        ['header' => 'Ações'],
+      
 
         [
             'text' => 'Refeições',

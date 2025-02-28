@@ -3,7 +3,7 @@
 @include('components.modal.contact')
 
 <!-- Cabeçalho para Desktop -->
-<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm d-none d-lg-flex">
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm d-none d-lg-flex fixed-top mb-5">
     <div class="container-fluid">
         <!-- Logo -->
         <a class="navbar-brand" href="/">
@@ -83,7 +83,7 @@
 </nav>
 
 <!-- Cabeçalho para Mobile -->
-<nav class="navbar navbar-light bg-white shadow-sm d-lg-none">
+<nav class="navbar navbar-light bg-white shadow-sm d-lg-none  fixed-top">
     <div class="container-fluid flex-column">
         <!-- Primeira Linha: Logo e Ícones -->
         <div class="d-flex justify-content-between align-items-center w-100">
@@ -143,7 +143,7 @@
                
             </ul>
         </div>
-        <!-- Segunda Linha: Links de Navegação Centralizados -->
+      
         <div class="w-100 mt-2">
             <ul class="navbar-nav justify-content-center flex-row">
                 <li class="nav-item">

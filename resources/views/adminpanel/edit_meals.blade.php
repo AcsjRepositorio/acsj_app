@@ -53,9 +53,7 @@
 
             <div class="mb-4">
                 <label for="name" class="form-label">Nome do prato</label>
-                <input type="text" name="name" id="name"
-                    value="{{ old('name', $meal->name) }}"
-                    class="form-control" required>
+                <input type="text" name="name" id="name" value="{{ old('name', $meal->name) }}" class="form-control" required>
                 <div class="invalid-feedback">
                     Adicione o nome do prato.
                 </div>
@@ -70,8 +68,7 @@
         <div id="step-2" class="form-step d-none">
             <div class="mb-4">
                 <label for="price" class="form-label">Preço</label>
-                <input type="number" name="price" id="price" value="{{ old('price', $meal->price) }}"
-                    class="form-control" step="0.01" required>
+                <input type="number" name="price" id="price" value="{{ old('price', $meal->price) }}" class="form-control" step="0.01" required>
                 <div class="invalid-feedback">
                     Por favor, insira um preço válido.
                 </div>
@@ -89,10 +86,10 @@
                 <label for="category_id" class="form-label">Tipo de Refeição</label>
                 <select name="category_id" id="category_id" class="form-select" required>
                     <option value="" selected disabled>Selecione um tipo de refeição</option>
-                    @foreach ($categories as $categoryName => $categoryId)
-                    <option value="{{ $categoryId }}" {{ old('category_id', $meal->category_id) == $categoryId ? 'selected' : '' }}>
-                        {{ $categoryName }}
-                    </option>
+                    @foreach ($categories as $categoryId => $categoryName)
+                        <option value="{{ $categoryId }}" {{ old('category_id', $meal->category_id) == $categoryId ? 'selected' : '' }}>
+                            {{ $categoryName }}
+                        </option>
                     @endforeach
                 </select>
                 <div class="invalid-feedback">
@@ -100,21 +97,18 @@
                 </div>
             </div>
 
-            <div class="mb-3">
+            <!-- Container do Datepicker: exibido somente se a categoria for "Almoço" (id 2) -->
+            <div class="mb-3" id="sale-date-container">
                 <label for="day_week_start" class="form-label">Data de venda:</label>
                 <div class="input-group">
-                    <input type="text"
-                           class="form-control"
-                           name="day_week_start"
-                           id="day_week_start"
-                           value="{{ old('day_week_start', $meal->day_week_start ? \Carbon\Carbon::parse($meal->day_week_start)->format('Y-m-d') : '') }}">
+                    <input type="text" class="form-control" name="day_week_start" id="day_week_start" value="{{ old('day_week_start', $meal->day_week_start ? \Carbon\Carbon::parse($meal->day_week_start)->format('Y-m-d') : '') }}">
                     <span class="input-group-text">
                         <i class="bi bi-calendar3"></i>
                     </span>
                     <input type="hidden" name="day_of_week" id="day_of_week" value="{{ old('day_of_week', $meal->day_of_week) }}">
-                    <div class="mt-2">
-                        <p id="dayOfWeek" class="text-muted">{{ old('day_of_week', $meal->day_of_week) ? 'Dia da semana: ' . old('day_of_week', $meal->day_of_week) : '' }}</p>
-                    </div>
+                </div>
+                <div class="mt-2">
+                    <p id="dayOfWeek" class="text-muted">{{ old('day_of_week', $meal->day_of_week) ? 'Dia da semana: ' . old('day_of_week', $meal->day_of_week) : '' }}</p>
                 </div>
                 <div class="invalid-feedback">
                     Por favor, selecione uma data de venda!
@@ -149,7 +143,7 @@
 <div class="alert alert-danger mt-3">
     <ul>
         @foreach ($errors->all() as $error)
-        <li>{{ $error }}</li>
+            <li>{{ $error }}</li>
         @endforeach
     </ul>
 </div>
@@ -158,23 +152,18 @@
 @endsection
 
 @section('css')
-
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
-<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-
 <style>
     .steps-container {
         display: flex;
         justify-content: center;
     }
-
     .steps {
         display: flex;
         align-items: center;
     }
-
     .step-circle {
         width: 40px;
         height: 40px;
@@ -186,12 +175,10 @@
         font-weight: bold;
         color: #6c757d;
     }
-
     .active .step-circle {
         background-color: #198754;
         color: #fff;
     }
-
     .form-step {
         padding: 10px 20px;
     }
@@ -201,16 +188,12 @@
 @section('js')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 <script>
-
+    // Controle dos passos do formulário
     const steps = document.querySelectorAll('.form-step');
     const stepCircles = document.querySelectorAll('.step-circle');
     let currentStep = 0;
 
-    // Atualizar indicador de etapas
     function updateStepIndicator(step) {
         stepCircles.forEach((circle, index) => {
             if (index <= step) {
@@ -221,11 +204,9 @@
         });
     }
 
-    // Função de validação
     function validateStep(step) {
         const inputs = steps[step].querySelectorAll('input, select, textarea');
         let isValid = true;
-
         inputs.forEach(input => {
             if (!input.checkValidity()) {
                 input.classList.add('is-invalid');
@@ -234,11 +215,9 @@
                 input.classList.remove('is-invalid');
             }
         });
-
         return isValid;
     }
 
-    // Avançar para a próxima etapa
     function nextStep() {
         if (validateStep(currentStep)) {
             steps[currentStep].classList.add('d-none');
@@ -248,7 +227,6 @@
         }
     }
 
-    // Voltar para a etapa anterior
     function prevStep() {
         steps[currentStep].classList.add('d-none');
         currentStep--;
@@ -275,17 +253,32 @@
         }
     }
 
-    $(function () {
+    $(function() {
         $("#day_week_start").datepicker({
             dateFormat: "yy-mm-dd",
-            onSelect: function (dateText) {
+            onSelect: function(dateText) {
                 const date = new Date(dateText);
                 const dayOfWeek = date.toLocaleDateString('pt-PT', { weekday: 'long' });
                 $('#dayOfWeek').text(`Dia da semana: ${dayOfWeek}`);
-                $('#day_of_week').val(dayOfWeek); // Atualiza o campo oculto
+                $('#day_of_week').val(dayOfWeek);
             }
         });
     });
-    
+
+    // Função para ocultar o container de data se a categoria for diferente de Almoço (id 2)
+    $(document).ready(function() {
+        function toggleSaleDate() {
+            var selectedCategory = $('#category_id').val();
+            if (selectedCategory == "2") {
+                $('#sale-date-container').show();
+                $('#day_week_start').attr('required', true);
+            } else {
+                $('#sale-date-container').hide();
+                $('#day_week_start').removeAttr('required');
+            }
+        }
+        $('#category_id').on('change', toggleSaleDate);
+        toggleSaleDate();
+    });
 </script>
 @endsection

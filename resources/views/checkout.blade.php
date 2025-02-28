@@ -11,7 +11,8 @@
     $countItems = is_array($cart) ? count($cart) : 0;
 @endphp
 
-<div class="container mt-4">
+<!-- Contêiner do carrinho -->
+<div class="container mt-4" id="cart-container">
     <!-- Exibe erros de validação -->
     @if ($errors->any())
         <div class="alert alert-danger">
@@ -32,9 +33,9 @@
     @endif
 
     @if ($countItems > 0)
-        <!-- ROW PRINCIPAL COM 2 COLUNAS: ESQUERDA (itens) E DIREITA (checkout) -->
+        <!-- ROW PRINCIPAL COM 2 COLUNAS: ITENS E CHECKOUT -->
         <div class="row g-4">
-            <!-- COLUNA ESQUERDA -->
+            <!-- COLUNA ESQUERDA: Itens do carrinho -->
             <div class="col-lg-8">
                 <!-- Grid dos cards dos itens -->
                 <div class="row row-cols-1 row-cols-md-2 g-4 justify-content-center">
@@ -72,7 +73,7 @@
                                     <div class="mt-auto">
                                         <div class="d-flex justify-content-between align-items-center">
                                             <div>
-                                                <!-- Botões de - e + com id para possibilitar desabilitar -->
+                                                <!-- Botões de - e + -->
                                                 <input type="button" id="btn-minus-{{ $id }}" value="-" onclick="processarQuantidade({{ $id }}, -1)" />
                                                 <input id="campo-quant-{{ $id }}"
                                                        class="text-center"
@@ -116,9 +117,9 @@
                 </div>
             </div>
 
-            <!-- COLUNA DIREITA -->
+            <!-- COLUNA DIREITA: Checkout -->
             <div class="col-lg-4">
-                <!-- Seção: Selecione o método de pagamento (com radios) -->
+                <!-- Seção: Método de Pagamento -->
                 <div class="shadow-sm p-3 mb-4 bg-body rounded">
                     <h5 class="mb-3">Selecione o método de pagamento</h5>
                     <div class="d-flex justify-content-around align-items-center">
@@ -176,7 +177,7 @@
                     </p>
                 </div>
 
-                <!-- Form de pagamento e dados do cliente -->
+                <!-- Formulário do Checkout -->
                 <form method="POST" action="{{ route('payment.process') }}" onsubmit="return prepararCamposHidden(event)">
                     @csrf
 
@@ -206,7 +207,7 @@
                         </div>
                     @endif
 
-                    <!-- Campo MBWay (exibido apenas quando selecionado) -->
+                    <!-- Campo MBWay -->
                     <div id="mbway-phone-field" class="shadow-sm p-3 mb-4 bg-body rounded" style="display: none;">
                         <label for="mbway_phone" class="form-label">Telefone MBWay</label>
                         <input type="text"
@@ -217,7 +218,7 @@
                                value="{{ old('mbway_phone') }}">
                     </div>
 
-                    <!-- Resumo do pedido -->
+                    <!-- Resumo do Pedido -->
                     <div class="shadow-sm p-3 mb-4 bg-body rounded">
                         <h5 class="mb-2">Resumo do pedido</h5>
                         @foreach ($cart as $id => $item)
@@ -226,15 +227,14 @@
                                 <span>€ {{ number_format($item['price'] * $item['quantity'], 2) }}</span>
                             </div>
                         @endforeach
-
-                        <!-- Linha da taxa de serviço com ID para manipular via JS -->
+                        <!-- Taxa de serviço -->
                         <div class="d-flex justify-content-between" id="service-fee-row">
                             <span>Taxa de serviço:</span>
                             <span>€ 0,50</span>
                         </div>
                     </div>
 
-                    <!-- Início: Campo para Fatura -->
+                    <!-- Fatura -->
                     <div class="mb-3">
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="check-fatura" name="fatura" onclick="toggleNifField()">
@@ -247,15 +247,14 @@
                         <label for="nif" class="form-label">NIF</label>
                         <input type="text" id="nif" name="nif" class="form-control" placeholder="Digite o contribuinte" maxlength="10">
                     </div>
-                    <!-- Fim: Campo para Fatura -->
 
-                    <!-- Inputs hidden para note, pickup_time e quantity de cada item -->
+                    <!-- Inputs ocultos para cada item -->
                     <div id="hidden-fields-container"></div>
 
-                    <!-- Hidden para armazenar o total final calculado (com ou sem taxa) -->
+                    <!-- Total final -->
                     <input type="hidden" name="final_total" id="final_total" value="0.00">
 
-                    <!-- Total e botão Pagar -->
+                    <!-- Botão de pagamento -->
                     <div class="shadow-sm p-3 rounded" style="background-color:rgba(90, 88, 88, 0.14);">
                         <div class="d-flex justify-content-between mb-3">
                             <strong>TOTAL</strong>
@@ -274,10 +273,9 @@
                     <input type="hidden" name="payment_method" id="payment_method" value="">
                 </form>
             </div>
-            <!-- FIM COLUNA DIREITA -->
         </div>
     @else
-        <!-- Caso o carrinho esteja vazio -->
+        <!-- Carrinho vazio -->
         <div class="shadow-lg p-4 mt-5 bg-body rounded text-center mx-auto" style="max-width: 350px; width: 100%;">
             <img src="/images/icons/emptycart.png" alt="carrinho vazio" class="img-fluid empty-cart-img" style="max-height: 140px; object-fit: contain;">
             <h5 class="mb-3 text-secondary">Por hora, o seu carrinho está vazio!</h5>
@@ -288,8 +286,12 @@
 
 <x-footer />
 
+{{-- Inclui o modal de bebidas --}}
+@include('beverages')
+
 @endsection
 
+<!-- Estilos -->
 <style>
     .payment-icon {
         width: 80px;
@@ -320,14 +322,14 @@
 
 <!-- JS Customizado -->
 <script>
-    //Lógica para inserir nif 
+    // Lógica para exibir/ocultar campo NIF
     function toggleNifField() {
         var checkbox = document.getElementById('check-fatura');
         var nifField = document.getElementById('nif_field');
         nifField.style.display = checkbox.checked ? 'block' : 'none';
     }
 
-    // Variável global para armazenar a taxa de serviço
+    // Taxa de serviço
     let serviceFee = 0;
 
     function processarQuantidade(id, delta) {
@@ -394,7 +396,8 @@
 
     function recalcularTotalCarrinho() {
         let totalCarrinho = 0;
-        document.querySelectorAll('[id^="produto-"]').forEach(produto => {
+        // Seleciona apenas itens dentro do #cart-container
+        document.querySelectorAll('#cart-container [id^="produto-"]').forEach(produto => {
             const preco = parseFloat(produto.getAttribute('data-preco'));
             const campoQuant = produto.querySelector('[id^="campo-quant-"]');
             const quantidade = parseInt(campoQuant.value) || 1;
@@ -435,7 +438,7 @@
         container.innerHTML = '';
         let itensSemHorario = [];
 
-        document.querySelectorAll('[id^="produto-"]').forEach(produto => {
+        document.querySelectorAll('#cart-container [id^="produto-"]').forEach(produto => {
             const itemId = produto.id.replace('produto-', '');
             const nomeItem = produto.getAttribute('data-nome') || ('Item ' + itemId);
 
@@ -474,8 +477,9 @@
         event.target.submit();
     }
 
+    // Inicialização dos controles do carrinho
     document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('[id^="produto-"]').forEach(produto => {
+        document.querySelectorAll('#cart-container [id^="produto-"]').forEach(produto => {
             const id = produto.id.split('-')[1];
             const campoQuant = document.getElementById('campo-quant-' + id);
             const quantidade = parseInt(campoQuant.value) || 1;
@@ -526,7 +530,7 @@
 
         let cartSize = {{ $countItems }};
         if (cartSize > 1) {
-            const allSelects = document.querySelectorAll('select[id^="horarios-"]');
+            const allSelects = document.querySelectorAll('#cart-container select[id^="horarios-"]');
             allSelects.forEach(select => {
                 select.addEventListener('change', () => {
                     if (select.value) {
@@ -542,4 +546,44 @@
             });
         }
     });
+
+    // Exibe o modal de bebidas apenas uma vez (usando localStorage)
+    document.addEventListener('DOMContentLoaded', function() {
+        if (!localStorage.getItem('modalBeveragesShown')) {
+            var beveragesModal = new bootstrap.Modal(document.getElementById('beverages'));
+            beveragesModal.show();
+            localStorage.setItem('modalBeveragesShown', 'true');
+        }
+    });
+
+    // Lógica do modal de bebidas
+
+    // Variável global para armazenar os IDs selecionados
+    let selectedItems = [];
+
+    // Função para alternar a seleção dos cards do modal
+    function toggleSelect(id) {
+        const card = document.getElementById(`beverage-${id}`);
+        const check = document.getElementById(`beverage-check-${id}`);
+        const index = selectedItems.indexOf(id);
+        if (index === -1) {
+            selectedItems.push(id);
+            card.classList.add('border', 'border-2', 'border-success');
+            check.style.display = 'block';
+        } else {
+            selectedItems.splice(index, 1);
+            card.classList.remove('border', 'border-2', 'border-success');
+            check.style.display = 'none';
+        }
+    }
+
+    // Função para submeter os itens selecionados do modal
+    function submitSelected() {
+        if (selectedItems.length === 0) {
+            alert('Nenhum produto selecionado.');
+            return;
+        }
+        document.getElementById('selected-ids').value = JSON.stringify(selectedItems);
+        document.getElementById('selected-form').submit();
+    }
 </script>

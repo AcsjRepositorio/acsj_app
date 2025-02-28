@@ -10,7 +10,7 @@
 
 <x-banner-hero/>
 
-<!-- componente com o banner do prato do dia -->
+
 
 
 
@@ -41,9 +41,12 @@
 <x-meal-tabs :mealsByDay="$mealsByDay" />
 </div>
 
+
+<x-beaveragesbanner/>
+
 <x-cards.meal-carousel :meals="$meals" /> 
     
-    <!-- Componente modal com detalhes do prato -->
+
 
 <x-footer />
 

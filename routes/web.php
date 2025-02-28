@@ -174,6 +174,11 @@ Route::post('/cart/update-quantity', [CartController::class, 'updateQuantity'])
 Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
 
 
+//Rota para selecionar bebidas
+
+ Route::post('cart/bulk-store', [CartController::class, 'bulkStore'])->name('cart.bulk.store');
+
+
 // Lógica para definir o "prato do dia". Se não houver, pode ser null.
 Route::get('/', function () {
     $mealOfTheDay =  null;

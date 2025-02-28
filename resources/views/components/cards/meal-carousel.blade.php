@@ -17,7 +17,7 @@
 
         
             @foreach($meals as $meal)
-            @if($meal->category_id !=2)
+            @if($meal->category_id !=2 && $meal->category_id != 5)
                 <div class="swiper-slide" >
                     <x-cards.meal-week :meal="$meal" />
                 </div>

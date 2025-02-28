@@ -23,15 +23,69 @@ class OrderController extends Controller
         // Aqui usamos eager loading para evitar N+1
         $orders = $user->orders()->with(['meals' => function ($query) {
             // Se necessário, você pode customizar a consulta dos meals
-            $query->withPivot(['id', 'quantity', 'day_of_week', 'pickup_time', 'note', 'disponivel_preparo', 'entregue']);
+            $query->withPivot([
+                'id', 
+                'quantity', 
+                'day_of_week', 
+                'pickup_time', 
+                'note', 
+                'disponivel_preparo', 
+                'entregue'
+            ]);
         }])->orderBy('created_at', 'desc')->get();
 
         // Retorna a view com os dados
         return view('minhas_encomendas', compact('orders'));
     }
 
+    /**
+     * Cria um novo pedido.
+     *
+     * Permite criar pedidos mesmo para clientes não autenticados,
+     * atribuindo null para user_id quando necessário.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function store(Request $request)
+    {
+        // Validação dos dados recebidos
+        $validated = $request->validate([
+            'order_id'       => 'required|string',
+            'amount'         => 'required|numeric',
+            'payment_method' => 'required|string',
+            'customer_name'  => 'required|string',
+            'customer_email' => 'required|email',
+            'nif'            => 'nullable|string',
+            // Outros campos se necessários...
+        ]);
 
+        // Cria o pedido e atribui os dados
+        $order = new Order();
+        $order->order_id = $validated['order_id'];
+        $order->amount = $validated['amount'];
+        $order->payment_method = $validated['payment_method'];
+        $order->status = 'pending';
+        $order->payment_status = 'pending';
+        $order->customer_name = $validated['customer_name'];
+        $order->customer_email = $validated['customer_email'];
+        $order->nif = $validated['nif'] ?? null;
 
+        // Atribui o user_id se o usuário estiver autenticado; caso contrário, null
+        $order->user_id = Auth::check() ? Auth::id() : null;
+
+        $order->save();
+
+        return redirect()->route('minhas.encomendas')
+                         ->with('success', 'Pedido realizado com sucesso!');
+    }
+
+    /**
+     * Exclui um pedido.
+     *
+     * @param  \App\Models\Order  $order
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function destroy(Order $order)
     {
         // Verifica se o usuário autenticado pode excluir este pedido
@@ -44,3 +98,4 @@ class OrderController extends Controller
         return redirect()->route('minhas.encomendas')->with('success', 'Pedido excluído com sucesso!');
     }
 }
+

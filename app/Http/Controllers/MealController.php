@@ -50,31 +50,44 @@ class MealController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        // Definindo as regras básicas de validação
+        $rules = [
             'name'           => 'required|string|max:255',
             'description'    => 'required',
             'photo'          => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'price'          => 'required|numeric',
-            'category_id'    => 'required|integer|in:1,2,3,4',
+            // Permite 1,2,3,4 e 5 (Bebidas)
+            'category_id'    => 'required|integer|in:1,2,3,4,5',
+            // Se for Almoço (id 2), exige a data; para os demais, os campos serão ignorados
             'day_week_start' => 'required_if:category_id,2|nullable|date',
             'day_of_week'    => 'required_if:category_id,2|nullable|string|max:50',
-            'stock'          => 'required|integer|min:0',
-        ], [
+        ];
+
+        $messages = [
             'name.required'              => 'O nome do prato é obrigatório.',
             'price.required'             => 'O preço é obrigatório.',
             'category_id.required'       => 'O tipo de refeição é obrigatório.',
             'day_week_start.required_if' => 'A data de venda é obrigatória para refeições do tipo Almoço.',
             'description.required'       => 'A descrição é obrigatória.',
             'photo.image'                => 'O arquivo enviado deve ser uma imagem.',
-            'stock.required'             => 'Defina a quantidade a ser vendida.',
-        ]);
+        ];
+
+        // Se a categoria não for Bebidas (id 5), o campo stock é obrigatório
+        if ($request->input('category_id') != 5) {
+            $rules['stock'] = 'required|integer|min:0';
+            $messages['stock.required'] = 'Defina a quantidade a ser vendida.';
+        }
+
+        $validated = $request->validate($rules, $messages);
 
         // Tratamento da imagem
         $photoPath = $request->hasFile('photo')
             ? $request->file('photo')->store('photos', 'public')
             : 'images/default-meal.jpg';
 
+        // Preparação dos dados conforme a categoria
         if ($validated['category_id'] == 2) {
+            // Para Almoço (id 2): os campos de data são utilizados
             $mealData = [
                 'name'           => $validated['name'],
                 'description'    => $validated['description'],
@@ -85,7 +98,20 @@ class MealController extends Controller
                 'photo'          => $photoPath,
                 'stock'          => $validated['stock'],
             ];
+        } elseif ($validated['category_id'] == 5) {
+            // Para Bebidas (id 5): não exige data nem estoque; definimos stock como 0
+            $mealData = [
+                'name'           => $validated['name'],
+                'description'    => $validated['description'],
+                'price'          => $validated['price'],
+                'category_id'    => $validated['category_id'],
+                'day_week_start' => null,
+                'day_of_week'    => null,
+                'photo'          => $photoPath,
+                'stock'          => 0,
+            ];
         } else {
+            // Para as demais categorias: os campos de data ficam nulos e o estoque é obrigatório
             $mealData = [
                 'name'           => $validated['name'],
                 'description'    => $validated['description'],
@@ -117,12 +143,8 @@ class MealController extends Controller
     public function edit(string $id)
     {
         $meal = Meal::findOrFail($id);
-        $categories = [
-            'Pequeno almoço' => 1,
-            'Almoço'         => 2,
-            'Jantar'         => 3,
-            'Lanche'         => 4,
-        ];
+        // Busca as categorias dinamicamente do banco de dados.
+        $categories = Category::pluck('meal_category', 'id');
         return view('adminpanel.edit_meals', compact('meal', 'categories'));
     }
 
@@ -131,24 +153,36 @@ class MealController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $validatedData = $request->validate([
+        $rules = [
             'name'           => 'required|string|max:255',
             'description'    => 'required|string',
             'photo'          => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'price'          => 'required|numeric',
-            'category_id'    => 'required|integer|in:1,2,3,4',
+            // Atualiza a regra para aceitar 1,2,3,4 e 5
+            'category_id'    => 'required|integer|in:1,2,3,4,5',
             'day_week_start' => 'required_if:category_id,2|nullable|date',
             'day_of_week'    => 'required_if:category_id,2|nullable|string|max:50',
-            'stock'          => 'required|integer|min:0', // Nova regra para estoque
-        ], [
+        ];
+
+        $messages = [
             'name.required'              => 'O nome do prato é obrigatório.',
             'price.required'             => 'O preço é obrigatório.',
             'category_id.required'       => 'O tipo de refeição é obrigatório.',
             'day_week_start.required_if' => 'A data de venda é obrigatória para refeições do tipo Almoço.',
             'description.required'       => 'A descrição é obrigatória.',
             'photo.image'                => 'O arquivo enviado deve ser uma imagem.',
-            'stock.required'             => 'Defina a quantidade a ser vendida.',
-        ]);
+        ];
+
+        // Se a categoria não for Bebidas (id 5), o campo stock é obrigatório.
+        // Para Bebidas, torna-se opcional.
+        if ($request->input('category_id') != 5) {
+            $rules['stock'] = 'required|integer|min:0';
+            $messages['stock.required'] = 'Defina a quantidade a ser vendida.';
+        } else {
+            $rules['stock'] = 'nullable|integer|min:0';
+        }
+
+        $validatedData = $request->validate($rules, $messages);
 
         $meal = Meal::findOrFail($id);
         $dayWeekStart = $request->input('day_week_start') ?: $meal->day_week_start;
@@ -159,6 +193,11 @@ class MealController extends Controller
         } else {
             $validatedData['day_week_start'] = null;
             $validatedData['day_of_week'] = null;
+        }
+
+        // Para Bebidas, se nenhum valor for informado para stock, definir como 0.
+        if ($validatedData['category_id'] == 5) {
+            $validatedData['stock'] = $validatedData['stock'] ?? 0;
         }
 
         $meal->update($validatedData);

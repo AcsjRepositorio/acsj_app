@@ -69,7 +69,7 @@
                     </div>
                 </div>
                 <!-- Campo para o Estoque -->
-                <div class="mb-4" style="width: 30%;">
+                <div class="mb-4" style="width: 30%;" id="stock-container">
                     <label for="stock" class="form-label">Estoque</label>
                     <input type="number" name="stock" id="stock" value="{{ old('stock', 0) }}" class="form-control" min="0" required>
                     <div class="invalid-feedback">
@@ -93,11 +93,11 @@
                 </div>
             </div>
 
-            <!-- Container do Datepicker -->
+            <!-- Container do Datepicker: exibido somente para Almoço (id 2) -->
             <div class="mb-3" id="sale-date-container">
                 <label for="day_week_start" class="form-label">Data de venda:</label>
                 <div class="input-group">
-                    <input type="text" class="form-control" name="day_week_start" id="day_week_start" required>
+                    <input type="text" class="form-control" name="day_week_start" id="day_week_start">
                     <span class="input-group-text">
                         <i class="bi bi-calendar3"></i>
                     </span>
@@ -120,7 +120,7 @@
         <!-- Step 3 -->
         <div id="step-3" class="form-step d-none">
             <div class="mb-4">
-                <label for="validationTextarea" class="form-label">Descrição</label>
+                <label for="description" class="form-label">Descrição</label>
                 <textarea name="description" id="description" class="form-control" rows="4" required>{{ old('description') }}</textarea>
                 <div class="invalid-feedback">
                     Descreva um pouco do prato a ser oferecido.
@@ -254,11 +254,11 @@
         });
     });
 
-    // Exibir ou ocultar o campo de data conforme a categoria selecionada
+    // Exibir ou ocultar o container de data somente para Almoço (id 2)
     $(document).ready(function() {
         function toggleSaleDate() {
-            var selectedOption = $('#category_id option:selected').text().trim();
-            if (selectedOption === "Almoço") {
+            var selectedCategory = $('#category_id').val();
+            if (selectedCategory == "2") {
                 $('#sale-date-container').show();
                 $('#day_week_start').attr('required', true);
             } else {
