@@ -1,16 +1,5 @@
+@include('beverages')
 
-
-<style>
-  .titulo {
-    /* O tamanho mínimo será 1.5rem, o ideal 2vw e o máximo 3rem */
-    font-size: clamp(1.5rem, 2vw, 3rem);
-  }
-
-  .btn-menu {
-    /* Para o botão, por exemplo, ajuste o tamanho de fonte também */
-    font-size: clamp(1rem, 1.5vw, 2rem);
-  }
-</style>
 
 <div class="container mb-5">
   <div class="row justify-content-center">
@@ -31,17 +20,27 @@
 </div>
 
 
+<!-- Ajustes para modo mobile -->
+
+<style>
+ .titulo {
+  font-size: clamp( 2rem, 2vw, 3rem);
+}
+
+/* Ajuste adicional para telas menores */
+@media (max-width: 600px) {
+  .titulo {
+    font-size:  1rem;
+  }
+}
+</style>
 
 
 
 
-
-
-    <!-- Botão para abrir o modal de bebidas -->
     
 
 
-<!-- Inclua o modal (o arquivo beverages.blade.php) -->
-@include('beverages')
+
 
 
