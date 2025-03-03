@@ -112,8 +112,10 @@
           /* Ajusta o valor de top via media query, se necessário, e mantém a margem */
           top: 63% !important;
       }
+      .img-fluid {
+        opacity: 0.8; /* Valor entre 0 e 1: quanto menor, mais opaca */
   }
-
+  }
   /* Para telas ainda menores */
   @media (max-width: 576px) {
       .main-text {
