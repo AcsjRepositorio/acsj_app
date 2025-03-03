@@ -99,7 +99,7 @@
           left: 45% !important;
           margin-bottom: 16px;
       }
-      .sub-text {
+      .sub-text { 
           top: 40% !important;
           left: 60% !important;
           text-align: center;
@@ -110,7 +110,7 @@
       }
       .button-container {
           /* Ajusta o valor de top via media query, se necessário, e mantém a margem */
-          top: 55% !important;
+          top: 60% !important;
       }
   }
 
