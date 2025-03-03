@@ -46,8 +46,7 @@
                     Alameda Professor Hernâni Monteiro<br>
                     4200-319 , Porto
                     </address>
-                    <p class="text-dark mb-1"><b>Telf.:</b>1511515155</p>
-                    <p class="text-dark mb-3"><b>E-mail:</b></p>
+                    
                 </div>
             </div>
         </div>

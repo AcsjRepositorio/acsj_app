@@ -548,13 +548,30 @@
     });
 
     // Exibe o modal de bebidas apenas uma vez (usando localStorage)
-    document.addEventListener('DOMContentLoaded', function() {
-        if (!localStorage.getItem('modalBeveragesShown')) {
-            var beveragesModal = new bootstrap.Modal(document.getElementById('beverages'));
-            beveragesModal.show();
-            localStorage.setItem('modalBeveragesShown', 'true');
-        }
-    });
+    function setCookie(name, value, minutes) {
+    const d = new Date();
+    d.setTime(d.getTime() + (minutes * 60 * 1000));
+    const expires = "expires=" + d.toUTCString();
+    document.cookie = name + "=" + value + "; " + expires + "; path=/";
+}
+
+function getCookie(name) {
+    const nameEQ = name + "=";
+    const ca = document.cookie.split(';');
+    for(let c of ca) {
+        c = c.trim();
+        if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length);
+    }
+    return null;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    if (!getCookie('modalBeveragesShown')) {
+        var beveragesModal = new bootstrap.Modal(document.getElementById('beverages'));
+        beveragesModal.show();
+        setCookie('modalBeveragesShown', 'true', 1); // O cookie expira em 1 minuto
+    }
+});
 
     // Lógica do modal de bebidas
 
