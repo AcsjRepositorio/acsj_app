@@ -547,7 +547,8 @@
         }
     });
 
-    // Exibe o modal de bebidas apenas uma vez (usando localStorage)
+    // Exibe o modal de bebidas apenas uma vez  (usando localStorage , mas com contador de 
+    // 1 minuto para ser mostrado novamente)
     function setCookie(name, value, minutes) {
     const d = new Date();
     d.setTime(d.getTime() + (minutes * 60 * 1000));
