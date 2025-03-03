@@ -125,7 +125,7 @@
           right: 30%;
       }
       .btn{
-        margin-top: clamp(16px, 2vw, 36px);
+        margin-top: 16px;
       }
   }
 </style>
