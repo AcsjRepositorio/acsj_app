@@ -110,7 +110,7 @@
       }
       .button-container {
           /* Ajusta o valor de top via media query, se necessário, e mantém a margem */
-          top: 70% !important;
+          top: 63% !important;
       }
   }
 
