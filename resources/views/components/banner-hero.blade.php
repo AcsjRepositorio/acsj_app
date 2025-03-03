@@ -98,7 +98,7 @@
           left: 60% !important;
           /* Quebra o texto em duas linhas */
           text-align: center;
-          margin-bottom: 16px;
+          margin-bottom: 8px;
           margin-top: 16px;
       }
       /* Força o span a exibir em bloco, quebrando a linha */
@@ -108,7 +108,7 @@
       .btn {
           top: 55% !important;
           left: 45% !important;
-          margin-top: clamp(16px, 5vw, 36px);
+          margin-top: 8px
       }
   }
 
@@ -125,7 +125,7 @@
           right: 30%;
       }
       .btn{
-        margin-top: clamp(16px, 5vw, 36px);
+        margin-top: clamp(16px, 2vw, 36px);
       }
   }
 </style>
