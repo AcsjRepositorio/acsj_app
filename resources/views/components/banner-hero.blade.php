@@ -108,7 +108,7 @@
       .btn {
           top: 55% !important;
           left: 45% !important;
-          margin-top: 8px
+          margin-top: 16px
       }
   }
 
