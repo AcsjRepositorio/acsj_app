@@ -32,8 +32,8 @@
                   </h3>
               </div>
 
-              <!-- Botão com tamanhos responsivos -->
-              <div class="position-absolute w-100 text-end" 
+              <!-- Botão com tamanhos responsivos e espaçamento adequado -->
+              <div class="position-absolute w-100 text-end button-container" 
                   style="top: 65%; left: 30%; transform: translate(-50%, -50%);">
                   <a href="#scroll-day-meal" class="btn btn-lg btn-responsive" 
                      style="font-size: clamp(0.9rem, 2vw, 1.2rem); padding: clamp(8px, 2vw, 16px) clamp(16px, 3vw, 24px);">
@@ -66,6 +66,12 @@
     display: inline;
   }
 
+  /* Classe para o container do botão com margem */
+  .button-container {
+      /* Define margem superior e inferior para afastar o botão dos outros elementos */
+      margin: clamp(16px, 5vw, 36px) 0;
+  }
+
   /* Para telas médias */
   @media (max-width: 768px) {
       .main-text {
@@ -96,19 +102,15 @@
       .sub-text {
           top: 40% !important;
           left: 60% !important;
-          /* Quebra o texto em duas linhas */
           text-align: center;
-          margin-bottom: 8px;
-          margin-top: 16px;
       }
       /* Força o span a exibir em bloco, quebrando a linha */
       .sub-text .line-break {
           display: block;
       }
-      .btn {
+      .button-container {
+          /* Ajusta o valor de top via media query, se necessário, e mantém a margem */
           top: 55% !important;
-          left: 45% !important;
-          margin-top: 16px
       }
   }
 
@@ -125,7 +127,7 @@
           right: 30%;
       }
       .btn{
-        margin-top: 16px;
+        margin-top: clamp(16px, 5vw, 36px);
       }
   }
 </style>
