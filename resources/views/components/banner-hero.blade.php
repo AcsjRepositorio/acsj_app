@@ -97,7 +97,7 @@
       .main-text {
           top: 30% !important;
           left: 45% !important;
-          margin-bottom: 16px;
+          margin-bottom: 24px;
       }
       .sub-text { 
           top: 40% !important;
