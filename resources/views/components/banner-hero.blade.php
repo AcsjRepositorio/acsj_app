@@ -97,7 +97,7 @@
       .main-text {
           top: 30% !important;
           left: 45% !important;
-          margin-bottom: 24px;
+          margin-bottom: 36px;
       }
       .sub-text { 
           top: 40% !important;
@@ -127,7 +127,7 @@
           font-size: 1.1rem;
           width: 70%;
           right: 30%;
-          margin-top: 16px;
+          
       }
       .btn{
         margin-top: clamp(16px, 5vw, 36px);
