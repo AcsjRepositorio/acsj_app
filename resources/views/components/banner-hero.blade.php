@@ -1,5 +1,5 @@
 <!-- Título principal acima da imagem -->
-<div class="container text-center  text-brand-color">
+<div class="container text-center text-brand-color">
   <h1>Bar da Associação</h1>
   <h1>das Crianças do São João</h1>
 </div>
@@ -7,35 +7,28 @@
 <div class="container mb-5">
   <div class="row justify-content-center">
     <div class="col-12 col-md-11 position-relative">
-      <img 
-        src="{{ asset('images/hero-image.png') }}" 
-        alt="Imagem de refeições" 
-        class="img-fluid w-100"
-      >
+      <picture>
+        <source media="(max-width: 600px)" srcset="{{ asset('images/hero-imagemobile.svg') }}">
+        <img 
+          src="{{ asset('images/hero-image.png') }}" 
+          alt="Imagem de refeições" 
+          class="img-fluid w-100"
+        >
+      </picture>
 
       <!-- Texto e botão dentro de uma div -->
       <div>
         <div class="text-white">
-          <!-- Título principal sobre a imagem com responsividade -->
-         
-
           <!-- Sub-texto com quebra de linha opcional -->
           <div class="position-absolute sub-text">
             <h3>Planeie sua semana sem filas</h3>
-            
             <h4 class="line-break">e aproveite suas refeições sem espera!</h4>
 
-            <a 
-            href="#scroll-day-meal" 
-            class="btn  btn-responsive"
-          >
-            Iniciar pedido
-          </a>
+            <a href="#scroll-day-meal" class="btn btn-responsive">
+              Iniciar pedido
+            </a>
           </div>
         </div>
-
-        
-        
       </div>
     </div>
   </div>
@@ -61,8 +54,6 @@
     width: 100%;
     text-align: end;
     margin-bottom: 3rem;
-
-    /* Fundo semi-transparente */
     background-color: rgba(0, 0, 0, 0.6);
     padding: 0.5rem 1rem;
     border-radius: 8px;
@@ -77,11 +68,8 @@
     max-width: 35ch;
     word-wrap: break-word;
     text-align: center;
-   
-
-    /* Fundo semi-transparente */
-    background-color: rgba(0, 0, 0, 0.22);
-    padding: 8px;
+    background-color: rgba(0, 0, 0, 0.55);
+    padding: 16px;
     border-radius: 8px;
   }
 
@@ -100,7 +88,6 @@
     color: #fff !important;
     font-weight: bold;
     font-size: clamp(0.9rem, 2vw, 1rem);
-   
   }
 
   .btn:hover {
@@ -140,9 +127,8 @@
     }
     .sub-text { 
       top: 42% !important;
-      left: 60% !important;
+      left: 50% !important;
     }
-    /* Força o span a quebrar linha */
     .sub-text .line-break {
       display: block;
     }
@@ -150,7 +136,7 @@
       top: 63% !important;
     }
     .img-fluid {
-      opacity: 0.8; /* Mais escuro para contrastar melhor o texto */
+      opacity: 0.8; /* Mais escuro para melhor contraste com o texto */
     }
   }
 
@@ -164,7 +150,7 @@
     .sub-text {
       font-size: 1.1rem;
       width: 70%;
-      right: 30%;
+      right: 40%;
     }
     .btn {
       margin-top: clamp(16px, 5vw, 16px);

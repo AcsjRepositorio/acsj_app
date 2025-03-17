@@ -11,14 +11,24 @@
     @include('profile.partials.favicons')
 
     <style>
-        /* Ajuste o valor conforme a altura do seu navbar fixo */
+        /* Ajuste para navbar fixa */
         body {
             padding-top: 150px;
+            margin: 0;
+            width: 100vw;
+            overflow-x: hidden;
+        }
+
+        /* Centraliza e mantém responsivo */
+        .container {
+            max-width: 90%;
         }
     </style>
 </head>
 <body>
-    @yield('content')
+    <div class="container">
+        @yield('content')
+    </div>
 
     @include('cookie-consent')
    
@@ -46,3 +56,4 @@
     </script>
 </body>
 </html>
+
