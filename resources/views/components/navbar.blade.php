@@ -3,7 +3,7 @@
 @include('components.modal.contact')
 
 <!-- Cabeçalho para Desktop -->
-<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm d-none d-lg-flex fixed-top mb-5">
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm d-none d-lg-flex fixed-top mb-3">
     <div class="container-fluid">
         <!-- Logo -->
         <a class="navbar-brand" href="/">

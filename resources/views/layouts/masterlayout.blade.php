@@ -13,7 +13,7 @@
     <style>
         /* Ajuste o valor conforme a altura do seu navbar fixo */
         body {
-            padding-top: 200px;
+            padding-top: 150px;
         }
     </style>
 </head>

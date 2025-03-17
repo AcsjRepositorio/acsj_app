@@ -1,64 +1,110 @@
 <!-- Título principal acima da imagem -->
-<div style="color: #FF452B;" class="container text-center my-4">
-    <h1>Bar da Associação </h1>
-    <h1>das Crianças do São João</h1>
+<div class="container text-center  text-brand-color">
+  <h1>Bar da Associação</h1>
+  <h1>das Crianças do São João</h1>
 </div>
 
 <div class="container mb-5">
   <div class="row justify-content-center">
-      <div class="col-12 col-md-11 position-relative">
-          <img 
-              src="{{ asset('images/hero-image.png') }}" 
-              alt="Imagem de refeições" 
-              class="img-fluid w-100"
+    <div class="col-12 col-md-11 position-relative">
+      <img 
+        src="{{ asset('images/hero-image.png') }}" 
+        alt="Imagem de refeições" 
+        class="img-fluid w-100"
+      >
+
+      <!-- Texto e botão dentro de uma div -->
+      <div>
+        <div class="text-white">
+          <!-- Título principal sobre a imagem com responsividade -->
+         
+
+          <!-- Sub-texto com quebra de linha opcional -->
+          <div class="position-absolute sub-text">
+            <h3>Planeie sua semana sem filas</h3>
+            
+            <h4 class="line-break">e aproveite suas refeições sem espera!</h4>
+
+            <a 
+            href="#scroll-day-meal" 
+            class="btn  btn-responsive"
           >
-
-          <!-- Texto e botão dentro de uma div -->
-          <div>
-              <div style="color: #fff;">
-                  <!-- Título principal sobre a imagem com responsividade via clamp() -->
-                  <h1 class="position-absolute w-100 text-end main-text mb-3" 
-                      style="top: 36%; left: 35%; transform: translate(-50%, -50%);
-                             font-size: clamp(1.4rem, 2.5vw, 2.5rem);">
-                      Planeie sua semana sem filas
-                  </h1>
-
-                  <!-- Sub-text modificado para quebrar em duas linhas no modo responsivo -->
-                  <h3 class="position-absolute text-center sub-text" 
-                      style="top: 47%; left: 62%; transform: translate(-50%, -50%);
-                             font-size: clamp(1.1rem, 2vw, 1.8rem); max-width: 35ch; word-wrap: break-word;">
-                      Faça seu pedido online 
-                      <span class="line-break">e aproveite suas refeições sem espera!</span>
-                  </h3>
-              </div>
-
-              <!-- Botão com tamanhos responsivos e espaçamento adequado -->
-              <div class="position-absolute w-100 text-end button-container" 
-                  style="top: 65%; left: 30%; transform: translate(-50%, -50%);">
-                  <a href="#scroll-day-meal" class="btn btn-lg btn-responsive" 
-                     style="font-size: clamp(0.9rem, 2vw, 1.2rem); padding: clamp(8px, 2vw, 16px) clamp(16px, 3vw, 24px);">
-                      Iniciar pedido
-                  </a>
-              </div>
+            Iniciar pedido
+          </a>
           </div>
+        </div>
+
+        
+        
       </div>
+    </div>
   </div>
 </div>
 
 <style>
+  /* Cor de destaque para o texto principal */
+  .text-brand-color {
+    color: #FF452B;
+  }
+
+  /* Cor branca para textos sobre a imagem */
+  .text-white {
+    color: #fff;
+  }
+
+  /* Título principal sobre a imagem */
+  .main-text {
+    top: 36%;
+    left: 35%;
+    transform: translate(-50%, -50%);
+    font-size: clamp(1.4rem, 2.5vw, 2.5rem);
+    width: 100%;
+    text-align: end;
+    margin-bottom: 3rem;
+
+    /* Fundo semi-transparente */
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+  }
+
+  /* Subtítulo (h3) sobre a imagem */
+  .sub-text {
+    top: 50%;
+    left: 62%;
+    transform: translate(-50%, -50%);
+    font-size: clamp(1.0rem, 2vw, 1.5rem);
+    max-width: 35ch;
+    word-wrap: break-word;
+    text-align: center;
+   
+
+    /* Fundo semi-transparente */
+    background-color: rgba(0, 0, 0, 0.22);
+    padding: 8px;
+    border-radius: 8px;
+  }
+
+  /* Container do botão */
+  .button-container {
+    top: 65%;
+    left: 30%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    text-align: end;
+  }
+
+  /* Botão padrão */
   .btn {
     background-color: #FF452B;
     color: #fff !important;
     font-weight: bold;
+    font-size: clamp(0.9rem, 2vw, 1rem);
+   
   }
-  .btn:hover{
+
+  .btn:hover {
     background-color: #F25F29;
-  }
-  
-  /* Estilização responsiva padrão */
-  .btn {
-    font-size: 0.9rem;
-    padding: 8px 16px;
   }
 
   /* Define que, por padrão, o span não quebra a linha */
@@ -66,71 +112,62 @@
     display: inline;
   }
 
-  /* Classe para o container do botão com margem */
-  .button-container {
-      /* Define margem superior e inferior para afastar o botão dos outros elementos */
-      margin: clamp(16px, 5vw, 36px) 0;
-  }
-
-  /* Para telas médias */
+  /* Responsividade para telas médias (até 768px) */
   @media (max-width: 768px) {
-      .main-text {
-          font-size: 1.7rem;
-          width: 70%;
-          left: 50%;
-      }
-      .sub-text {
-          font-size: 1.3rem;
-          width: 60%;
-          left: 50%;
-          /* Margens proporcionais */
-          margin-top: clamp(10px, 5vw, 20px);
-          margin-bottom: clamp(10px, 5vw, 20px);
-      }
-      .btn{
-        margin-top: clamp(20px, 5vw, 36px);
-      }
+    .main-text {
+      font-size: 1.7rem;
+      width: 70%;
+      left: 50%;
+    }
+    .sub-text {
+      font-size: 1.3rem;
+      width: 60%;
+      left: 50%;
+      margin-top: clamp(10px, 5vw, 20px);
+      margin-bottom: clamp(10px, 5vw, 20px);
+    }
+    .btn {
+      margin-top: clamp(20px, 5vw, 36px);
+    }
   }
 
-  /* Para telas pequenas */
+  /* Responsividade para telas pequenas (até 600px) */
   @media (max-width: 600px) {
-      .main-text {
-          top: 30% !important;
-          left: 45% !important;
-          margin-bottom: 36px;
-      }
-      .sub-text { 
-          top: 40% !important;
-          left: 60% !important;
-          text-align: center;
-      }
-      /* Força o span a exibir em bloco, quebrando a linha */
-      .sub-text .line-break {
-          display: block;
-      }
-      .button-container {
-          /* Ajusta o valor de top via media query, se necessário, e mantém a margem */
-          top: 63% !important;
-      }
-      .img-fluid {
-        opacity: 0.8; /* Valor entre 0 e 1: quanto menor, mais opaca */
+    .main-text {
+      top: 30% !important;
+      left: 42% !important;
+      margin-bottom: 36px;
+    }
+    .sub-text { 
+      top: 42% !important;
+      left: 60% !important;
+    }
+    /* Força o span a quebrar linha */
+    .sub-text .line-break {
+      display: block;
+    }
+    .button-container {
+      top: 63% !important;
+    }
+    .img-fluid {
+      opacity: 0.8; /* Mais escuro para contrastar melhor o texto */
+    }
   }
-  }
-  /* Para telas ainda menores */
+
+  /* Responsividade para telas muito pequenas (até 576px) */
   @media (max-width: 576px) {
-      .main-text {
-          font-size: 1.4rem;
-          width: 80%;
-          left: 50%;
-      }
-      .sub-text {
-          font-size: 1.1rem;
-          width: 70%;
-          right: 30%;
-          
-      }
-      .btn{
-        margin-top: clamp(16px, 5vw, 36px);
-      }
+    .main-text {
+      font-size: 1.4rem;
+      width: 80%;
+      left: 50%;
+    }
+    .sub-text {
+      font-size: 1.1rem;
+      width: 70%;
+      right: 30%;
+    }
+    .btn {
+      margin-top: clamp(16px, 5vw, 16px);
+    }
   }
 </style>

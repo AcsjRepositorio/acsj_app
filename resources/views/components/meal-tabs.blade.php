@@ -4,8 +4,8 @@
     $daysOfWeek = ['segunda'=>'Segunda','terça'=>'Terça','quarta'=>'Quarta','quinta'=>'Quinta','sexta'=>'Sexta'];
 @endphp
 
-<div class="meal-tabs-background shadow p-3 mb-5 bg-body rounded">
-    <div class="text-center mt-3 mb-5">
+<div class= " w-75 d-flex flex-column justify-content-center meal-tabs-background  p-3 mb-5 ">
+    <div class="text-center mt-3 mb-5 ">
         <h1 style="color:rgba(11, 11, 11, 0.6)">Menu da semana</h1>
     </div>
     <div class="meal-tabs-container">
