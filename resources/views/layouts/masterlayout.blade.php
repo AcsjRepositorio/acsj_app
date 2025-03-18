@@ -21,7 +21,7 @@
 
         /* Centraliza e mantém responsivo */
         .container {
-            max-width: 90%;
+            max-width: 80%;
         }
     </style>
 </head>
